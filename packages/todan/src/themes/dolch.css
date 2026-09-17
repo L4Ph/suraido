@@ -1,0 +1,10 @@
+/* GMK Dolch — 黒と灰と白だけ。暗い部屋・強い光、どちらでも潰れない。 */
+:root {
+  --todan-bg: #17181a;
+  --todan-fg: #eceef0;
+  --todan-accent: #ffffff;
+  --todan-accent-2: #9aa0a6;
+  --todan-muted: #949aa1;
+  --todan-rule: #ffffff2e;
+  --todan-letterbox: #0b0c0d;
+}

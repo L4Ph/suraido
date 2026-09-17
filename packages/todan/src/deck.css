@@ -1,0 +1,202 @@
+/*
+ * todan のスタイルは全部このレイヤーの中にある。
+ * レイヤー付きのスタイルはレイヤー無しのスタイルに必ず負けるので、
+ * 利用側は素のセレクタを書くだけで何でも上書きできる。!important も特異度の細工も要らない。
+ */
+@layer todan.base, todan.theme, todan.type, todan.layout, todan.deck;
+
+@layer todan.theme {
+  :root {
+    /* ---- 上書きしてほしいもの（テーマの公開 API） ---- */
+    --todan-fg: #16181d;
+    --todan-bg: #fbfaf8;
+    --todan-accent: #2f6df6;
+    --todan-muted: #6b7280;
+    --todan-font: system-ui, "Hiragino Sans", "Noto Sans JP", sans-serif;
+
+    --todan-accent-2: var(--todan-accent);
+    --todan-rule: color-mix(in oklab, var(--todan-fg) 18%, transparent);
+    --todan-font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+    --todan-pad: 96px 120px;
+    --todan-gap: 72px;
+    --todan-letterbox: #111;
+
+    /* 1920x1080 のキャンバス上の実寸 */
+    --todan-h1: 92px;
+    --todan-h2: 60px;
+    --todan-h3: 34px;
+    --todan-text: 32px;
+
+    --todan-step-fade: 200ms;
+    --todan-slide-fade: 180ms;
+  }
+}
+
+@layer todan.base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: var(--todan-letterbox);
+    font-family: var(--todan-font);
+  }
+}
+
+@layer todan.type {
+  /*
+   * スライドの中の素の要素に最低限の体裁を与える。テーマはここをトークン経由で着せ替える。
+   * 全部トークンで書いてあるので、値を1つ差し替えれば全体が動く。
+   */
+  .stage :is(h1, h2, h3) {
+    margin: 0 0 0.4em;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+  .stage h1 { font-size: var(--todan-h1); letter-spacing: -0.03em; }
+  .stage h2 { font-size: var(--todan-h2); }
+  .stage h3 { font-size: var(--todan-h3); }
+
+  .stage p,
+  .stage li {
+    font-size: var(--todan-text);
+    line-height: 1.7;
+  }
+  .stage p { margin: 0 0 0.6em; }
+
+  .stage ul,
+  .stage ol { padding-left: 1.2em; }
+  .stage li { margin-bottom: 0.4em; }
+  .stage li::marker { color: var(--todan-accent); }
+
+  .stage strong { color: var(--todan-accent); }
+
+  .stage code {
+    font-family: var(--todan-font-mono);
+    font-size: 0.88em;
+    background: color-mix(in oklab, var(--todan-fg) 8%, transparent);
+    padding: 0.1em 0.35em;
+    border-radius: 6px;
+  }
+
+  .stage blockquote {
+    margin: 0;
+    font-size: calc(var(--todan-text) * 1.7);
+    line-height: 1.5;
+    letter-spacing: -0.02em;
+    border-left: 8px solid var(--todan-accent);
+    padding-left: 48px;
+  }
+  .stage blockquote cite {
+    display: block;
+    margin-top: 0.6em;
+    font-size: calc(var(--todan-text) * 0.85);
+    font-style: normal;
+    color: var(--todan-muted);
+  }
+
+  .stage hr {
+    border: 0;
+    border-top: 2px solid var(--todan-rule);
+    margin: 1.2em 0;
+  }
+}
+
+@layer todan.layout {
+  .todan-pad {
+    height: 100%;
+    padding: var(--todan-pad);
+  }
+
+  .todan-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  /* 子の数だけ列ができる。ratio を渡した時だけ grid-template-columns に切り替わる。 */
+  .todan-cols {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: var(--todan-gap);
+    align-items: start;
+  }
+
+  .todan-full {
+    position: relative;
+    height: 100%;
+  }
+  .todan-full > :is(img, video) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+@layer todan.deck {
+  .deck {
+    position: fixed;
+    inset: 0;
+  }
+
+  /*
+   * ---- 仕組みであってスタイルではない ----
+   * スライドは固定ピクセルで書き、--todan-scale で画面に合わせる。
+   * position / transform / transform-origin を上書きすると拡大縮小が壊れる。
+   */
+  .stage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(var(--todan-scale, 1));
+    transform-origin: center;
+    overflow: hidden;
+    background: var(--todan-bg);
+    color: var(--todan-fg);
+  }
+
+  /* 段階表示。data-shown は Deck が付け外しする。 */
+  .step {
+    transition: opacity var(--todan-step-fade);
+  }
+  .step:not([data-shown]) {
+    opacity: 0;
+  }
+
+  .pager {
+    position: absolute;
+    right: 16px;
+    bottom: 12px;
+    color: var(--todan-muted);
+    font: 14px/1 var(--todan-font);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /*
+   * スライドの差し替えはクロスフェード。
+   * group も指定しないと、そこだけ UA 既定の 250ms が残って遷移の完了が遅れる。
+   */
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: var(--todan-slide-fade);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
+    }
+    .step {
+      transition: none;
+    }
+  }
+}

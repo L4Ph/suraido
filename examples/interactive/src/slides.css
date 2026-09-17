@@ -1,0 +1,54 @@
+:root {
+  --todan-accent: #2f6df6;
+}
+
+h2 { font-size: 60px; margin: 0 0 40px; letter-spacing: -0.02em; }
+.hint { font-size: 26px; line-height: 1.7; color: var(--todan-muted); margin-top: 40px; }
+code { font-size: 0.9em; background: #0001; padding: 2px 8px; border-radius: 6px; }
+
+/* ---- 投票 ---- */
+.poll { display: flex; flex-direction: column; gap: 20px; }
+.poll button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font: inherit;
+  font-size: 34px;
+  padding: 24px 32px;
+  border: 2px solid var(--todan-fg);
+  border-radius: 14px;
+  background: none;
+  cursor: pointer;
+  overflow: hidden;
+  text-align: left;
+}
+.poll .bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: color-mix(in oklab, var(--todan-accent) 22%, transparent);
+  transition: width 220ms;
+}
+.poll .label { position: relative; flex: 1; }
+.poll .n {
+  position: relative;
+  font-variant-numeric: tabular-nums;
+  color: var(--todan-accent);
+  font-weight: 700;
+}
+
+/* ---- canvas ---- */
+canvas { width: 100%; height: 420px; display: block; }
+
+/* ---- 入力 ---- */
+.field {
+  font: inherit;
+  font-size: 34px;
+  padding: 20px 28px;
+  width: 720px;
+  border: 2px solid var(--todan-fg);
+  border-radius: 14px;
+  background: none;
+}
+.answers { font-size: 30px; line-height: 1.8; padding-left: 1.2em; }
+.answers li::marker { color: var(--todan-accent); }

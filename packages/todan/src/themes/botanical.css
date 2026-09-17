@@ -1,0 +1,9 @@
+/* GMK Botanical — 生成りに深緑。落ち着いた、文字の多い話向け。 */
+:root {
+  --todan-bg: #f3f1e6;
+  --todan-fg: #26332a;
+  --todan-accent: #2f6b45;
+  --todan-accent-2: #7d6a4f;
+  --todan-muted: #657062;
+  --todan-letterbox: #1b241d;
+}

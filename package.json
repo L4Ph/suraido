@@ -1,0 +1,19 @@
+{
+  "name": "todan-monorepo",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/todan",
+    "packages/create-todan",
+    "packages/create-todan/template",
+    "examples/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w example-basic",
+    "build": "npm run build -w todan",
+    "test": "npm test -w todan"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}

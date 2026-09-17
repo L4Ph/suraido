@@ -1,0 +1,17 @@
+h1 { font-size: 88px; margin: 0 0 24px; letter-spacing: -0.02em; }
+h2 { font-size: 64px; margin: 0 0 48px; letter-spacing: -0.02em; }
+.lead { font-size: 36px; color: var(--muted); margin: 0 0 40px; }
+code { font-size: 0.9em; background: #0001; padding: 2px 8px; border-radius: 6px; }
+
+.bullets { font-size: 40px; line-height: 1.8; padding-left: 1.2em; }
+.bullets li::marker { color: var(--accent); }
+
+.big {
+  font: inherit;
+  font-size: 36px;
+  padding: 16px 32px;
+  border: 2px solid var(--fg);
+  border-radius: 12px;
+  background: none;
+  cursor: pointer;
+}
