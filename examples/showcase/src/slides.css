@@ -1,0 +1,110 @@
+/*
+ * Arrangement comes from <Pad> <Center> <Cols> <Full>; type and colour come from the tokens.
+ * Only what is particular to this deck lives here.
+ */
+
+.eyebrow {
+  font-size: 24px;
+  letter-spacing: 0.2em;
+  color: var(--suraido-accent);
+}
+.lead {
+  font-size: 34px;
+  color: var(--suraido-muted);
+}
+.hint {
+  font-size: 24px;
+  color: var(--suraido-muted);
+  margin-top: auto;
+  padding-top: 32px;
+}
+.wide li {
+  font-size: 34px;
+}
+
+a {
+  color: var(--suraido-accent);
+}
+
+/* ---- source blocks ---- */
+.code {
+  margin: 0;
+  padding: 32px 36px;
+  border-radius: 16px;
+  background: color-mix(in oklab, var(--suraido-fg) 7%, transparent);
+  border: 2px solid var(--suraido-rule);
+  overflow: hidden;
+}
+.code code {
+  background: none;
+  padding: 0;
+  font-size: 23px;
+  line-height: 1.65;
+  white-space: pre;
+  color: var(--suraido-fg);
+}
+
+/* ---- a single big number ---- */
+.figure b {
+  display: block;
+  font-size: 128px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.figure .accent {
+  color: var(--suraido-accent);
+}
+.figure .mono {
+  font-family: var(--suraido-font-mono);
+  font-size: 92px;
+  color: var(--suraido-accent);
+}
+.figure span {
+  font-size: 26px;
+  color: var(--suraido-muted);
+}
+
+/* ---- cards in a Cols row ---- */
+.card {
+  padding: 36px;
+  border: 2px solid var(--suraido-rule);
+  border-radius: 18px;
+}
+.card b {
+  display: block;
+  font-family: var(--suraido-font-mono);
+  font-size: 30px;
+  color: var(--suraido-accent);
+  margin-bottom: 12px;
+}
+.card span {
+  font-size: 24px;
+  color: var(--suraido-muted);
+}
+
+.big {
+  font: inherit;
+  font-size: 34px;
+  padding: 18px 40px;
+  border: 2px solid var(--suraido-fg);
+  border-radius: 14px;
+  background: none;
+  cursor: pointer;
+}
+
+/* ---- full-bleed caption ---- */
+.caption {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 72px 112px;
+  background: linear-gradient(transparent, #000d);
+  color: #fff;
+}
+.caption h2,
+.caption p {
+  margin: 0;
+}
+.caption h2 {
+  margin-bottom: 12px;
+}

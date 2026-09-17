@@ -1,5 +1,7 @@
 # suraido.js
 
+[![npm](https://img.shields.io/npm/v/suraido.js)](https://www.npmjs.com/package/suraido.js) [![tour](https://img.shields.io/badge/tour-live-blue)](https://l4ph.github.io/suraido/)
+
 **スライド (suraido)** — the Japanese for _slide_, spelled the way it is said.
 
 A framework for writing slides in JSX. No React, no virtual DOM: JSX goes through suraido.js's own
