@@ -1,4 +1,5 @@
 import { atom, Center, Cols, deck, Full, Pad, Slide, Step } from "suraido.js";
+import { presenter } from "suraido.js/presenter";
 import "suraido.js/deck.css";
 import "suraido.js/themes/noel.css";
 import { Code } from "./code.tsx";
@@ -9,6 +10,8 @@ import { applyTheme, THEMES } from "./themes.ts";
 
 class Cover extends Slide {
   static path = "intro";
+  static notes =
+    "Thank the organisers. Say the whole deck is running, not pictured — then press p.";
   render() {
     return (
       <Center>
@@ -28,6 +31,7 @@ class Cover extends Slide {
 
 class Shape extends Slide {
   static path = "shape";
+  static notes = "Four presses here. Land on: state on the class, class not className, plain HTML.";
   static steps = 4;
   render() {
     return (
@@ -72,6 +76,7 @@ deck([Intro]);`}</Code>
 
 class Steps extends Slide {
   static path = "steps";
+  static notes = "The point: nothing moves as these appear. They were always in the DOM.";
   static steps = 5;
   render() {
     return (
@@ -202,6 +207,7 @@ const votes = atom(0);
 
 class AtomWrite extends Slide {
   static path = "atom";
+  static notes = "Get the room to shout numbers. Press it that many times, then move on.";
   mounted() {
     this.watch(votes);
   }
@@ -241,6 +247,7 @@ class Poll extends Slide {
 
 class AtomRead extends Slide {
   static path = "kept";
+  static notes = "The number survived. The slide that collected it was unmounted two presses ago.";
   mounted() {
     this.watch(votes);
   }
@@ -271,6 +278,7 @@ class AtomRead extends Slide {
 
 class Themes extends Slide<{}, { at: number }> {
   static path = "themes";
+  static notes = "Cycle two or three. Mention the contrast tests — a projector eats pale palettes.";
   state = { at: 0 };
 
   cycle = () => {
@@ -515,6 +523,8 @@ class Outro extends Slide {
     );
   }
 }
+
+presenter();
 
 deck([
   Cover,

@@ -7,12 +7,32 @@ export abstract class Slide<P = {}, S = {}> extends Component<P, S> {
   static steps = 1;
   /** The name that shows in the URL. Omit it and the index is used. */
   static path?: string;
+  /** What you want to be reminded of while this slide is up. Shown in the presenter view. */
+  static notes?: string;
 }
 
 export type SlideComponent = (new (props: {}) => Slide<any, any>) & {
   steps?: number;
   path?: string;
+  notes?: string;
 };
+
+/** What a deck reports when it moves. */
+export type Move = {
+  index: number;
+  step: number;
+  steps: number;
+  total: number;
+  path: string;
+  notes?: string;
+  next?: { path: string; notes?: string };
+};
+
+/**
+ * Dispatched on document every time the deck settles somewhere new — a step or a slide.
+ * The presenter view listens for it; so could anything else.
+ */
+export const MOVE = "suraido:move";
 
 /** How much of the left edge sends you back rather than forward. */
 const BACK_ZONE = 0.25;
@@ -137,6 +157,8 @@ export class Deck extends Component<DeckProps, { i: number }> {
     const hash = formatHash(next, this.paths);
     if (location.hash !== hash) history.replaceState(null, "", hash);
 
+    this.announce(next);
+
     // A step on its own is just an attribute.
     if (!slideChanged) return syncSteps(next[1]);
 
@@ -208,6 +230,22 @@ export class Deck extends Component<DeckProps, { i: number }> {
     // Normalise the URL and match the attributes to it, rounding an out-of-range step.
     this.go(this.pos);
     this.check();
+  }
+
+  announce([i, step]: Pos) {
+    const { slides } = this.props;
+    const at = slides[i];
+    const after = slides[i + 1];
+    const detail: Move = {
+      index: i,
+      step,
+      steps: this.steps(i),
+      total: slides.length,
+      path: formatHash([i, step], this.paths),
+      notes: at?.notes,
+      next: after && { path: formatHash([i + 1, 0], this.paths), notes: after.notes },
+    };
+    document.dispatchEvent(new CustomEvent(MOVE, { detail }));
   }
 
   /** Measured a frame later, once layout has settled. */

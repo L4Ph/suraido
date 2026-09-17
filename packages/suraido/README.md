@@ -227,6 +227,31 @@ Three ways to keep styles close, and they are not equivalent:
 `style={{ }}` is for injecting one value, such as the `width: ${pct}%` above. For anything
 else, `<style>` covers it without a separate file.
 
+## Presenter view
+
+A second window with your notes, what is coming and a clock, while the deck stays on the
+projector. Opt in — not everyone presents from a machine with two screens, and it is not in
+your bundle unless you import it.
+
+```tsx
+import { deck, Slide } from "suraido.js";
+import { presenter } from "suraido.js/presenter";
+
+class Intro extends Slide {
+  static notes = "Thank the organisers. Mention the wifi password.";
+}
+
+presenter(); // press p to open it
+deck([Intro]);
+```
+
+Arrow keys work in either window and both stay together; `r` restarts the clock. The two talk
+over a `BroadcastChannel`, which reaches **same-origin windows in the same browser** — a
+laptop and a projector, not the audience's phones.
+
+Anything else can follow along the same way: the deck dispatches `suraido:move` on `document`
+whenever it settles, carrying the position, the notes and what is next.
+
 ## Slide transitions
 
 Crossing to another slide slides: forward pushes the old one out to the left and brings the

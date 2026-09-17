@@ -68,6 +68,16 @@ that overflows the canvas and is clipped, a `<Step>` that wrapped an `li` in a `
 that is not a class. **Read the console before assuming a deck is fine** — every one of these
 looks correct on screen.
 
+## Presenter view
+
+`static notes` on a slide is what you want to be reminded of while it is up. It shows in the
+presenter window, which is opt-in:
+
+```tsx
+import { presenter } from "suraido.js/presenter";
+presenter(); // press p during the talk
+```
+
 ## State
 
 `setState` **rebuilds that slide's DOM** — suraido.js does not diff. So:
