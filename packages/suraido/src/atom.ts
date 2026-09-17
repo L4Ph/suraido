@@ -24,7 +24,10 @@ export function atom<T>(initial: T): Atom<T> {
       // Writing the same value is not a change, and redrawing for it is wasted work.
       if (Object.is(next, value)) return;
       value = next;
-      // Copied, so a watcher that subscribes or leaves mid-notification does not disturb it.
+      // Iterating a Set is already safe against deletion, but not against growth: a watcher
+      // that subscribes another one mid-notification would see it run in the same pass.
+      // Notify the set as it stood when the write happened.
+      // oxlint-disable-next-line no-useless-spread -- the copy is the point
       for (const run of [...watchers]) run();
     },
 

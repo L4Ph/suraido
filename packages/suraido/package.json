@@ -1,6 +1,6 @@
 {
   "name": "suraido.js",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "スライド — write slides in JSX. No React, no virtual DOM.",
   "keywords": [
     "deck",
