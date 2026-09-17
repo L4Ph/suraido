@@ -54,8 +54,7 @@ class Demo extends Slide<{}, { count: number }> {
         <h2>State on a class</h2>
         <button
           class="big"
-          onClick={(e: MouseEvent) => {
-            e.stopPropagation();
+          onClick={() => {
             this.setState((s) => ({ count: s.count + 1 }));
           }}
         >

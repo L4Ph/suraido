@@ -165,16 +165,15 @@ class LiveState extends Slide<{}, { count: number }> {
           <div>
             <button
               class="big"
-              onClick={(e: MouseEvent) => {
-                e.stopPropagation();
+              onClick={() => {
                 this.setState((s) => ({ count: s.count + 1 }));
               }}
             >
               Pressed {this.state.count} times
             </button>
             <p class="hint">
-              A button inside a slide must call <code>stopPropagation</code>, or the click also
-              advances the deck.
+              Clicks on a button do not turn the page, so this just works. Tapping the left quarter
+              of the screen goes back — a phone has no shift key.
             </p>
           </div>
           <Code>{`class Live extends Slide<{}, { count: number }> {
@@ -215,8 +214,7 @@ class AtomWrite extends Slide {
           <div>
             <button
               class="big"
-              onClick={(e: MouseEvent) => {
-                e.stopPropagation();
+              onClick={() => {
                 votes.update((n) => n + 1);
               }}
             >
@@ -275,8 +273,7 @@ class Themes extends Slide<{}, { at: number }> {
   static path = "themes";
   state = { at: 0 };
 
-  cycle = (e: MouseEvent) => {
-    e.stopPropagation();
+  cycle = () => {
     const at = (this.state.at + 1) % THEMES.length;
     applyTheme(THEMES[at]![1]);
     this.setState({ at });

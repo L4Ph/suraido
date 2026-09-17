@@ -164,7 +164,12 @@ The URL is `#<slide>.<step>`, for example `#intro.2`. Reloading keeps the positi
 `→ ↓ Space` forward, `← ↑` back, `Home` `End`, `f` fullscreen. Clicking advances;
 shift-clicking goes back.
 
-A button inside a slide must call `e.stopPropagation()`, or clicking it also advances the deck.
+Tapping the left quarter of the screen goes back, anywhere else goes forward — a phone has no
+shift key, so without that a touch deck could only move one way.
+
+Clicks on `a`, `button`, `input`, `select`, `textarea` and `label` do not turn the page, so
+controls in a slide just work. For something clickable that is none of those, mark it with
+`data-suraido-keep`.
 
 ## Commands
 

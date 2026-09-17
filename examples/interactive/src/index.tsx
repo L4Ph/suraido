@@ -32,8 +32,7 @@ class Tally extends Slide {
             const n = counts[i];
             return (
               <button
-                onClick={(e: MouseEvent) => {
-                  e.stopPropagation();
+                onClick={() => {
                   this.bump(i);
                 }}
               >
@@ -134,12 +133,7 @@ class Typing extends Slide<{}, { submitted: string[] }> {
     return (
       <Pad>
         <h2>Taking input</h2>
-        <input
-          class="field"
-          placeholder="Type and press Enter"
-          onKeydown={this.onKey}
-          onClick={(e: MouseEvent) => e.stopPropagation()}
-        />
+        <input class="field" placeholder="Type and press Enter" onKeydown={this.onKey} />
         <ul class="answers">
           {this.state.submitted.map((s) => (
             <li>{s}</li>

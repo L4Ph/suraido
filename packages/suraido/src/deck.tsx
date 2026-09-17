@@ -14,6 +14,9 @@ export type SlideComponent = (new (props: {}) => Slide<any, any>) & {
   path?: string;
 };
 
+/** How much of the left edge sends you back rather than forward. */
+const BACK_ZONE = 0.25;
+
 // ponytail: assumes one deck at a time. For several, hang this off each Deck instance.
 let deckStep = 0;
 
@@ -176,6 +179,20 @@ export class Deck extends Component<DeckProps, { i: number }> {
 
   onHash = () => this.go(parseHash(location.hash, this.paths, this.steps));
 
+  /**
+   * Tapping the left edge goes back, anywhere else goes forward. A phone has no shift key, so
+   * without a zone a touch deck could only ever move one way.
+   *
+   * Anything you could have meant to press is left alone, so a link or a button in a slide
+   * does not also turn the page.
+   */
+  onClick = (e: MouseEvent) => {
+    const target = e.target as Element | null;
+    if (target?.closest("a, button, input, select, textarea, label, [data-suraido-keep]")) return;
+    const back = e.shiftKey || e.clientX < innerWidth * BACK_ZONE;
+    this.move(back ? -1 : 1);
+  };
+
   /** The scale is a variable on :root, so it drags in neither a re-render nor a swap. */
   fit = () => {
     const { width = 1920, height = 1080 } = this.props;
@@ -209,7 +226,7 @@ export class Deck extends Component<DeckProps, { i: number }> {
     const Current = slides[this.state.i];
 
     return (
-      <div class="deck" onClick={(e: MouseEvent) => this.move(e.shiftKey ? -1 : 1)}>
+      <div class="deck" onClick={this.onClick}>
         <div class="stage" style={{ width: `${width}px`, height: `${height}px` }}>
           <Current />
         </div>

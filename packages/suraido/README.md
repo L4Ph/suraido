@@ -266,8 +266,13 @@ Reveals and scaling deliberately avoid `render()`:
 
 ## Controls
 
-`→ ↓ Space` forward, `← ↑` back, `Home` `End`, `f` fullscreen. Clicking advances;
-shift-clicking goes back.
+`→ ↓ Space` forward, `← ↑` back, `Home` `End`, `f` fullscreen.
+
+Tapping the left quarter of the screen goes back and anywhere else goes forward, so a deck
+works on a phone, where there is no shift key. Shift-clicking goes back too.
+
+A click on `a`, `button`, `input`, `select`, `textarea` or `label` does not turn the page —
+controls inside a slide just work. Mark anything else clickable with `data-suraido-keep`.
 
 The position lives in the URL as `#intro.1`, so a reload lands in the same place. suraido.js uses
 `replaceState`, so no history is stacked — the browser's back button leaves the deck rather
