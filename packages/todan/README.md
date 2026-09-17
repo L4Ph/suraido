@@ -245,6 +245,18 @@ Crossing to another slide cross-fades through View Transitions. The speed is a v
 UA's 250ms, which holds the transition open about 70ms longer and makes fast stepping feel
 sluggish.
 
+## When something is wrong
+
+A few todan mistakes produce no error, and the deck simply does the wrong thing quietly. Those
+are reported to the console as they happen, with the position, the measurement and the fix:
+
+- A slide that runs past the 1920x1080 canvas, and by how much. The overflow is clipped and
+  the stage is scaled down, so nothing on screen shows that it happened
+- A `<Step>` that wrapped an `li` in a `div`, which stops `ul > li` matching
+- A `static steps` that does not match the highest `<Step n>` on the slide — either dead key
+  presses or reveals that never arrive
+- Something in `deck()` that is not a Slide subclass, which means its statics were dropped
+
 ## Paths that never re-render
 
 Reveals and scaling deliberately avoid `render()`:

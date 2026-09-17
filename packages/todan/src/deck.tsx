@@ -57,6 +57,48 @@ function syncSteps(step: number) {
   }
 }
 
+/**
+ * todan has a handful of mistakes that produce no error at all: the deck simply does the
+ * wrong thing quietly. A rule in a document is weaker than a word at the moment it happens,
+ * so these say it out loud — to whoever, or whatever, is reading the console.
+ */
+function audit(slides: SlideComponent[], i: number, paths: Paths, steps: (i: number) => number) {
+  const where = formatHash([i, 0], paths);
+  const say = (problem: string, fix: string) =>
+    console.warn(`todan ${where}: ${problem}\n  ${fix}`);
+
+  const stage = document.querySelector(".stage");
+  if (stage) {
+    const down = stage.scrollHeight - stage.clientHeight;
+    const across = stage.scrollWidth - stage.clientWidth;
+    if (down > 0 || across > 0) {
+      say(
+        `the slide runs ${down > 0 ? `${down}px past the bottom` : `${across}px past the right`} of the 1920x1080 canvas, and that part is clipped`,
+        "Nothing on screen shows this — the whole stage is scaled down. Cut the content or raise --todan-pad.",
+      );
+    }
+  }
+
+  if (document.querySelector("ul > div.step, ol > div.step")) {
+    say(
+      "a <Step> wrapped an <li> in a <div>, so ul > li no longer matches",
+      'Pass as="li": <Step n={1} as="li">…</Step>',
+    );
+  }
+
+  const shown = [...document.querySelectorAll<HTMLElement>(".step[data-n]")];
+  const highest = Math.max(0, ...shown.map((el) => Number(el.dataset.n)));
+  const declared = steps(i) - 1;
+  if (highest !== declared) {
+    say(
+      `static steps declares ${declared + 1}, but the highest <Step n> here is ${highest}`,
+      highest > declared
+        ? `Raise it to ${highest + 1}, or those reveals never appear.`
+        : `Lower it to ${highest + 1}, or ${declared - highest} key press(es) do nothing.`,
+    );
+  }
+}
+
 type DeckProps = { slides: SlideComponent[]; width?: number; height?: number };
 
 export class Deck extends Component<DeckProps, { i: number }> {
@@ -68,6 +110,14 @@ export class Deck extends Component<DeckProps, { i: number }> {
 
   constructor(props: DeckProps) {
     super(props);
+    props.slides.forEach((slide, i) => {
+      if (typeof slide !== "function" || typeof slide.prototype?.render !== "function") {
+        console.warn(
+          `todan: slides[${i}] is not a Slide subclass.\n` +
+            "  Wrapping one in a function drops its static steps and path, so reveals and URLs stop working.",
+        );
+      }
+    });
     // So a deep link that carries a step is honoured from the very first render.
     // Forget this and reveals are missing on exactly those links.
     deckStep = this.pos[1];
@@ -88,6 +138,9 @@ export class Deck extends Component<DeckProps, { i: number }> {
     const swap = () => {
       this.setState({ i: next[0] });
       flushSync();
+      // Inside the swap, not after it: startViewTransition defers the callback, so measuring
+      // outside would read the slide that is still on screen.
+      this.check();
     };
     if (document.startViewTransition) document.startViewTransition(swap);
     else swap();
@@ -133,7 +186,13 @@ export class Deck extends Component<DeckProps, { i: number }> {
     this.fit();
     // Normalise the URL and match the attributes to it, rounding an out-of-range step.
     this.go(this.pos);
+    this.check();
   }
+
+  /** Measured a frame later, once layout has settled. */
+  check = () => {
+    requestAnimationFrame(() => audit(this.props.slides, this.pos[0], this.paths, this.steps));
+  };
 
   unmounted() {
     removeEventListener("keydown", this.onKey);

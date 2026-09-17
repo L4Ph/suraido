@@ -46,6 +46,9 @@ const s = document.querySelector(".stage");
 });
 ```
 
+Read the console at each position too. todan reports the mistakes it would otherwise make
+silently, and it has already done the measuring for you.
+
 Also weigh body text against its background: below 4.5:1 will not carry to the back of
 a room, however good it looks on a laptop.
 

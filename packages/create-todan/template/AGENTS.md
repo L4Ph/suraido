@@ -60,6 +60,14 @@ deck([Intro]);
   stage is scaled down so you cannot see that it happened. Measure the fit again whenever you
   add text.
 
+## When something is wrong
+
+todan speaks up in the console about the mistakes it would otherwise make in silence: a slide
+that overflows the canvas and is clipped, a `<Step>` that wrapped an `li` in a `div`, a
+`static steps` that does not match the highest `<Step n>`, and a slide passed to `deck()`
+that is not a class. **Read the console before assuming a deck is fine** — every one of these
+looks correct on screen.
+
 ## State
 
 `setState` **rebuilds that slide's DOM** — todan does not diff. So:
