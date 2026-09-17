@@ -1,4 +1,4 @@
-import { defineConfig } from "vite-plus";
+import { defineConfig } from "vite";
 
 // There is no JSX configuration here. Vite reads jsxImportSource from tsconfig.json.
 export default defineConfig({

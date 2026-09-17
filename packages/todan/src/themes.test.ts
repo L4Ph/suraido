@@ -66,3 +66,12 @@ for (const [file, css] of entries) {
     }
   });
 }
+
+test("create-todan offers exactly the themes that ship", async () => {
+  // The CLI has to name the themes to list them in --help and reject a typo, and it cannot
+  // read them at runtime. This is what keeps that list honest.
+  const { THEMES } = await import("../../create-todan/src/themes.ts");
+  const shipped = Object.keys(themes).map((f) => f.replace(/\.css$/, ""));
+  const byName = (a: string, b: string) => a.localeCompare(b);
+  expect([...THEMES].sort(byName)).toEqual(shipped.sort(byName));
+});

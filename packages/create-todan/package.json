@@ -4,15 +4,18 @@
   "description": "登壇 — create a todan slide project",
   "license": "MIT",
   "bin": {
-    "create-todan": "index.js"
+    "create-todan": "dist/index.mjs"
   },
   "files": [
-    "index.js",
+    "dist",
     "template"
   ],
   "type": "module",
   "scripts": {
-    "prepack": "rm -rf template/dist template/.vite"
+    "prepack": "rm -rf template/dist template/.vite && vp pack"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0"
   },
   "engines": {
     "node": ">=20"

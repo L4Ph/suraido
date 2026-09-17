@@ -9,6 +9,7 @@ Integration is one line of `tsconfig.json`, so it works as-is under Vite and Rsb
 
 ```
 npm create todan@latest my-deck
+npm create todan@latest ./decks/2026-04 --name react-conf-talk --theme laser
 ```
 
 ## Packages
