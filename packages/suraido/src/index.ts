@@ -1,4 +1,6 @@
-export { Component, render, flushSync } from "./dom.ts";
+export { atom } from "./atom.ts";
+export type { Atom } from "./atom.ts";
+export { Component, flushSync, render } from "./dom.ts";
 export type { VNode, Child } from "./dom.ts";
 export { Slide, Step, Deck, deck } from "./deck.tsx";
 export type { SlideComponent } from "./deck.tsx";

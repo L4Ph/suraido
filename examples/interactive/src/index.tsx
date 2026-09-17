@@ -1,25 +1,35 @@
-import { deck, Pad, Slide, Step } from "suraido.js";
+import { atom, deck, Pad, Slide, Step } from "suraido.js";
 import "suraido.js/deck.css";
 import "./slides.css";
 
+/**
+ * The votes live outside any slide. A slide unmounts the moment you move on, so anything you
+ * want to show again later has to be kept here instead of in its state.
+ */
+const LABELS = ["I write it", "I have seen it", "First I have heard"];
+const votes = atom([0, 0, 0]);
+
 /** Instead of asking for a show of hands, count it here. */
-class Tally extends Slide<{}, { counts: number[] }> {
+class Tally extends Slide {
   static path = "tally";
-  static labels = ["I write it", "I have seen it", "First I have heard"];
-  state = { counts: [0, 0, 0] };
+
+  mounted() {
+    this.watch(votes);
+  }
 
   bump(i: number) {
-    this.setState((s) => ({ counts: s.counts.map((n, j) => (j === i ? n + 1 : n)) }));
+    votes.update((counts) => counts.map((n, j) => (j === i ? n + 1 : n)));
   }
 
   render() {
-    const total = this.state.counts.reduce((a, b) => a + b, 0);
+    const counts = votes.get();
+    const total = counts.reduce((a, b) => a + b, 0);
     return (
       <Pad>
         <h2>How much JSX do you write?</h2>
         <div class="poll">
-          {Tally.labels.map((label, i) => {
-            const n = this.state.counts[i];
+          {LABELS.map((label, i) => {
+            const n = counts[i];
             return (
               <button
                 onClick={(e: MouseEvent) => {
@@ -146,4 +156,48 @@ class Typing extends Slide<{}, { submitted: string[] }> {
   }
 }
 
-deck([Tally, Animation, Typing]);
+/**
+ * Several slides later, the same votes are still here. Nothing was passed along: both slides
+ * read the same atom, and watch() redraws this one if the count moves while it is on screen.
+ */
+class Results extends Slide {
+  static path = "results";
+
+  mounted() {
+    this.watch(votes);
+  }
+
+  render() {
+    const counts = votes.get();
+    const total = counts.reduce((a, b) => a + b, 0);
+    const winner = counts.indexOf(Math.max(...counts));
+
+    return (
+      <Pad>
+        <h2>What the room said</h2>
+        {total === 0 ? (
+          <p class="hint">Nobody voted yet. Go back to the first slide and press a button.</p>
+        ) : (
+          <>
+            <p>
+              <strong>{LABELS[winner]}</strong> — {counts[winner]} of {total}
+            </p>
+            <ul class="answers">
+              {LABELS.map((label, i) => (
+                <li>
+                  {label}: {counts[i]}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+        <p class="hint">
+          The votes were cast on the first slide, which unmounted when you left it. They survive
+          because they live in an atom rather than in that slide.
+        </p>
+      </Pad>
+    );
+  }
+}
+
+deck([Tally, Animation, Typing, Results]);

@@ -277,8 +277,44 @@ than fighting the arrow keys.
 
 - `setState` **rebuilds that slide's DOM**; nothing is diffed
 - Crossing to another slide unmounts it and the state is gone
-- There is **no mechanism for sharing state between slides**. When you need one, put a store
-  outside — nanostores, or a hand-rolled atom — and `subscribe` to it in `mounted()`
+
+### Something that outlives a slide
+
+Anything you want to show again later cannot live in a slide's own state. Put it in an `atom`
+at module scope, and `watch` it from whichever slides care:
+
+```tsx
+const votes = atom([0, 0, 0]);
+
+class Poll extends Slide {
+  mounted() {
+    this.watch(votes);
+  }
+  cast(i: number) {
+    votes.update((counts) => counts.map((n, j) => (j === i ? n + 1 : n)));
+  }
+  render() {
+    /* votes.get() */
+  }
+}
+
+class Results extends Slide {
+  // several slides later
+  mounted() {
+    this.watch(votes);
+  } // same atom, nothing passed along
+  render() {
+    /* votes.get() */
+  }
+}
+```
+
+`watch` redraws the component whenever the atom changes, and drops the subscription when the
+component leaves — so a slide you have moved on from stops being redrawn, and the atom stops
+holding on to it. Writing a value equal to the current one notifies nobody.
+
+See [examples/interactive](../../examples/interactive), where a vote taken on the first slide
+is read back several slides later.
 
 ## What has been traded away
 

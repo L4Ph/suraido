@@ -84,8 +84,26 @@ updated() {
 - Do not call `setState` while someone is typing. Leave the value in the DOM and move it into
   state only when the entry is committed.
 - Start timers and rAF loops in `mounted()`, and **always stop them in `unmounted()`**.
-- Crossing to another slide unmounts the old one and its state is gone. Values shared across
-  slides belong in module scope or an external store.
+- Crossing to another slide unmounts the old one and its state is gone. **Anything you want to
+  show again later belongs in an `atom`**, not in a slide:
+
+```tsx
+import { atom } from "suraido.js";
+
+const votes = atom([0, 0, 0]); // module scope, outside every slide
+
+class Poll extends Slide {
+  mounted() {
+    this.watch(votes);
+  } // redraw when it changes; dropped on the way out
+  render() {
+    /* votes.get() */
+  }
+}
+```
+
+Use `votes.update(fn)` or `votes.set(next)` to write. Do not subscribe by hand — `watch`
+cleans up when the slide leaves, and a subscription left behind keeps the dead slide alive.
 
 ## Styling
 
