@@ -1,7 +1,7 @@
-import { Cols, deck, Pad, Slide, Step } from "todan";
-import "todan/deck.css";
-// A theme is one stylesheet. All it does is override --todan-*.
-import "todan/themes/noel.css";
+import { Cols, deck, Pad, Slide, Step } from "suraido.js";
+import "suraido.js/deck.css";
+// A theme is one stylesheet. All it does is override --suraido-*.
+import "suraido.js/themes/noel.css";
 import "./slides.css";
 
 /** The same content under every theme. Not one color is written on the slide. */
@@ -12,10 +12,10 @@ class Sampler extends Slide {
   render() {
     return (
       <Pad>
-        <h1>登壇</h1>
+        <h1>スライド</h1>
         <p>
-          No color is written on this slide. Swapping the one <code>todan/themes/*.css</code> import
-          changes all of it, and <strong>emphasis takes the accent</strong>.
+          No color is written on this slide. Swapping the one <code>suraido.js/themes/*.css</code>{" "}
+          import changes all of it, and <strong>emphasis takes the accent</strong>.
         </p>
         <hr />
         <Cols>
@@ -62,9 +62,9 @@ class Numbers extends Slide {
           .stats b {
             display: block; font-size: 88px; line-height: 1;
             letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
-            color: var(--todan-accent);
+            color: var(--suraido-accent);
           }
-          .stats span { font-size: 26px; color: var(--todan-muted); }
+          .stats span { font-size: 26px; color: var(--suraido-muted); }
         `}</style>
       </Pad>
     );

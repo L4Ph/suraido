@@ -12,7 +12,7 @@ export default defineConfig({
       {
         // These are published, or copied by people who are not using Vite+.
         // They must import from vite itself.
-        files: ["packages/create-todan/template/**", "examples/**"],
+        files: ["packages/create-suraido/template/**", "examples/**"],
         rules: { "vite-plus/prefer-vite-plus-imports": "off" },
       },
     ],

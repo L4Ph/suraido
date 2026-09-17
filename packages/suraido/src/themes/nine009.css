@@ -1,0 +1,9 @@
+/* GMK 9009 — orange on grey-beige. The color of an old calculator. */
+:root {
+  --suraido-bg: #e7e2d8;
+  --suraido-fg: #34302a;
+  --suraido-accent: #b1521f;
+  --suraido-accent-2: #6d675c;
+  --suraido-muted: #69645a;
+  --suraido-letterbox: #2b2822;
+}

@@ -8,7 +8,7 @@
     "preview": "vp preview"
   },
   "dependencies": {
-    "todan": "*"
+    "suraido.js": "*"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

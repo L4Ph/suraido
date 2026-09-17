@@ -1,17 +1,17 @@
 /*
- * Every todan style lives inside an @layer, so a plain selector here always wins.
- * Headings and lists already carry their sizing from todan; only the differences go here.
+ * Every suraido.js style lives inside an @layer, so a plain selector here always wins.
+ * Headings and lists already carry their sizing from suraido.js; only the differences go here.
  */
 .lead {
   font-size: 36px;
-  color: var(--todan-muted);
+  color: var(--suraido-muted);
 }
 
 .big {
   font: inherit;
   font-size: 36px;
   padding: 16px 32px;
-  border: 2px solid var(--todan-fg);
+  border: 2px solid var(--suraido-fg);
   border-radius: 12px;
   background: none;
   cursor: pointer;

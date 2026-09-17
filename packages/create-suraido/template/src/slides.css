@@ -1,0 +1,7 @@
+/*
+ * Every suraido.js style lives inside an @layer, so a plain selector here always wins.
+ * For colors and sizes, override the --suraido-* variables instead — they reach everything.
+ */
+.lead {
+  color: var(--suraido-muted);
+}

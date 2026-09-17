@@ -1,17 +1,17 @@
 {
-  "name": "todan-monorepo",
+  "name": "suraido-monorepo",
   "private": true,
   "workspaces": [
-    "packages/todan",
-    "packages/create-todan",
-    "packages/create-todan/template",
+    "packages/suraido",
+    "packages/create-suraido",
+    "packages/create-suraido/template",
     "examples/*"
   ],
   "type": "module",
   "scripts": {
     "dev": "npm run dev -w example-basic",
-    "build": "npm run build -w todan",
-    "test": "npm test -w todan",
+    "build": "npm run build -w suraido.js",
+    "test": "npm test -w suraido.js",
     "prepare": "vp config"
   },
   "devDependencies": {

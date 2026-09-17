@@ -1,7 +1,0 @@
-/*
- * Every todan style lives inside an @layer, so a plain selector here always wins.
- * For colors and sizes, override the --todan-* variables instead — they reach everything.
- */
-.lead {
-  color: var(--todan-muted);
-}

@@ -1,5 +1,5 @@
 :root {
-  --todan-accent: #2f6df6;
+  --suraido-accent: #2f6df6;
 }
 
 h2 {
@@ -10,7 +10,7 @@ h2 {
 .hint {
   font-size: 26px;
   line-height: 1.7;
-  color: var(--todan-muted);
+  color: var(--suraido-muted);
   margin-top: 40px;
 }
 code {
@@ -34,7 +34,7 @@ code {
   font: inherit;
   font-size: 34px;
   padding: 24px 32px;
-  border: 2px solid var(--todan-fg);
+  border: 2px solid var(--suraido-fg);
   border-radius: 14px;
   background: none;
   cursor: pointer;
@@ -44,7 +44,7 @@ code {
 .poll .bar {
   position: absolute;
   inset: 0 auto 0 0;
-  background: color-mix(in oklab, var(--todan-accent) 22%, transparent);
+  background: color-mix(in oklab, var(--suraido-accent) 22%, transparent);
   transition: width 220ms;
 }
 .poll .label {
@@ -54,7 +54,7 @@ code {
 .poll .n {
   position: relative;
   font-variant-numeric: tabular-nums;
-  color: var(--todan-accent);
+  color: var(--suraido-accent);
   font-weight: 700;
 }
 
@@ -71,7 +71,7 @@ canvas {
   font-size: 34px;
   padding: 20px 28px;
   width: 720px;
-  border: 2px solid var(--todan-fg);
+  border: 2px solid var(--suraido-fg);
   border-radius: 14px;
   background: none;
 }
@@ -81,5 +81,5 @@ canvas {
   padding-left: 1.2em;
 }
 .answers li::marker {
-  color: var(--todan-accent);
+  color: var(--suraido-accent);
 }

@@ -6,12 +6,16 @@
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
     "jsxImportSource": "suraido.js",
+    "paths": {
+      "suraido.js/jsx-runtime": ["./src/jsx-runtime.ts"],
+      "suraido.js/jsx-dev-runtime": ["./src/jsx-dev-runtime.ts"]
+    },
     "strict": true,
-    "noEmit": true,
     "skipLibCheck": true,
-    "verbatimModuleSyntax": true,
     "allowImportingTsExtensions": true,
-    "types": ["vite/client", "node"]
+    "verbatimModuleSyntax": true,
+    "types": ["node"],
+    "noEmit": true
   },
-  "include": ["src", "vite.config.ts"]
+  "include": ["src"]
 }

@@ -1,0 +1,10 @@
+/* GMK Laser — magenta and cyan on deep purple. For when you want it loud. */
+:root {
+  --suraido-bg: #221a38;
+  --suraido-fg: #ece6f7;
+  --suraido-accent: #ff4d9d;
+  --suraido-accent-2: #3fd8ef;
+  --suraido-muted: #a596cf;
+  --suraido-rule: #ffffff26;
+  --suraido-letterbox: #120d1f;
+}

@@ -1,6 +1,6 @@
-import { Center, Cols, deck, Full, Pad, Slide, Step } from "todan";
-import "todan/deck.css";
-import "todan/themes/nine009.css";
+import { Center, Cols, deck, Full, Pad, Slide, Step } from "suraido.js";
+import "suraido.js/deck.css";
+import "suraido.js/themes/nine009.css";
 import "./slides.css";
 
 class Title extends Slide {
@@ -8,7 +8,7 @@ class Title extends Slide {
   render() {
     return (
       <Center>
-        <p class="eyebrow">todan — 登壇</p>
+        <p class="eyebrow">suraido.js — スライド</p>
         <h1>Shapes you keep needing</h1>
         <p class="lead">You will rebuild these every time, so copy them from here</p>
       </Center>
@@ -132,15 +132,15 @@ class Stats extends Slide {
         </Cols>
 
         <style>{`
-          .todan-cols b {
+          .suraido-cols b {
             display: block;
             font-size: 88px;
             line-height: 1;
             letter-spacing: -0.03em;
             font-variant-numeric: tabular-nums;
-            color: var(--todan-accent);
+            color: var(--suraido-accent);
           }
-          .todan-cols span { font-size: 26px; color: var(--todan-muted); }
+          .suraido-cols span { font-size: 26px; color: var(--suraido-muted); }
         `}</style>
       </Pad>
     );

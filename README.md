@@ -1,23 +1,23 @@
-# todan
+# suraido.js
 
-**登壇 (tōdan)** — to step onto the platform, to give a talk.
+**スライド (suraido)** — the Japanese for _slide_, spelled the way it is said.
 
-A framework for writing slides in JSX. No React, no virtual DOM: JSX goes through todan's own
+A framework for writing slides in JSX. No React, no virtual DOM: JSX goes through suraido.js's own
 runtime and becomes DOM directly.
 
 Integration is one line of `tsconfig.json`, so it works as-is under Vite and Rsbuild.
 
 ```
-npm create todan@latest my-deck
-npm create todan@latest ./decks/2026-04 --name react-conf-talk --theme laser
+npm create suraido@latest my-deck
+npm create suraido@latest ./decks/2026-04 --name react-conf-talk --theme laser
 ```
 
 ## Packages
 
-|                                       |                                                                                  |
-| ------------------------------------- | -------------------------------------------------------------------------------- |
-| [todan](packages/todan)               | The framework. JSX runtime, `Slide` / `Step` / `Deck`, layout components, themes |
-| [create-todan](packages/create-todan) | `npm create todan`                                                               |
+|                                           |                                                                                  |
+| ----------------------------------------- | -------------------------------------------------------------------------------- |
+| [suraido.js](packages/suraido)            | The framework. JSX runtime, `Slide` / `Step` / `Deck`, layout components, themes |
+| [create-suraido](packages/create-suraido) | `npm create suraido`                                                             |
 
 ## Examples
 
@@ -36,9 +36,9 @@ This repository uses [Vite+](https://viteplus.dev).
 vp install
 vp check          # format, lint, type check
 vp test           # 24 tests
-vp pack           # build the library (run inside packages/todan)
+vp pack           # build the library (run inside packages/suraido)
 vp dev            # run an example (run inside examples/<name>)
 ```
 
-The template under `packages/create-todan/template` is also a workspace: inside the repository
-it is a deck you can run, and `create-todan` hands out a copy of it. One copy, no drift.
+The template under `packages/create-suraido/template` is also a workspace: inside the repository
+it is a deck you can run, and `create-suraido` hands out a copy of it. One copy, no drift.

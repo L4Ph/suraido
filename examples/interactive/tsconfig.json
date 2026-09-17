@@ -5,7 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "jsxImportSource": "todan",
+    "jsxImportSource": "suraido.js",
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true,

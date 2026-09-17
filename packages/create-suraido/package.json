@@ -1,0 +1,38 @@
+{
+  "name": "create-suraido",
+  "version": "0.1.0",
+  "description": "スライド — create a suraido.js slide project",
+  "keywords": [
+    "create",
+    "jsx",
+    "presentation",
+    "scaffold",
+    "slides",
+    "suraido.js"
+  ],
+  "homepage": "https://github.com/L4Ph/suraido#readme",
+  "bugs": "https://github.com/L4Ph/suraido/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/L4Ph/suraido.git",
+    "directory": "packages/create-suraido"
+  },
+  "bin": {
+    "create-suraido": "dist/index.mjs"
+  },
+  "files": [
+    "dist",
+    "template"
+  ],
+  "type": "module",
+  "scripts": {
+    "prepack": "rm -rf template/dist template/.vite && vp pack"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

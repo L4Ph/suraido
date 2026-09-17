@@ -1,5 +1,5 @@
-import { deck, Pad, Slide, Step } from "todan";
-import "todan/deck.css";
+import { deck, Pad, Slide, Step } from "suraido.js";
+import "suraido.js/deck.css";
 import "./slides.css";
 
 /** Instead of asking for a show of hands, count it here. */
@@ -60,7 +60,7 @@ class Animation extends Slide {
       const { width: w, height: h } = ctx.canvas;
       ctx.clearRect(0, 0, w, h);
       ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue(
-        "--todan-accent",
+        "--suraido-accent",
       );
       ctx.lineWidth = 6;
       ctx.beginPath();

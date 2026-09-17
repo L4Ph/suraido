@@ -1,6 +1,6 @@
 # basic
 
-The smallest todan deck: a cover, staged reveals, and state held on a class.
+The smallest suraido.js deck: a cover, staged reveals, and state held on a class.
 
 ```
 vp dev

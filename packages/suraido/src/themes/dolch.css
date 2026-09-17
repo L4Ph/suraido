@@ -1,0 +1,10 @@
+/* GMK Dolch — black, grey and white only. Survives any lighting. */
+:root {
+  --suraido-bg: #17181a;
+  --suraido-fg: #eceef0;
+  --suraido-accent: #ffffff;
+  --suraido-accent-2: #9aa0a6;
+  --suraido-muted: #949aa1;
+  --suraido-rule: #ffffff2e;
+  --suraido-letterbox: #0b0c0d;
+}

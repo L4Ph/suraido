@@ -5,23 +5,23 @@
 .eyebrow {
   font-size: 24px;
   letter-spacing: 0.18em;
-  color: var(--todan-accent);
+  color: var(--suraido-accent);
 }
 .lead {
   font-size: 34px;
-  color: var(--todan-muted);
+  color: var(--suraido-muted);
 }
 
 /* Section divider: flip the ground */
 .invert {
-  background: var(--todan-fg);
-  color: var(--todan-bg);
+  background: var(--suraido-fg);
+  color: var(--suraido-bg);
 }
 .invert .num {
   font-size: 200px;
   line-height: 0.9;
   margin: 0;
-  color: var(--todan-accent);
+  color: var(--suraido-accent);
   letter-spacing: -0.04em;
 }
 

@@ -1,0 +1,220 @@
+/*
+ * Every suraido.js style lives inside this layer.
+ * Layered styles always lose to unlayered ones, so anything here can be overridden
+ * with a plain selector — no !important, no specificity games.
+ */
+@layer suraido.base, suraido.theme, suraido.type, suraido.layout, suraido.deck;
+
+@layer suraido.theme {
+  :root {
+    /* ---- meant to be overridden: the theme API ---- */
+    --suraido-fg: #16181d;
+    --suraido-bg: #fbfaf8;
+    --suraido-accent: #2f6df6;
+    --suraido-muted: #6b7280;
+    --suraido-font: system-ui, "Hiragino Sans", "Noto Sans JP", sans-serif;
+
+    --suraido-accent-2: var(--suraido-accent);
+    --suraido-rule: color-mix(in oklab, var(--suraido-fg) 18%, transparent);
+    --suraido-font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+    --suraido-pad: 96px 120px;
+    --suraido-gap: 72px;
+    --suraido-letterbox: #111;
+
+    /* real sizes on the 1920x1080 canvas */
+    --suraido-h1: 92px;
+    --suraido-h2: 60px;
+    --suraido-h3: 34px;
+    --suraido-text: 32px;
+
+    --suraido-step-fade: 200ms;
+    --suraido-slide-fade: 180ms;
+  }
+}
+
+@layer suraido.base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: var(--suraido-letterbox);
+    font-family: var(--suraido-font);
+  }
+}
+
+@layer suraido.type {
+  /*
+   * Gives the plain elements inside a slide enough shape to read. Themes dress this
+   * through the tokens: everything below is written in them, so changing one value moves
+   * the whole deck.
+   */
+  .stage :is(h1, h2, h3) {
+    margin: 0 0 0.4em;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+  .stage h1 {
+    font-size: var(--suraido-h1);
+    letter-spacing: -0.03em;
+  }
+  .stage h2 {
+    font-size: var(--suraido-h2);
+  }
+  .stage h3 {
+    font-size: var(--suraido-h3);
+  }
+
+  .stage p,
+  .stage li {
+    font-size: var(--suraido-text);
+    line-height: 1.7;
+  }
+  .stage p {
+    margin: 0 0 0.6em;
+  }
+
+  .stage ul,
+  .stage ol {
+    padding-left: 1.2em;
+  }
+  .stage li {
+    margin-bottom: 0.4em;
+  }
+  .stage li::marker {
+    color: var(--suraido-accent);
+  }
+
+  .stage strong {
+    color: var(--suraido-accent);
+  }
+
+  .stage code {
+    font-family: var(--suraido-font-mono);
+    font-size: 0.88em;
+    background: color-mix(in oklab, var(--suraido-fg) 8%, transparent);
+    padding: 0.1em 0.35em;
+    border-radius: 6px;
+  }
+
+  .stage blockquote {
+    margin: 0;
+    font-size: calc(var(--suraido-text) * 1.7);
+    line-height: 1.5;
+    letter-spacing: -0.02em;
+    border-left: 8px solid var(--suraido-accent);
+    padding-left: 48px;
+  }
+  .stage blockquote cite {
+    display: block;
+    margin-top: 0.6em;
+    font-size: calc(var(--suraido-text) * 0.85);
+    font-style: normal;
+    color: var(--suraido-muted);
+  }
+
+  .stage hr {
+    border: 0;
+    border-top: 2px solid var(--suraido-rule);
+    margin: 1.2em 0;
+  }
+}
+
+@layer suraido.layout {
+  .suraido-pad {
+    height: 100%;
+    padding: var(--suraido-pad);
+  }
+
+  .suraido-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  /* One column per child. Passing ratio switches it to grid-template-columns. */
+  .suraido-cols {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: var(--suraido-gap);
+    align-items: start;
+  }
+
+  .suraido-full {
+    position: relative;
+    height: 100%;
+  }
+  .suraido-full > :is(img, video) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+@layer suraido.deck {
+  .deck {
+    position: fixed;
+    inset: 0;
+  }
+
+  /*
+   * ---- machinery, not style ----
+   * Slides are written in fixed pixels and fitted to the window with --suraido-scale.
+   * Override position / transform / transform-origin and the scaling breaks.
+   */
+  .stage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(var(--suraido-scale, 1));
+    transform-origin: center;
+    overflow: hidden;
+    background: var(--suraido-bg);
+    color: var(--suraido-fg);
+  }
+
+  /* Staged reveals. Deck adds and removes data-shown. */
+  .step {
+    transition: opacity var(--suraido-step-fade);
+  }
+  .step:not([data-shown]) {
+    opacity: 0;
+  }
+
+  .pager {
+    position: absolute;
+    right: 16px;
+    bottom: 12px;
+    color: var(--suraido-muted);
+    font: 14px/1 var(--suraido-font);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /*
+   * Crossing to another slide cross-fades.
+   * Leave the group out and it keeps the UA's 250ms, holding the transition open longer.
+   */
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: var(--suraido-slide-fade);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
+    }
+    .step {
+      transition: none;
+    }
+  }
+}
