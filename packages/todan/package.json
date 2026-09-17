@@ -1,37 +1,29 @@
 {
   "name": "todan",
   "version": "0.1.0",
-  "description": "\u767b\u58c7 \u2014 JSX \u3067\u30b9\u30e9\u30a4\u30c9\u3092\u66f8\u304f\u3002React \u3082 VDOM \u3082\u4f7f\u308f\u306a\u3044\u3002",
-  "type": "module",
+  "description": "登壇 — write slides in JSX. No React, no virtual DOM.",
   "license": "MIT",
   "files": [
     "dist"
   ],
+  "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
     },
     "./jsx-runtime": {
-      "types": "./dist/jsx-runtime.d.ts",
-      "default": "./dist/jsx-runtime.js"
+      "types": "./dist/jsx-runtime.d.mts",
+      "default": "./dist/jsx-runtime.mjs"
     },
     "./jsx-dev-runtime": {
-      "types": "./dist/jsx-dev-runtime.d.ts",
-      "default": "./dist/jsx-dev-runtime.js"
+      "types": "./dist/jsx-dev-runtime.d.mts",
+      "default": "./dist/jsx-dev-runtime.mjs"
     },
     "./deck.css": "./dist/deck.css",
     "./themes/*.css": "./dist/themes/*.css"
   },
-  "scripts": {
-    "build": "tsc -p tsconfig.build.json && cp src/deck.css dist/deck.css && cp -R src/themes dist/themes",
-    "test": "node --test src/*.test.ts",
-    "typecheck": "tsc --noEmit",
-    "pretest": "npm run build"
-  },
   "devDependencies": {
-    "@types/node": "^24.0.0",
-    "happy-dom": "^20.0.0",
-    "typescript": "^5.9.0"
+    "happy-dom": "^20.0.0"
   }
 }

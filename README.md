@@ -1,42 +1,43 @@
 # todan
 
-**登壇** — 壇に上がること。JSX でスライドを書くためのフレームワーク。
+**登壇 (tōdan)** — to step onto the platform, to give a talk.
 
-React も VDOM も使わない。JSX は自前のランタイムで DOM になる。
-ビルドツールへの統合は tsconfig の 1 行だけで、Vite でも Rsbuild でもそのまま動く。
+A framework for writing slides in JSX. No React, no virtual DOM: JSX goes through todan's own
+runtime and becomes DOM directly.
+
+Integration is one line of `tsconfig.json`, so it works as-is under Vite and Rsbuild.
 
 ```
 npm create todan@latest my-deck
 ```
 
-## パッケージ
+## Packages
 
-| | 説明 |
-|---|---|
-| [todan](packages/todan) | フレームワーク本体。JSX ランタイム、`Slide` / `Step` / `Deck` |
-| [create-todan](packages/create-todan) | `npm create todan` でプロジェクトを作る |
+|                                       |                                                                                  |
+| ------------------------------------- | -------------------------------------------------------------------------------- |
+| [todan](packages/todan)               | The framework. JSX runtime, `Slide` / `Step` / `Deck`, layout components, themes |
+| [create-todan](packages/create-todan) | `npm create todan`                                                               |
 
-## 例
+## Examples
 
-| | |
-|---|---|
-| [basic](examples/basic) | 最小構成。表紙・段階表示・クラスの状態 |
-| [layouts](examples/layouts) | 表紙 / セクション扉 / 二段組 / 全面 / 引用 / 数字。**写して使う用** |
-| [themes](examples/themes) | 同じ中身を 6 つのテーマで見比べる |
-| [interactive](examples/interactive) | その場で数える投票、rAF の埋め込み、入力欄。markdown スライドにできないこと |
+|                                     |                                                                                        |
+| ----------------------------------- | -------------------------------------------------------------------------------------- |
+| [basic](examples/basic)             | The smallest deck: a cover, staged reveals, state on a class                           |
+| [layouts](examples/layouts)         | Cover, section divider, two columns, full bleed, quote, figures. **Made to be copied** |
+| [themes](examples/themes)           | The same deck under six themes                                                         |
+| [interactive](examples/interactive) | A live tally, an rAF animation, a text field. The things a Markdown deck cannot do     |
 
-```
-npm run dev -w example-layouts
-```
+## Development
 
-## 開発
+This repository uses [Vite+](https://viteplus.dev).
 
 ```
-npm install
-npm run dev     # packages/create-todan/template をそのまま動かす
-npm test
-npm run build
+vp install
+vp check          # format, lint, type check
+vp test           # 24 tests
+vp pack           # build the library (run inside packages/todan)
+vp dev            # run an example (run inside examples/<name>)
 ```
 
-テンプレートはワークスペースを兼ねている。リポジトリ内ではこれが開発用のデッキで、
-`create-todan` は同じものをコピーして配る。二重管理にならない。
+The template under `packages/create-todan/template` is also a workspace: inside the repository
+it is a deck you can run, and `create-todan` hands out a copy of it. One copy, no drift.

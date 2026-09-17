@@ -2,12 +2,30 @@
   --todan-accent: #2f6df6;
 }
 
-h2 { font-size: 60px; margin: 0 0 40px; letter-spacing: -0.02em; }
-.hint { font-size: 26px; line-height: 1.7; color: var(--todan-muted); margin-top: 40px; }
-code { font-size: 0.9em; background: #0001; padding: 2px 8px; border-radius: 6px; }
+h2 {
+  font-size: 60px;
+  margin: 0 0 40px;
+  letter-spacing: -0.02em;
+}
+.hint {
+  font-size: 26px;
+  line-height: 1.7;
+  color: var(--todan-muted);
+  margin-top: 40px;
+}
+code {
+  font-size: 0.9em;
+  background: #0001;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
 
-/* ---- 投票 ---- */
-.poll { display: flex; flex-direction: column; gap: 20px; }
+/* ---- poll ---- */
+.poll {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 .poll button {
   position: relative;
   display: flex;
@@ -29,7 +47,10 @@ code { font-size: 0.9em; background: #0001; padding: 2px 8px; border-radius: 6px
   background: color-mix(in oklab, var(--todan-accent) 22%, transparent);
   transition: width 220ms;
 }
-.poll .label { position: relative; flex: 1; }
+.poll .label {
+  position: relative;
+  flex: 1;
+}
 .poll .n {
   position: relative;
   font-variant-numeric: tabular-nums;
@@ -38,9 +59,13 @@ code { font-size: 0.9em; background: #0001; padding: 2px 8px; border-radius: 6px
 }
 
 /* ---- canvas ---- */
-canvas { width: 100%; height: 420px; display: block; }
+canvas {
+  width: 100%;
+  height: 420px;
+  display: block;
+}
 
-/* ---- 入力 ---- */
+/* ---- text field ---- */
 .field {
   font: inherit;
   font-size: 34px;
@@ -50,5 +75,11 @@ canvas { width: 100%; height: 420px; display: block; }
   border-radius: 14px;
   background: none;
 }
-.answers { font-size: 30px; line-height: 1.8; padding-left: 1.2em; }
-.answers li::marker { color: var(--todan-accent); }
+.answers {
+  font-size: 30px;
+  line-height: 1.8;
+  padding-left: 1.2em;
+}
+.answers li::marker {
+  color: var(--todan-accent);
+}

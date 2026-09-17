@@ -1,6 +1,6 @@
 /*
- * 配置は組み込みの <Pad> <Center> <Cols> <Full> に任せて、
- * ここにはこのデッキ固有の装飾だけを書く。
+ * Arrangement is left to the built-in <Pad> <Center> <Cols> <Full>.
+ * Only this deck's own decoration lives here.
  */
 .eyebrow {
   font-size: 24px;
@@ -12,7 +12,7 @@
   color: var(--todan-muted);
 }
 
-/* セクションの扉：地を反転させる */
+/* Section divider: flip the ground */
 .invert {
   background: var(--todan-fg);
   color: var(--todan-bg);
@@ -25,7 +25,7 @@
   letter-spacing: -0.04em;
 }
 
-/* 全面スライドに重ねる文字 */
+/* Text laid over a full-bleed slide */
 .caption {
   position: absolute;
   inset: auto 0 0 0;
@@ -34,4 +34,6 @@
   color: #fff;
 }
 .caption h2,
-.caption p { margin: 0; }
+.caption p {
+  margin: 0;
+}

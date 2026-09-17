@@ -1,116 +1,134 @@
-import { Slide, Step, Pad, Center, Cols, Full, deck } from 'todan'
-import 'todan/deck.css'
-import 'todan/themes/nine009.css'
-import './slides.css'
+import { Center, Cols, deck, Full, Pad, Slide, Step } from "todan";
+import "todan/deck.css";
+import "todan/themes/nine009.css";
+import "./slides.css";
 
 class Title extends Slide {
-  static path = 'title'
+  static path = "title";
   render() {
     return (
       <Center>
         <p class="eyebrow">todan — 登壇</p>
-        <h1>よく使う型</h1>
-        <p class="lead">毎回これを作り直すことになるので、写して使う</p>
+        <h1>Shapes you keep needing</h1>
+        <p class="lead">You will rebuild these every time, so copy them from here</p>
       </Center>
-    )
+    );
   }
 }
 
 class Section extends Slide {
-  static path = 'section'
+  static path = "section";
   render() {
     return (
       <Center class="invert">
         <p class="num">01</p>
-        <h2>セクションの扉</h2>
+        <h2>A section divider</h2>
       </Center>
-    )
+    );
   }
 }
 
 class TwoCols extends Slide {
-  static path = 'cols'
-  static steps = 2
+  static path = "cols";
+  static steps = 2;
   render() {
     return (
       <Pad>
-        <h2>二段組</h2>
+        <h2>Two columns</h2>
         <Cols>
           <div>
-            <h3>左</h3>
-            <p>説明はこちら。読ませたい文章を置く。</p>
+            <h3>Left</h3>
+            <p>The explanation goes here — the part you want read.</p>
           </div>
           <Step n={1}>
             <div>
-              <h3>右</h3>
-              <p>図やコードを置いて、キーを押してから見せる。</p>
+              <h3>Right</h3>
+              <p>A diagram or some code, held back until you press the key.</p>
             </div>
           </Step>
         </Cols>
       </Pad>
-    )
+    );
   }
 }
 
 class Ratio extends Slide {
-  static path = 'ratio'
+  static path = "ratio";
   render() {
     return (
       <Pad>
-        <h2>比率を変える</h2>
+        <h2>Changing the proportions</h2>
         <Cols ratio="2fr 1fr">
-          <p>本文を広く取って、右に補足を細く添える。grid-template-columns をそのまま渡せる。</p>
+          <p>
+            Give the body most of the width and set a narrow aside beside it. Whatever you pass goes
+            straight to grid-template-columns.
+          </p>
           <aside>
-            <h3>補足</h3>
-            <p>細い側。</p>
+            <h3>Aside</h3>
+            <p>The narrow one.</p>
           </aside>
         </Cols>
       </Pad>
-    )
+    );
   }
 }
 
 class FullBleed extends Slide {
-  static path = 'full'
+  static path = "full";
   render() {
     return (
       <Full>
         <img src="/photo.svg" alt="" />
         <div class="caption">
-          <h2>全面</h2>
-          <p>余白を無視して端まで使う。文字は上に重ねる。</p>
+          <h2>Full bleed</h2>
+          <p>Ignore the padding and run to the edges. Text sits on top.</p>
         </div>
       </Full>
-    )
+    );
   }
 }
 
 class Quote extends Slide {
-  static path = 'quote'
+  static path = "quote";
   render() {
     return (
       <Center>
         <blockquote>
-          最良のコードは、書かれなかったコードである。
-          <cite>— よく言われるやつ</cite>
+          The best code is the code that was never written.
+          <cite>— the thing everyone says</cite>
         </blockquote>
       </Center>
-    )
+    );
   }
 }
 
-/** スタイルをこのスライドの中に同居させる例。同時に1枚しか居ないので衝突しない。 */
+/** Styles kept inside the slide. Only one slide is mounted, so nothing collides. */
 class Stats extends Slide {
-  static path = 'stats'
-  static steps = 4
+  static path = "stats";
+  static steps = 4;
   render() {
     return (
       <Pad>
-        <h2>数字を並べる</h2>
+        <h2>Figures side by side</h2>
         <Cols>
-          <Step n={1}><div><b>151</b><span>dom.ts の行数</span></div></Step>
-          <Step n={2}><div><b>6.4 kB</b><span>ビルド後</span></div></Step>
-          <Step n={3}><div><b>0</b><span>依存</span></div></Step>
+          <Step n={1}>
+            <div>
+              <b>166</b>
+              <span>lines in dom.ts</span>
+            </div>
+          </Step>
+          <Step n={2}>
+            <div>
+              <b>6.4 kB</b>
+              <span>built</span>
+            </div>
+          </Step>
+          <Step n={3}>
+            <div>
+              <b>0</b>
+              <span>dependencies</span>
+            </div>
+          </Step>
         </Cols>
 
         <style>{`
@@ -125,8 +143,8 @@ class Stats extends Slide {
           .todan-cols span { font-size: 26px; color: var(--todan-muted); }
         `}</style>
       </Pad>
-    )
+    );
   }
 }
 
-deck([Title, Section, TwoCols, Ratio, FullBleed, Quote, Stats])
+deck([Title, Section, TwoCols, Ratio, FullBleed, Quote, Stats]);

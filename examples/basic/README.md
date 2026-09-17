@@ -1,7 +1,7 @@
 # basic
 
-todan の最小構成。表紙・段階表示・クラスの状態の 3 枚。
+The smallest todan deck: a cover, staged reveals, and state held on a class.
 
 ```
-npm run dev -w example-basic
+vp dev
 ```

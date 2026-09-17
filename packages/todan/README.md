@@ -1,186 +1,190 @@
 # todan
 
-**登壇** — 壇に上がること。
+**登壇 (tōdan)** — to step onto the platform, to give a talk.
 
-JSX でスライドを書く。React も VDOM も無し。
+Write slides in JSX. No React, no virtual DOM.
 
 ```
 npm create todan@latest my-deck
 ```
 
-依存ゼロ、ビルド 6.4 kB (gzip 2.9 kB)。
+Zero dependencies; the build comes to 6.4 kB (2.9 kB gzipped).
 
-## 構成
+## What is in here
 
-| ファイル | 行 | 中身 |
-|---|---|---|
-| [src/jsx-runtime.ts](src/jsx-runtime.ts) | 31 | JSX → `{type, props, key}` + `JSX` 型定義 |
-| [src/dom.ts](src/dom.ts) | 162 | vnode → DOM 生成、`Component` と `setState` / `flushSync` |
-| [src/nav.ts](src/nav.ts) | 26 | スライド/段階の移動と URL。純粋関数 |
-| [src/deck.tsx](src/deck.tsx) | 132 | `Slide` / `Step` / `Deck` / `deck()` |
-| [src/layout.tsx](src/layout.tsx) | 57 | `Pad` / `Center` / `Cols` / `Full` |
-| [src/themes/](src/themes) | — | キーキャップのカラーウェイ 6 種 |
+| File                                     | Lines |                                                              |
+| ---------------------------------------- | ----- | ------------------------------------------------------------ |
+| [src/jsx-runtime.ts](src/jsx-runtime.ts) | 31    | JSX → `{type, props, key}`, plus the `JSX` types             |
+| [src/dom.ts](src/dom.ts)                 | 166   | vnode → DOM, `Component`, `setState`, `flushSync`            |
+| [src/nav.ts](src/nav.ts)                 | 26    | Moving between slides and steps, and the URL. Pure functions |
+| [src/deck.tsx](src/deck.tsx)             | 134   | `Slide` / `Step` / `Deck` / `deck()`                         |
+| [src/layout.tsx](src/layout.tsx)         | 57    | `Pad` / `Center` / `Cols` / `Full`                           |
+| [src/themes/](src/themes)                | —     | Six keycap colorways                                         |
 
-`tsconfig.json` の `jsxImportSource: "todan"` だけで繋がる。Vite はこれを読むので
-vite.config.ts に JSX の設定は要らない。
+## Build tools
 
-## 書き方
-
-ファイルは 1 つ。スライドを並べて `deck()` に渡すところまでが全部入る。
-
-```tsx
-// src/index.tsx
-import { Slide, Step, Center, Pad, Cols, deck } from 'todan'
-import 'todan/deck.css'
-import 'todan/themes/olivia.css'
-
-class Intro extends Slide<{}, { count: number }> {
-  static path = 'intro'     // → #intro.1（省略すると #0.1）
-  static steps = 2          // このスライドが吸収するキー入力の回数
-  state = { count: 0 }
-
-  mounted() { /* タイマーや video の制御はここ */ }
-  updated() { /* 作り直しの直後。フォーカスなど DOM 側の状態を戻す */ }
-  unmounted() {}
-
-  render() {
-    return (
-      <Pad>
-        <h2>タイトル</h2>
-        <Cols ratio="2fr 1fr">
-          <p>本文。<strong>強調</strong>はアクセント色になる。</p>
-          <img src="/photo.jpg" />
-        </Cols>
-        <Step n={1}><p>2 回目のキーで出る</p></Step>
-      </Pad>
-    )
-  }
-}
-
-deck([Intro])
-```
-
-`deck()` は `#root` を探し、無ければ `body` に容器を作って描き始める。
-
-### 組み込みコンポーネント
-
-毎回書くことになる配置だけを持っている。どれもクラス名は `todan-` 始まりで
-`@layer` の中なので、素の CSS で上書きできる。
-
-| | 中身 |
-|---|---|
-| `<Pad>` | スライド本体。高さいっぱい + `--todan-pad` の余白 |
-| `<Center>` | `<Pad>` と同じで、中身を縦方向の中央に寄せる。表紙やセクションの扉に |
-| `<Cols>` | 段組み。子の数だけ列ができる。`ratio="2fr 1fr"` で比率を指定 |
-| `<Full>` | 余白を無視して端まで。直下の `img` / `video` が全面に敷かれる |
-| `<Step n={1}>` | 到達するまで透明。場所は取り続けるのでレイアウトが動かない。`<ul>` の中では `as="li"` を付けて、div が挟まらないようにする |
-
-これ以外は素の HTML を書く。`<img>` `<video>` `<table>` `<svg>` はそのまま使えて、
-`<svg>` 以下は自動で SVG 名前空間になる。見出し・本文・箇条書き・引用・`code` には
-`todan.type` レイヤーで体裁が入っているので、`<h2>` と書けばスライド用の大きさになる。
-
-## 操作
-
-`→ ↓ Space` 進む / `← ↑` 戻る / `Home` `End` / `f` フルスクリーン / クリック進む・Shift+クリック戻る。
-位置は `#intro.1` で URL に入る。リロードしてもその場所。`replaceState` なので履歴は積まない
-（ブラウザバックは ← と競合せず、デッキ自体を抜ける）。
-
-## ビルドツール
-
-統合点は tsconfig の 1 行だけ。
+The integration point is a single line of `tsconfig.json`.
 
 ```json
 { "compilerOptions": { "jsx": "react-jsx", "jsxImportSource": "todan" } }
 ```
 
-| | 追加設定 |
-|---|---|
-| Vite | 不要 |
-| Rsbuild | 不要 |
-| 素の Rspack | 必要（下記） |
+|                   | Extra configuration |
+| ----------------- | ------------------- |
+| Vite              | none                |
+| Rsbuild           | none                |
+| Rspack on its own | required (below)    |
 
-Vite も Rsbuild も tsconfig の `jsxImportSource` を読むので、`npm create todan` が作った
-プロジェクトはそのまま両方でビルドできる。エントリを `src/index.tsx` にしてあるのは
-Rsbuild の既定のエントリに合わせるため（Vite は `index.html` の script src を見るので影響なし）。
+Vite and Rsbuild both read `jsxImportSource` from `tsconfig.json`, so a project made by
+`npm create todan` builds under either one untouched. The entry is `src/index.tsx` to match
+Rsbuild's default; Vite reads the script tag in `index.html`, so the name costs nothing there.
 
-素の Rspack をバンドラとして直接使う場合だけ、SWC が tsconfig を見ないので loader に明示する:
+Only bare Rspack needs telling, because SWC does not look at `tsconfig.json`:
 
 ```js
 {
   test: /\.tsx?$/,
-  loader: 'builtin:swc-loader',
+  loader: "builtin:swc-loader",
   options: {
     jsc: {
-      parser: { syntax: 'typescript', tsx: true },
-      transform: { react: { runtime: 'automatic', importSource: 'todan' } },
+      parser: { syntax: "typescript", tsx: true },
+      transform: { react: { runtime: "automatic", importSource: "todan" } },
     },
   },
 }
 ```
 
-`importSource` を書き忘れると SWC が `react/jsx-runtime` を探しに行って
-`Can't resolve 'react/jsx-runtime'` で止まる。todan 側の問題に見えないので注意。
+Leave `importSource` out and SWC goes looking for `react/jsx-runtime`, failing with
+`Can't resolve 'react/jsx-runtime'` — which does not look like a todan problem at all.
 
-## テーマ
+## Writing a deck
 
-CSS を 1 本読むだけ。中身は `--todan-*` の上書きだけで、JS は無い。
+One file. The slides and the `deck()` call that starts them live together.
+
+```tsx
+// src/index.tsx
+import { Cols, deck, Pad, Slide, Step } from "todan";
+import "todan/deck.css";
+import "todan/themes/olivia.css";
+
+class Intro extends Slide<{}, { count: number }> {
+  static path = "intro"; // → #intro.1 (without it, the index is used)
+  static steps = 2; // how many key presses this slide absorbs
+  state = { count: 0 };
+
+  mounted() {
+    /* timers and video control go here */
+  }
+  updated() {
+    /* right after a rebuild: restore focus and other DOM-side state */
+  }
+  unmounted() {}
+
+  render() {
+    return (
+      <Pad>
+        <h2>Heading</h2>
+        <Cols ratio="2fr 1fr">
+          <p>
+            Body text. <strong>Emphasis</strong> takes the accent color.
+          </p>
+          <img src="/photo.jpg" />
+        </Cols>
+        <Step n={1}>
+          <p>Appears on the second key press</p>
+        </Step>
+      </Pad>
+    );
+  }
+}
+
+deck([Intro]);
+```
+
+`deck()` looks for `#root` and creates a container on `body` if there is none.
+
+### Built-in components
+
+Only the arrangements you would otherwise rewrite on every deck. Each carries a `todan-`
+class inside an `@layer`, so plain CSS overrides it.
+
+|                |                                                                                                                                      |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `<Pad>`        | The body of a slide: full height, `--todan-pad` of padding                                                                           |
+| `<Center>`     | `<Pad>` with its contents centred vertically. For covers and section dividers                                                        |
+| `<Cols>`       | Columns — one per child. `ratio="2fr 1fr"` sets the proportions                                                                      |
+| `<Full>`       | Full bleed, ignoring the padding. A direct `img` / `video` child covers the slide                                                    |
+| `<Step n={1}>` | Transparent until the step is reached, but holds its space so nothing shifts. Inside `<ul>`, add `as="li"` so no `div` comes between |
+
+Everything else is plain HTML. `<img>`, `<video>`, `<table>` and `<svg>` work as they are, and
+anything under `<svg>` gets the SVG namespace automatically. Headings, body text, lists, quotes
+and `code` already carry slide-sized typography from the `todan.type` layer, so `<h2>` is
+simply the right size.
+
+## Themes
+
+One stylesheet. It only overrides `--todan-*`; there is no JavaScript in it.
 
 ```ts
-import 'todan/deck.css'
-import 'todan/themes/olivia.css'
+import "todan/deck.css";
+import "todan/themes/olivia.css";
 ```
 
-キーキャップのカラーウェイから採っている。
+Taken from keycap colorways.
 
-| | 地 | 明暗 | 用途 |
-|---|---|---|---|
-| `olivia` | 生成り + サーモン | 明 | 上品で無難。迷ったらこれ |
-| `noel` | 淡いアクア + 桜色 | 明 | やわらかい、かわいい寄り |
-| `nine009` | 灰味ベージュ + 橙 | 明 | レトロな計算機の色 |
-| `botanical` | 生成り + 深緑 | 明 | 落ち着いた、文字の多い話向け |
-| `dolch` | 黒 + 灰 + 白 | 暗 | 単色。どんな照明でも潰れない |
-| `laser` | 深い紫 + マゼンタ/シアン | 暗 | 派手にやりたい時 |
+|             | Ground                            |       | For                               |
+| ----------- | --------------------------------- | ----- | --------------------------------- |
+| `olivia`    | cream and salmon                  | light | Elegant and safe. Start here      |
+| `noel`      | pale aqua and blossom pink        | light | Soft, on the cute side            |
+| `nine009`   | grey-beige and orange             | light | The color of an old calculator    |
+| `botanical` | cream and deep green              | light | Calm; good for text-heavy talks   |
+| `dolch`     | black, grey, white                | dark  | Monochrome. Survives any lighting |
+| `laser`     | deep purple with magenta and cyan | dark  | When you want it loud             |
 
-どのテーマも**プロジェクタで読める明暗差をテストで縛ってある**
-（本文 7:1 以上、補足 4.5:1 以上、見出し・図形 3:1 以上）。
-テーマを足す時も同じ基準を通す必要がある。手元の画面で綺麗でも会場で読めない配色を防ぐため。
+Every theme is **held to a contrast bar by tests** — body text at 7:1 or better, secondary text
+at 4.5:1, headings and shapes at 3:1. A new theme has to clear the same bar, because a palette
+that looks lovely on a laptop can be unreadable from the back of a room.
 
-自前のテーマは同じトークンを書けばいい。`:root` に置けば todan のレイヤーに勝つ。
+For your own theme, write the same tokens. Put them on `:root` and they beat todan's layer.
 
-## スタイルの境界
+## Where todan stops and you start
 
-todan のスタイルは**全部 `@layer` の中**にある。レイヤー付きのスタイルはレイヤー無しに必ず負けるので、
-利用側は素のセレクタを書くだけで何でも上書きできる。`!important` も特異度の細工も要らない。
+Every todan style lives inside an `@layer`. Layered styles always lose to unlayered ones, so a
+plain selector wins without `!important` and without specificity games.
 
 ```css
-/* あなたの CSS。todan の .pager より特異度が低くても勝つ */
-.pager { display: none; }
+/* yours — beats todan's .pager even at lower specificity */
+.pager {
+  display: none;
+}
 ```
 
-境界は3層:
+Three tiers:
 
-| 層 | 中身 | 扱い |
-|---|---|---|
-| **仕組み** | `.stage` の `position` / `transform` / `transform-origin`、`--todan-scale`、`.step[data-shown]` | 上書きすると拡大縮小と段階表示が壊れる |
-| **トークン** | `--todan-*` | **上書き前提の公開 API**。テーマはこれだけを書き換える |
-| **見た目** | `.deck` / `.stage` の色、`.pager`、遷移 | 自由に上書き |
+| Tier           | What                                                                                           |                                                |
+| -------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| **Machinery**  | `.stage`'s `position` / `transform` / `transform-origin`, `--todan-scale`, `.step[data-shown]` | Override it and scaling and reveals break      |
+| **Tokens**     | `--todan-*`                                                                                    | **The public API.** Themes change nothing else |
+| **Appearance** | colors, `.pager`, transitions                                                                  | Yours                                          |
 
-### トークン
+### Tokens
 
 ```css
 :root {
-  --todan-fg: #16181d;        /* 文字色 */
-  --todan-bg: #fbfaf8;        /* スライドの地 */
+  --todan-fg: #16181d; /* text */
+  --todan-bg: #fbfaf8; /* the slide's ground */
   --todan-accent: #2f6df6;
   --todan-muted: #6b7280;
-  --todan-font: system-ui, "Hiragino Sans", sans-serif;
-  --todan-pad: 96px 120px;    /* スライドの余白（使うかは利用側の自由） */
-  --todan-letterbox: #111;    /* 画面とスライドの間に出る色 */
+  --todan-font: system-ui, sans-serif;
   --todan-accent-2: var(--todan-accent);
-  --todan-rule: …;            /* 罫線 */
+  --todan-rule: …; /* rules and borders */
   --todan-font-mono: …;
 
-  --todan-h1: 92px;           /* 1920x1080 上の実寸 */
+  --todan-pad: 96px 120px; /* slide padding; using it is up to you */
+  --todan-gap: 72px; /* the gap between columns */
+  --todan-letterbox: #111; /* what shows around the slide */
+
+  --todan-h1: 92px; /* real sizes on the 1920x1080 canvas */
   --todan-h2: 60px;
   --todan-h3: 34px;
   --todan-text: 32px;
@@ -190,84 +194,95 @@ todan のスタイルは**全部 `@layer` の中**にある。レイヤー付き
 }
 ```
 
-見出し・本文・箇条書き・引用・`code` には `todan.type` レイヤーで最低限の体裁が入っている。
-全部トークンで書いてあるので、テーマ側は値を差し替えるだけで全体が動く。
+### Keeping styles next to the slide
 
-### スタイルをスライドに同居させる
-
-CSS Modules のような別ファイルにしなくても、`<style>` をスライドの中にそのまま書ける。
-**同時にマウントされるスライドは 1 枚だけ**なので、書いたスタイルはそのスライドが表に居る間だけ効く。
-スライドを離れると `<style>` ごと外れる。
+You do not need a separate file or CSS Modules: write `<style>` inside the slide.
+**Only one slide is mounted at a time**, so what you write applies while that slide is up and
+leaves with it.
 
 ```tsx
 class Stats extends Slide {
   render() {
     return (
-      <section class="pad">
-        <div class="stats">...</div>
+      <Pad>
+        <div class="stats">…</div>
         <style>{`
           .stats { display: flex; gap: 80px; }
           .stats b { font-size: 96px; color: var(--todan-accent); }
         `}</style>
-      </section>
-    )
+      </Pad>
+    );
   }
 }
 ```
 
-同居の手段は3つあり、できることが違う:
+Three ways to keep styles close, and they are not equivalent:
 
-| | 擬似クラス / 擬似要素 | メディアクエリ | 子孫セレクタ | keyframes |
-|---|---|---|---|---|
-| `style={{ }}` | ✗ | ✗ | ✗ | ✗ |
-| スライド内の `<style>` | ✓ | ✓ | ✓ | ✓ |
-| 外部 `.css` | ✓ | ✓ | ✓ | ✓ |
+|                        | Pseudo-classes and elements | Media queries | Descendant selectors | Keyframes |
+| ---------------------- | --------------------------- | ------------- | -------------------- | --------- |
+| `style={{ }}`          | ✗                           | ✗             | ✗                    | ✗         |
+| `<style>` in the slide | ✓                           | ✓             | ✓                    | ✓         |
+| A separate `.css` file | ✓                           | ✓             | ✓                    | ✓         |
 
-`style={{ }}` は 1 つの値を差し込む用（上の例の `width: ${pct}%` など）。
-それ以外は `<style>` を使えば、別ファイルにせずに全部書ける。
+`style={{ }}` is for injecting one value, such as the `width: ${pct}%` above. For anything
+else, `<style>` covers it without a separate file.
 
+## Slide transitions
 
-## スライド遷移
-
-スライドをまたぐ差し替えは View Transitions でクロスフェードする。速さは CSS 変数:
+Crossing to another slide cross-fades through View Transitions. The speed is a variable:
 
 ```css
-:root { --slide-fade: 180ms; }   /* 既定 180ms */
+:root {
+  --slide-fade: 180ms;
+} /* --todan-slide-fade, default 180ms */
 ```
 
-- **step の移動では遷移しない**。`.step` の opacity transition がそのまま担当する
-- `prefers-reduced-motion: reduce` で遷移も段階表示のフェードも切れる
-- `document.startViewTransition` が無いブラウザでは、単に瞬間的に切り替わる（機能検出あり）
+- **Stepping does not transition.** The opacity transition on `.step` handles that.
+- `prefers-reduced-motion: reduce` turns off both the transition and the step fade.
+- Where `document.startViewTransition` is missing, slides simply cut. There is a feature check.
 
-`::view-transition-group(root)` にも同じ duration を当てている。ここを省くと group だけ
-UA 既定の 250ms が残り、遷移の完了が 70ms ほど遅れて連打時にもたつく。
+`::view-transition-group(root)` gets the same duration. Leave it out and the group keeps the
+UA's 250ms, which holds the transition open about 70ms longer and makes fast stepping feel
+sluggish.
 
-## 再レンダリングしない経路
+## Paths that never re-render
 
-段階表示と拡大率は、意図的に `render()` を通らない:
+Reveals and scaling deliberately avoid `render()`:
 
-- **step の切り替え** → `.step` の `data-shown` 属性を叩くだけ。CSS transition が生き残る
-- **リサイズ** → `:root` の `--scale` を書き換えるだけ。スライドの DOM に触らない
+- **Stepping** toggles `data-shown` on `.step`. The CSS transition survives
+- **Resizing** rewrites `--todan-scale` on `:root`. The slide's DOM is untouched
 
-`render()` が走るのは **スライドをまたぐ時**と**スライド自身の `setState`** だけ。
+`render()` runs when you cross to another slide, and when a slide calls its own `setState`.
 
-## 状態のライフサイクル
+## Controls
 
-- `setState` → **そのスライドの DOM を作り直す**（差分は取らない）
-- スライドをまたぐ → アンマウントされて state はリセット
-- スライド間で状態を共有する仕組みは**無い**。必要になったら nanostores なり `atom` 自作なりを外に置き、
-  `mounted()` で `subscribe` して `setState` を呼ぶ
+`→ ↓ Space` forward, `← ↑` back, `Home` `End`, `f` fullscreen. Clicking advances;
+shift-clicking goes back.
 
-## 割り切っているところ
+The position lives in the URL as `#intro.1`, so a reload lands in the same place. todan uses
+`replaceState`, so no history is stacked — the browser's back button leaves the deck rather
+than fighting the arrow keys.
 
-- **`setState` は DOM の同一性を保たない**。`<video>`、フォーカス中の `<input>`、進行中の transition を
-  `setState` するスライドに置くと壊れる。フォーカスやスクロールは `updated()` で戻せる
-  （[examples/interactive](../../examples/interactive) 参照）。丸ごと避けたいなら差分適用を戻すこと
-  （[dom.ts](src/dom.ts) の `flush()` を patch ベースに戻す ≒ 50 行）
-- **段階表示は `<Step>` 経由のみ**。`render()` の中で step による条件分岐はできない
-- **コンポーネントのルートは単一要素**。複数返すと最初のひとつだけ描画される
-- **`<Step>` は既定で div を作る**。`<ul>` / `<ol>` の中では `as="li"` を付けること。
-  付け忘れると `ul > div > li` になって `ul > li` のセレクタが効かなくなる
-- **`<Step>` はモジュール変数から現在の step を読む**。デッキを画面に 2 つ並べるなら持ち方を変える
-- `slides` にはクラスをそのまま並べる。`(p) => <Demo {...p} />` でラップすると `static steps` / `path` が消える
-- DOM ハンドルを取る `ref` は無い。`<video>` や `<canvas>` を触りたくなったら足す（5 行程度）
+## The life of state
+
+- `setState` **rebuilds that slide's DOM**; nothing is diffed
+- Crossing to another slide unmounts it and the state is gone
+- There is **no mechanism for sharing state between slides**. When you need one, put a store
+  outside — nanostores, or a hand-rolled atom — and `subscribe` to it in `mounted()`
+
+## What has been traded away
+
+- **`setState` does not preserve DOM identity.** A `<video>`, a focused `<input>` or a
+  transition in flight will break on a slide that calls it. Focus and scroll can be put back in
+  `updated()` (see [examples/interactive](../../examples/interactive)). To avoid the whole
+  problem, bring diffing back: `flush()` in [dom.ts](src/dom.ts) becomes a patch, roughly 50 lines
+- **Reveals go through `<Step>` only.** You cannot branch on the step inside `render()`
+- **A component's root is a single element.** Return several and only the first is drawn
+- **`<Step>` builds a `div` by default.** Inside `<ul>` or `<ol>`, pass `as="li"`, or you get
+  `ul > div > li` and `ul > li` stops matching
+- **`<Step>` reads the current step from a module-level variable.** Two decks on one screen
+  would need that moved
+- **Put the classes themselves in `slides`.** `(p) => <Demo {...p} />` drops `static steps`
+  and `path`
+- **There is no `ref`.** Add one (about five lines) when you need a handle on a `<video>` or
+  `<canvas>`

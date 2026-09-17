@@ -1,6 +1,6 @@
 /*
- * todan のスタイルは全部 @layer の中にあるので、ここに素のセレクタを書けば必ず勝つ。
- * 見出しや箇条書きの体裁は todan 側が持っているので、ここには差分だけ書く。
+ * Every todan style lives inside an @layer, so a plain selector here always wins.
+ * Headings and lists already carry their sizing from todan; only the differences go here.
  */
 .lead {
   font-size: 36px;

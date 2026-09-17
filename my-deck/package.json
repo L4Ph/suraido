@@ -1,0 +1,19 @@
+{
+  "name": "my-deck",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vp dev",
+    "build": "vp build",
+    "preview": "vp preview"
+  },
+  "dependencies": {
+    "todan": "^0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0",
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.3.2",
+    "vite-plus": "0.3.2"
+  }
+}

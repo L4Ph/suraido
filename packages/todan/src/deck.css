@@ -1,13 +1,13 @@
 /*
- * todan のスタイルは全部このレイヤーの中にある。
- * レイヤー付きのスタイルはレイヤー無しのスタイルに必ず負けるので、
- * 利用側は素のセレクタを書くだけで何でも上書きできる。!important も特異度の細工も要らない。
+ * Every todan style lives inside this layer.
+ * Layered styles always lose to unlayered ones, so anything here can be overridden
+ * with a plain selector — no !important, no specificity games.
  */
 @layer todan.base, todan.theme, todan.type, todan.layout, todan.deck;
 
 @layer todan.theme {
   :root {
-    /* ---- 上書きしてほしいもの（テーマの公開 API） ---- */
+    /* ---- meant to be overridden: the theme API ---- */
     --todan-fg: #16181d;
     --todan-bg: #fbfaf8;
     --todan-accent: #2f6df6;
@@ -22,7 +22,7 @@
     --todan-gap: 72px;
     --todan-letterbox: #111;
 
-    /* 1920x1080 のキャンバス上の実寸 */
+    /* real sizes on the 1920x1080 canvas */
     --todan-h1: 92px;
     --todan-h2: 60px;
     --todan-h3: 34px;
@@ -48,8 +48,9 @@
 
 @layer todan.type {
   /*
-   * スライドの中の素の要素に最低限の体裁を与える。テーマはここをトークン経由で着せ替える。
-   * 全部トークンで書いてあるので、値を1つ差し替えれば全体が動く。
+   * Gives the plain elements inside a slide enough shape to read. Themes dress this
+   * through the tokens: everything below is written in them, so changing one value moves
+   * the whole deck.
    */
   .stage :is(h1, h2, h3) {
     margin: 0 0 0.4em;
@@ -57,23 +58,40 @@
     line-height: 1.2;
     text-wrap: balance;
   }
-  .stage h1 { font-size: var(--todan-h1); letter-spacing: -0.03em; }
-  .stage h2 { font-size: var(--todan-h2); }
-  .stage h3 { font-size: var(--todan-h3); }
+  .stage h1 {
+    font-size: var(--todan-h1);
+    letter-spacing: -0.03em;
+  }
+  .stage h2 {
+    font-size: var(--todan-h2);
+  }
+  .stage h3 {
+    font-size: var(--todan-h3);
+  }
 
   .stage p,
   .stage li {
     font-size: var(--todan-text);
     line-height: 1.7;
   }
-  .stage p { margin: 0 0 0.6em; }
+  .stage p {
+    margin: 0 0 0.6em;
+  }
 
   .stage ul,
-  .stage ol { padding-left: 1.2em; }
-  .stage li { margin-bottom: 0.4em; }
-  .stage li::marker { color: var(--todan-accent); }
+  .stage ol {
+    padding-left: 1.2em;
+  }
+  .stage li {
+    margin-bottom: 0.4em;
+  }
+  .stage li::marker {
+    color: var(--todan-accent);
+  }
 
-  .stage strong { color: var(--todan-accent); }
+  .stage strong {
+    color: var(--todan-accent);
+  }
 
   .stage code {
     font-family: var(--todan-font-mono);
@@ -119,7 +137,7 @@
     align-items: flex-start;
   }
 
-  /* 子の数だけ列ができる。ratio を渡した時だけ grid-template-columns に切り替わる。 */
+  /* One column per child. Passing ratio switches it to grid-template-columns. */
   .todan-cols {
     display: grid;
     grid-auto-flow: column;
@@ -147,9 +165,9 @@
   }
 
   /*
-   * ---- 仕組みであってスタイルではない ----
-   * スライドは固定ピクセルで書き、--todan-scale で画面に合わせる。
-   * position / transform / transform-origin を上書きすると拡大縮小が壊れる。
+   * ---- machinery, not style ----
+   * Slides are written in fixed pixels and fitted to the window with --todan-scale.
+   * Override position / transform / transform-origin and the scaling breaks.
    */
   .stage {
     position: absolute;
@@ -162,7 +180,7 @@
     color: var(--todan-fg);
   }
 
-  /* 段階表示。data-shown は Deck が付け外しする。 */
+  /* Staged reveals. Deck adds and removes data-shown. */
   .step {
     transition: opacity var(--todan-step-fade);
   }
@@ -180,8 +198,8 @@
   }
 
   /*
-   * スライドの差し替えはクロスフェード。
-   * group も指定しないと、そこだけ UA 既定の 250ms が残って遷移の完了が遅れる。
+   * Crossing to another slide cross-fades.
+   * Leave the group out and it keeps the UA's 250ms, holding the transition open longer.
    */
   ::view-transition-group(root),
   ::view-transition-old(root),
