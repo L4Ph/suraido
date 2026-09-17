@@ -2,9 +2,19 @@
   "name": "create-todan",
   "version": "0.1.0",
   "description": "登壇 — スライドのプロジェクトを作る",
-  "type": "module",
   "license": "MIT",
-  "bin": { "create-todan": "index.js" },
-  "files": ["index.js", "template"],
-  "engines": { "node": ">=20" }
+  "bin": {
+    "create-todan": "index.js"
+  },
+  "files": [
+    "index.js",
+    "template"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "prepack": "rm -rf template/dist template/.vite"
+  }
 }

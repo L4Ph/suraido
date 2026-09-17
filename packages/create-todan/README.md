@@ -10,6 +10,6 @@ npm create todan@latest my-deck
 `class` を使う・`deck()` に渡す配列はラップしない・`setState` は DOM を作り直す・
 スタイルは `@layer` の外から上書きする、など。
 
-**`.claude/skills/rehearse/`** — 通し稽古の skill。全スライドを開いて測り、
+**`.agents/skills/rehearse/`** — 通し稽古の skill。全スライドを開いて測り、
 1920x1080 から**はみ出して切り落とされた内容**（`overflow: hidden` なので見ても気づけない）、
 読めないコントラスト、表示されない画像を見つける。
