@@ -30,12 +30,15 @@ jobs:
           cache: true
 
       - run: vp install
-      - run: vp check
-      - run: vp test
+
+      # First, because everything else resolves suraido.js through dist — including its
+      # types. Without it vp check cannot find the JSX namespace and reports the examples
+      # as 424 errors.
+      - run: vp pack
         working-directory: packages/suraido
 
-      # The showcase imports suraido.js, which the workspace serves from dist.
-      - run: vp pack
+      - run: vp check
+      - run: vp test
         working-directory: packages/suraido
 
       - run: vp build
