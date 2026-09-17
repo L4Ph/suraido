@@ -18,8 +18,8 @@ class Sampler extends Slide {
         <hr />
         <Cols>
           <ul>
-            <Step n={1}><li>段階表示</li></Step>
-            <Step n={2}><li>箇条書きの点もアクセント</li></Step>
+            <Step n={1} as="li">段階表示</Step>
+            <Step n={2} as="li">箇条書きの点もアクセント</Step>
           </ul>
           <blockquote>
             最良のコードは、書かれなかったコード。

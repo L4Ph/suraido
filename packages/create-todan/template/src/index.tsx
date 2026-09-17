@@ -24,8 +24,8 @@ class Points extends Slide {
       <Pad>
         <h2>言いたいこと</h2>
         <ul>
-          <Step n={1}><li>ひとつめ</li></Step>
-          <Step n={2}><li>ふたつめ</li></Step>
+          <Step n={1} as="li">ひとつめ</Step>
+          <Step n={2} as="li">ふたつめ</Step>
         </ul>
       </Pad>
     )

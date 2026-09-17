@@ -13,7 +13,7 @@ import { Window } from 'happy-dom'
 const DIST = new URL('../dist/', import.meta.url)
 assert.ok(existsSync(new URL('deck.js', DIST)), 'dist が無い: 先に npm run build')
 
-async function mountDeck(hash: string) {
+async function mountDeck(hash: string, kind: 'points' | 'list' = 'points') {
   const win = new Window({ url: `http://localhost/${hash}` })
   Object.assign(globalThis, {
     document: win.document,
@@ -39,14 +39,40 @@ async function mountDeck(hash: string) {
     }
   }
 
+  class List extends Slide {
+    static path = 'list'
+    static steps = 3
+    render() {
+      return jsx('ul', {
+        children: [
+          jsx(Step, { n: 1, as: 'li', children: 'a' }),
+          jsx(Step, { n: 2, as: 'li', children: 'b' }),
+        ],
+      })
+    }
+  }
+
   const host = win.document.createElement('div') as unknown as Element
-  render(jsx(Deck, { slides: [Points] }), host)
+  render(jsx(Deck, { slides: [kind === 'list' ? List : Points] }), host)
   await new Promise((r) => setTimeout(r, 0))
   return {
+    host,
     shown: [...host.querySelectorAll('.step')].map((e) => e.hasAttribute('data-shown')),
     hash: win.location.hash,
   }
 }
+
+test('<Step as="li"> は div を挟まず ul の直接の子になる', async () => {
+  const { host } = await mountDeck('#list.1', 'list')
+  const ul = host.querySelector('ul')!
+  assert.deepEqual(
+    [...ul.children].map((c) => c.tagName.toLowerCase()),
+    ['li', 'li'],
+    'ul の直下は li だけであること（div が挟まると ul > li が効かなくなる）',
+  )
+  assert.ok(ul.querySelector('li.step[data-n="1"]'), 'li 自身が .step を持つ')
+  assert.equal(ul.querySelectorAll('div').length, 0)
+})
 
 test('冷えた状態で #points.2 を開くと、最初の描画から段階 2 まで出ている', async () => {
   const { shown, hash } = await mountDeck('#points.2')

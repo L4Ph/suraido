@@ -25,15 +25,9 @@ class Agenda extends Slide {
       <Pad>
         <h2>フレームワークの中身</h2>
         <ul class="bullets">
-          <Step n={1}>
-            <li><code>jsx-runtime</code> — JSX を vnode にするだけの 8 行</li>
-          </Step>
-          <Step n={2}>
-            <li><code>dom.ts</code> — vnode から DOM を生成 + クラスの状態</li>
-          </Step>
-          <Step n={3}>
-            <li><code>deck.tsx</code> — 固定キャンバスの縮小とキー操作</li>
-          </Step>
+          <Step n={1} as="li"><code>jsx-runtime</code> — JSX を vnode にするだけの 8 行</Step>
+          <Step n={2} as="li"><code>dom.ts</code> — vnode から DOM を生成 + クラスの状態</Step>
+          <Step n={3} as="li"><code>deck.tsx</code> — 固定キャンバスの縮小とキー操作</Step>
         </ul>
       </Pad>
     )

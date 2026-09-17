@@ -17,12 +17,32 @@ let deckStep = 0
 /**
  * 段階 n に到達するまで透明。場所は取り続けるのでレイアウトが動かない。
  * マウント時の状態だけ自前で決め、以降の切り替えは Deck が属性を叩く。
+ *
+ * 既定では div を作る。置き場所が div を許さない時（ul の中など）は `as` で
+ * 要素名を変える。`<ul><Step n={1} as="li">…</Step></ul>` で ul > li になる。
  */
-export function Step({ n, children }: { n: number; children?: Child }) {
+export function Step({
+  n,
+  as: Tag = 'div',
+  class: cls,
+  children,
+  ...rest
+}: {
+  n: number
+  as?: string
+  class?: string
+  children?: Child
+  [attr: string]: unknown
+}) {
   return (
-    <div class="step" data-n={n} data-shown={n <= deckStep || null}>
+    <Tag
+      class={cls ? `step ${cls}` : 'step'}
+      data-n={n}
+      data-shown={n <= deckStep || null}
+      {...rest}
+    >
       {children}
-    </div>
+    </Tag>
   )
 }
 
