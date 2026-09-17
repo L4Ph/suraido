@@ -29,7 +29,8 @@
     --suraido-text: 32px;
 
     --suraido-step-fade: 200ms;
-    --suraido-slide-fade: 180ms;
+    --suraido-slide-fade: 260ms;
+    --suraido-slide-ease: cubic-bezier(0.32, 0.72, 0, 1);
   }
 }
 
@@ -205,6 +206,28 @@
   ::view-transition-old(root),
   ::view-transition-new(root) {
     animation-duration: var(--suraido-slide-fade);
+    animation-timing-function: var(--suraido-slide-ease);
+  }
+
+  /*
+   * The deck moves the way the keys do: forward pushes the old slide out to the left and
+   * brings the new one in from the right, and back reverses it. Deck sets data-suraido-dir
+   * before it starts the transition.
+   *
+   * Naming an animation here replaces the cross-fade the UA would otherwise run. To get that
+   * cross-fade back, set animation-name: none on these from your own stylesheet.
+   */
+  html[data-suraido-dir="forward"]::view-transition-old(root) {
+    animation-name: suraido-leave-left;
+  }
+  html[data-suraido-dir="forward"]::view-transition-new(root) {
+    animation-name: suraido-enter-right;
+  }
+  html[data-suraido-dir="back"]::view-transition-old(root) {
+    animation-name: suraido-leave-right;
+  }
+  html[data-suraido-dir="back"]::view-transition-new(root) {
+    animation-name: suraido-enter-left;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -216,5 +239,26 @@
     .step {
       transition: none;
     }
+  }
+}
+
+@keyframes suraido-leave-left {
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes suraido-enter-right {
+  from {
+    transform: translateX(100%);
+  }
+}
+@keyframes suraido-leave-right {
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes suraido-enter-left {
+  from {
+    transform: translateX(-100%);
   }
 }

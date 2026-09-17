@@ -106,8 +106,12 @@ Colors and sizes come from CSS variables. Reach for those before writing a selec
   --suraido-h1: 92px;
   --suraido-h2: 60px;
   --suraido-text: 32px;
+  --suraido-slide-fade: 260ms; /* how long a slide takes to come in */
 }
 ```
+
+Crossing to another slide slides in the direction the keys move. Stepping does not transition;
+the `.step` fade covers that.
 
 To change the whole palette at once, swap the `import "suraido.js/themes/<name>.css"` line
 (`olivia`, `noel`, `nine009`, `botanical`, `dolch`, `laser`).

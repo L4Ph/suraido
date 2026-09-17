@@ -229,33 +229,31 @@ else, `<style>` covers it without a separate file.
 
 ## Slide transitions
 
-Crossing to another slide cross-fades through View Transitions. The speed is a variable:
+Crossing to another slide slides: forward pushes the old one out to the left and brings the
+new one in from the right, and back reverses it. The deck moves the way the keys do.
 
 ```css
 :root {
-  --slide-fade: 180ms;
-} /* --suraido-slide-fade, default 180ms */
+  --suraido-slide-fade: 260ms;
+  --suraido-slide-ease: cubic-bezier(0.32, 0.72, 0, 1);
+}
 ```
 
 - **Stepping does not transition.** The opacity transition on `.step` handles that.
-- `prefers-reduced-motion: reduce` turns off both the transition and the step fade.
+- `prefers-reduced-motion: reduce` turns off the slide and the step fade alike.
 - Where `document.startViewTransition` is missing, slides simply cut. There is a feature check.
 
+For a plain cross-fade instead, take the animation back off — your stylesheet beats the layer:
+
+```css
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-name: none;
+}
+```
+
 `::view-transition-group(root)` gets the same duration. Leave it out and the group keeps the
-UA's 250ms, which holds the transition open about 70ms longer and makes fast stepping feel
-sluggish.
-
-## When something is wrong
-
-A few suraido.js mistakes produce no error, and the deck simply does the wrong thing quietly. Those
-are reported to the console as they happen, with the position, the measurement and the fix:
-
-- A slide that runs past the 1920x1080 canvas, and by how much. The overflow is clipped and
-  the stage is scaled down, so nothing on screen shows that it happened
-- A `<Step>` that wrapped an `li` in a `div`, which stops `ul > li` matching
-- A `static steps` that does not match the highest `<Step n>` on the slide — either dead key
-  presses or reveals that never arrive
-- Something in `deck()` that is not a Slide subclass, which means its statics were dropped
+UA's 250ms, which holds the transition open longer than the slide it is carrying.
 
 ## Paths that never re-render
 

@@ -125,6 +125,9 @@ export class Deck extends Component<DeckProps, { i: number }> {
 
   go = (next: Pos) => {
     const slideChanged = next[0] !== this.pos[0];
+    // Which way the deck is moving, so the transition can move the same way.
+    // Read it before pos is overwritten.
+    const dir = next[0] > this.pos[0] ? "forward" : "back";
     this.pos = next;
     deckStep = next[1];
 
@@ -142,6 +145,7 @@ export class Deck extends Component<DeckProps, { i: number }> {
       // outside would read the slide that is still on screen.
       this.check();
     };
+    document.documentElement.dataset.suraidoDir = dir;
     if (document.startViewTransition) document.startViewTransition(swap);
     else swap();
   };
