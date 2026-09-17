@@ -2,7 +2,22 @@
   "name": "create-todan",
   "version": "0.1.0",
   "description": "登壇 — create a todan slide project",
+  "keywords": [
+    "create",
+    "jsx",
+    "presentation",
+    "scaffold",
+    "slides",
+    "todan"
+  ],
+  "homepage": "https://github.com/L4Ph/todan#readme",
+  "bugs": "https://github.com/L4Ph/todan/issues",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/L4Ph/todan.git",
+    "directory": "packages/create-todan"
+  },
   "bin": {
     "create-todan": "dist/index.mjs"
   },

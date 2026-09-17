@@ -2,7 +2,22 @@
   "name": "todan",
   "version": "0.1.0",
   "description": "登壇 — write slides in JSX. No React, no virtual DOM.",
+  "keywords": [
+    "deck",
+    "jsx",
+    "presentation",
+    "slides",
+    "slideshow",
+    "talk"
+  ],
+  "homepage": "https://github.com/L4Ph/todan#readme",
+  "bugs": "https://github.com/L4Ph/todan/issues",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/L4Ph/todan.git",
+    "directory": "packages/todan"
+  },
   "files": [
     "dist"
   ],
