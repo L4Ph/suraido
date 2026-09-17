@@ -249,8 +249,25 @@ Arrow keys work in either window and both stay together; `r` restarts the clock.
 over a `BroadcastChannel`, which reaches **same-origin windows in the same browser** — a
 laptop and a projector, not the audience's phones.
 
-Anything else can follow along the same way: the deck dispatches `suraido:move` on `document`
-whenever it settles, carrying the position, the notes and what is next.
+## Attaching things
+
+Whatever is in `use` is handed the deck, and can read it, move it and hear about it moving.
+That object is the whole contract — there is nothing else to learn.
+
+```ts
+type Plugin = (deck: DeckContext) => (() => void) | void;
+
+type DeckContext = {
+  readonly at: At;                    // index, step, steps, total, path
+  readonly slides: readonly SlideInfo[];   // path, steps, notes
+  go(to: string | { index: number; step?: number }): void;
+  move(by: 1 | -1): void;
+  on("move", run: (at: At) => void): () => void;   // returns the way to stop
+};
+```
+
+Returning a function undoes whatever the plugin set up; the deck calls it on the way out, in
+reverse order. `deck()` also returns the context, for a test or for reaching in from elsewhere.
 
 ## Slide transitions
 

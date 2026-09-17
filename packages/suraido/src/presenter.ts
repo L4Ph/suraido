@@ -1,4 +1,4 @@
-import { MOVE, type Move } from "./deck.tsx";
+import type { At, DeckContext, Plugin, SlideInfo } from "./deck.tsx";
 
 /**
  * A second window for the person talking: the notes for this slide, what is coming, the clock,
@@ -7,7 +7,7 @@ import { MOVE, type Move } from "./deck.tsx";
  * Opt in, because not everyone presents from a machine with two screens:
  *
  *     import { presenter } from "suraido.js/presenter";
- *     presenter();
+ *     deck(slides, { use: [presenter()] });
  *
  * The two windows talk over a BroadcastChannel, which reaches same-origin windows in the same
  * browser — enough for a laptop and a projector, not enough for the audience's phones.
@@ -20,7 +20,17 @@ export type PresenterOptions = {
   channel?: string;
 };
 
-type Packet = { move: Move } | { key: string };
+/**
+ * What the two windows say to each other.
+ *
+ * `move` is relative, which is right here because there is exactly one deck: the presenter
+ * window only displays. Anything with several decks — syncing a room, say — has to send `go`
+ * instead, or two that drift apart never come back together.
+ */
+type Packet = { show: Shown } | { move: 1 | -1 } | { go: string };
+
+/** Everything the second window draws. Composed here so it stays a dumb display. */
+type Shown = At & { notes?: string; next?: SlideInfo };
 
 const STYLE = `
   :root { color-scheme: dark; }
@@ -65,29 +75,44 @@ const mmss = (ms: number) => {
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
 };
 
-export function presenter({ key = "p", channel = "suraido" }: PresenterOptions = {}) {
-  const wire = new BroadcastChannel(channel);
-  let last: Move | undefined;
+export function presenter({ key = "p", channel = "suraido" }: PresenterOptions = {}): Plugin {
+  return (deck: DeckContext) => {
+    const wire = new BroadcastChannel(channel);
+    let last: Shown | undefined;
 
-  // Keep the last position, so a window opened halfway through is not blank.
-  document.addEventListener(MOVE, (e) => {
-    last = (e as CustomEvent<Move>).detail;
-    wire.postMessage({ move: last } satisfies Packet);
-  });
+    const compose = (at: At): Shown => ({
+      ...at,
+      notes: deck.slides[at.index]?.notes,
+      next: deck.slides[at.index + 1],
+    });
 
-  // Keys pressed in the presenter window are replayed here; the deck is already listening.
-  wire.addEventListener("message", (e: MessageEvent<Packet>) => {
-    if ("key" in e.data) window.dispatchEvent(new KeyboardEvent("keydown", { key: e.data.key }));
-  });
+    // Kept, so a window opened halfway through a talk is not blank.
+    const offMove = deck.on("move", (at) => {
+      last = compose(at);
+      wire.postMessage({ show: last } satisfies Packet);
+    });
 
-  addEventListener("keydown", (e) => {
-    if (e.key !== key || e.metaKey || e.ctrlKey || e.altKey) return;
-    e.preventDefault();
-    open(last, channel);
-  });
+    wire.addEventListener("message", (e: MessageEvent<Packet>) => {
+      if ("move" in e.data) deck.move(e.data.move);
+      else if ("go" in e.data) deck.go(e.data.go);
+    });
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== key || e.metaKey || e.ctrlKey || e.altKey) return;
+      e.preventDefault();
+      open(last ?? compose(deck.at), channel);
+    };
+    addEventListener("keydown", onKey);
+
+    return () => {
+      offMove();
+      removeEventListener("keydown", onKey);
+      wire.close();
+    };
+  };
 }
 
-function open(last: Move | undefined, channel: string) {
+function open(last: Shown, channel: string) {
   const win = window.open("", "suraido-presenter", "width=900,height=680");
   if (!win) {
     // Pressing the key and having nothing happen is the worst outcome; say why.
@@ -107,7 +132,7 @@ function open(last: Move | undefined, channel: string) {
   const wire = new BroadcastChannel(channel);
   let started = Date.now();
 
-  const draw = (m: Move) => {
+  const draw = (m: Shown) => {
     el("at").textContent =
       `${m.index + 1} / ${m.total}${m.steps > 1 ? `  ·  step ${m.step + 1}/${m.steps}` : ""}`;
     el("where").textContent = m.path;
@@ -116,9 +141,9 @@ function open(last: Move | undefined, channel: string) {
     el("next-label").textContent = m.next ? `Next — ${m.next.path}` : "Last slide";
   };
 
-  if (last) draw(last);
+  draw(last);
   wire.addEventListener("message", (e: MessageEvent<Packet>) => {
-    if ("move" in e.data) draw(e.data.move);
+    if ("show" in e.data) draw(e.data.show);
   });
 
   win.addEventListener("keydown", (e) => {
@@ -126,7 +151,8 @@ function open(last: Move | undefined, channel: string) {
       started = Date.now();
       return;
     }
-    wire.postMessage({ key: e.key } satisfies Packet);
+    const by = { ArrowRight: 1, ArrowDown: 1, " ": 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+    if (by) wire.postMessage({ move: by as 1 | -1 } satisfies Packet);
   });
 
   const tick = win.setInterval(() => {

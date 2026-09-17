@@ -524,22 +524,23 @@ class Outro extends Slide {
   }
 }
 
-presenter();
-
-deck([
-  Cover,
-  Shape,
-  Steps,
-  Layout,
-  FullBleed,
-  LiveState,
-  AtomWrite,
-  AtomRead,
-  Themes,
-  Override,
-  Colocated,
-  Canvas,
-  Address,
-  Diagnostics,
-  Outro,
-]);
+deck(
+  [
+    Cover,
+    Shape,
+    Steps,
+    Layout,
+    FullBleed,
+    LiveState,
+    AtomWrite,
+    AtomRead,
+    Themes,
+    Override,
+    Colocated,
+    Canvas,
+    Address,
+    Diagnostics,
+    Outro,
+  ],
+  { use: [presenter()] },
+);

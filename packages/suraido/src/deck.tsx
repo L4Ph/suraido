@@ -17,22 +17,42 @@ export type SlideComponent = (new (props: {}) => Slide<any, any>) & {
   notes?: string;
 };
 
-/** What a deck reports when it moves. */
-export type Move = {
+/** Where the deck is. */
+export type At = {
   index: number;
   step: number;
   steps: number;
   total: number;
   path: string;
+};
+
+/** What a plugin can learn about a slide without holding the class. */
+export type SlideInfo = {
+  path: string;
+  steps: number;
   notes?: string;
-  next?: { path: string; notes?: string };
 };
 
 /**
- * Dispatched on document every time the deck settles somewhere new — a step or a slide.
- * The presenter view listens for it; so could anything else.
+ * What a deck hands to the things attached to it. The whole contract: where it is, what it
+ * holds, how to move it, and how to hear about it moving.
  */
-export const MOVE = "suraido:move";
+export type DeckContext = {
+  readonly at: At;
+  readonly slides: readonly SlideInfo[];
+  /** Jump to a path such as "#intro.2", or to a position. */
+  go(to: string | { index: number; step?: number }): void;
+  /** One step either way, spilling between slides at the ends. */
+  move(by: 1 | -1): void;
+  /** Returns the function that stops listening. */
+  on(event: "move", run: (at: At) => void): () => void;
+};
+
+/**
+ * Attached with `deck(slides, { use: [...] })`. Returning a function undoes whatever it set
+ * up, and the deck calls it on the way out.
+ */
+export type Plugin = (deck: DeckContext) => (() => void) | void;
 
 /** How much of the left edge sends you back rather than forward. */
 const BACK_ZONE = 0.25;
@@ -232,20 +252,25 @@ export class Deck extends Component<DeckProps, { i: number }> {
     this.check();
   }
 
-  announce([i, step]: Pos) {
-    const { slides } = this.props;
-    const at = slides[i];
-    const after = slides[i + 1];
-    const detail: Move = {
+  /** @internal */ listeners = new Set<(at: At) => void>();
+  /** @internal */ teardown: (() => void)[] = [];
+
+  /** @internal */ snapshot([i, step]: Pos = this.pos): At {
+    return {
       index: i,
       step,
       steps: this.steps(i),
-      total: slides.length,
+      total: this.props.slides.length,
       path: formatHash([i, step], this.paths),
-      notes: at?.notes,
-      next: after && { path: formatHash([i + 1, 0], this.paths), notes: after.notes },
     };
-    document.dispatchEvent(new CustomEvent(MOVE, { detail }));
+  }
+
+  announce(next: Pos) {
+    const at = this.snapshot(next);
+    // Same reason as the atom: a listener that attaches another one mid-notification would
+    // otherwise see it run in the same pass. Notify the set as it stood.
+    // oxlint-disable-next-line no-useless-spread -- the copy is the point
+    for (const run of [...this.listeners]) run(at);
   }
 
   /** Measured a frame later, once layout has settled. */
@@ -254,6 +279,10 @@ export class Deck extends Component<DeckProps, { i: number }> {
   };
 
   unmounted() {
+    // Reverse of the order they were attached, so a plugin unwinds after anything it set up.
+    for (const off of this.teardown.reverse()) off();
+    this.teardown.length = 0;
+    this.listeners.clear();
     removeEventListener("keydown", this.onKey);
     removeEventListener("hashchange", this.onHash);
     removeEventListener("resize", this.fit);
@@ -274,12 +303,53 @@ export class Deck extends Component<DeckProps, { i: number }> {
   }
 }
 
+export type DeckOptions = Omit<DeckProps, "slides"> & {
+  /** Things attached to this deck — the presenter view, sync, anything. */
+  use?: Plugin[];
+};
+
 /**
  * Starts a deck. It mounts into #root, or makes a container on body if there is none.
- * With this there is nothing to keep beyond the file that lists the slides.
+ *
+ * Whatever is in `use` is handed the deck and can move it, read it and hear about it. The
+ * context is returned as well, for a test or for reaching in from elsewhere.
  */
-export function deck(slides: SlideComponent[], opts: Omit<DeckProps, "slides"> = {}) {
+export function deck(slides: SlideComponent[], { use = [], ...opts }: DeckOptions = {}) {
   const host =
     document.getElementById("root") ?? document.body.appendChild(document.createElement("div"));
-  render(<Deck slides={slides} {...opts} />, host);
+  const mounted = render(<Deck slides={slides} {...opts} />, host);
+  const self = mounted.comp as Deck;
+
+  const context: DeckContext = {
+    get at() {
+      return self.snapshot();
+    },
+    get slides() {
+      return slides.map((slide, i) => ({
+        path: formatHash([i, 0], self.paths),
+        steps: slide.steps ?? 1,
+        notes: slide.notes,
+      }));
+    },
+    go(to) {
+      self.go(
+        typeof to === "string" ? parseHash(to, self.paths, self.steps) : [to.index, to.step ?? 0],
+      );
+    },
+    move(by) {
+      self.move(by);
+    },
+    on(_event, run) {
+      self.listeners.add(run);
+      return () => self.listeners.delete(run);
+    },
+  };
+
+  // Before mounted() runs — it normalises the URL, and a plugin should hear that too.
+  for (const plugin of use) {
+    const off = plugin(context);
+    if (off) self.teardown.push(off);
+  }
+
+  return context;
 }

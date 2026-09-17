@@ -1,76 +1,113 @@
-import { expect, test, vi } from "vite-plus/test";
-import { MOVE, type Move } from "./deck.tsx";
+import { afterEach, expect, test, vi } from "vite-plus/test";
+import type { At, DeckContext, SlideInfo } from "./deck.tsx";
 import { presenter } from "./presenter.ts";
 
 /** A window.open that hands back a document we can read, since a test has no pop-ups. */
 function stubWindow() {
   const doc = document.implementation.createHTMLDocument("presenter");
-  const listeners: Record<string, ((e: any) => void)[]> = {};
   const win = {
     document: doc,
-    addEventListener: (type: string, fn: (e: any) => void) => (listeners[type] ??= []).push(fn),
+    addEventListener: () => {},
     setInterval: () => 1,
     clearInterval: () => {},
-    fire: (type: string, e: unknown) => listeners[type]?.forEach((fn) => fn(e)),
   };
   vi.spyOn(window, "open").mockReturnValue(win as unknown as Window);
   return win;
 }
 
-const move = (over: Partial<Move> = {}): Move => ({
-  index: 1,
-  step: 2,
-  steps: 4,
-  total: 15,
-  path: "#shape.2",
-  notes: "Land on: state on the class.",
-  next: { path: "#steps", notes: "Nothing moves as these appear." },
-  ...over,
-});
+/** A deck the plugin can talk to, without mounting one. */
+function fakeDeck(slides: SlideInfo[]) {
+  const listeners = new Set<(at: At) => void>();
+  const moved: (1 | -1)[] = [];
+  let at: At = {
+    index: 0,
+    step: 0,
+    steps: slides[0]!.steps,
+    total: slides.length,
+    path: slides[0]!.path,
+  };
+  return {
+    moved,
+    settle(next: Partial<At>) {
+      at = { ...at, ...next };
+      for (const run of listeners) run(at);
+    },
+    context: {
+      get at() {
+        return at;
+      },
+      slides,
+      go: () => {},
+      move: (by: 1 | -1) => moved.push(by),
+      on: (_e, run) => (listeners.add(run), () => listeners.delete(run)),
+    } satisfies DeckContext,
+  };
+}
+
+const SLIDES: SlideInfo[] = [
+  { path: "#shape", steps: 4, notes: "Land on: state on the class." },
+  { path: "#steps", steps: 1, notes: "Nothing moves as these appear." },
+];
 
 const press = (key: string) => window.dispatchEvent(new KeyboardEvent("keydown", { key }));
-const announce = (m: Move) => document.dispatchEvent(new CustomEvent(MOVE, { detail: m }));
+
+/**
+ * Attach, and take it off again when the test ends. Every presenter binds keydown on the one
+ * window these tests share, so one left behind answers the next test's key press.
+ */
+function attach(deck: DeckContext) {
+  const key = `k${Math.random()}`;
+  const off = presenter({ key, channel: `t${Math.random()}` })(deck)!;
+  detachers.push(off);
+  return { open: () => press(key), off };
+}
+const detachers: (() => void)[] = [];
+afterEach(() => {
+  for (const off of detachers.splice(0)) off();
+});
 /** BroadcastChannel delivers on a later task, so give it one. */
 const delivered = () => new Promise((r) => setTimeout(r, 0));
 
 test("the window opens showing where the deck already is, not a blank page", () => {
-  presenter({ channel: `t${Math.random()}` });
-  announce(move()); // the deck moved before anyone opened the window
+  const deck = fakeDeck(SLIDES);
+  const it = attach(deck.context);
   const win = stubWindow();
-  press("p");
+  it.open();
 
   const text = (id: string) => win.document.getElementById(id)?.textContent;
   expect(text("notes")).toBe("Land on: state on the class.");
-  expect(text("at")).toBe("2 / 15  ·  step 3/4");
-  expect(text("where")).toBe("#shape.2");
+  expect(text("at")).toBe("1 / 2  ·  step 1/4");
+  expect(text("where")).toBe("#shape");
   expect(text("next")).toBe("Nothing moves as these appear.");
 });
 
 test("it follows the deck as it moves", async () => {
-  presenter({ channel: `t${Math.random()}` });
+  const deck = fakeDeck(SLIDES);
+  const it = attach(deck.context);
   const win = stubWindow();
-  press("p");
-  announce(move({ path: "#steps", notes: "Second position.", index: 2, steps: 1, step: 0 }));
+  it.open();
+  deck.settle({ index: 1, step: 0, steps: 1, path: "#steps" });
   await delivered();
 
-  expect(win.document.getElementById("notes")?.textContent).toBe("Second position.");
+  expect(win.document.getElementById("notes")?.textContent).toBe("Nothing moves as these appear.");
   // A slide with a single step should not advertise one.
-  expect(win.document.getElementById("at")?.textContent).toBe("3 / 15");
+  expect(win.document.getElementById("at")?.textContent).toBe("2 / 2");
+  expect(win.document.getElementById("next-label")?.textContent).toBe("Last slide");
 });
 
-test("the last slide says so rather than offering a next", () => {
-  presenter({ channel: `t${Math.random()}` });
-  announce(move({ next: undefined }));
+test("detaching stops it listening, so a closed deck is not still driving a window", () => {
+  const deck = fakeDeck(SLIDES);
+  const it = attach(deck.context);
+  it.off();
   const win = stubWindow();
-  press("p");
-  expect(win.document.getElementById("next-label")?.textContent).toBe("Last slide");
+  it.open(); // the key is no longer bound
+  expect(win.document.getElementById("notes")).toBe(null);
 });
 
 test("a blocked pop-up says why instead of doing nothing", () => {
   const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
   vi.spyOn(window, "open").mockReturnValue(null);
-  presenter({ channel: `t${Math.random()}` });
-  press("p");
+  attach(fakeDeck(SLIDES).context).open();
   expect(warn.mock.calls.map((c) => String(c[0])).join()).toContain("blocked");
   warn.mockRestore();
 });
