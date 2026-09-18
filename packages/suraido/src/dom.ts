@@ -133,6 +133,11 @@ export abstract class Component<P = {}, S = {}> {
   props: P;
   state: S = {} as S;
   /** @internal */ $inst!: Inst;
+  /** @internal The element this component built, for the rare job that needs to scope a query
+   * to one component's own subtree rather than the whole document. Valid once mounted. */
+  get $el(): Node {
+    return domOf(this.$inst);
+  }
   /** @internal */ $ns: string | null = null;
   /** @internal */ $dead = false;
   /** @internal */ $unwatch: (() => void)[] = [];
