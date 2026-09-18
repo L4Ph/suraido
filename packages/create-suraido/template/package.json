@@ -8,7 +8,7 @@
     "preview": "vp preview"
   },
   "dependencies": {
-    "suraido.js": "*"
+    "suraido.js": "^0.4.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

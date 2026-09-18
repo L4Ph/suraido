@@ -173,7 +173,7 @@ const LiveState = slide({ path: "state" }, ({ update }) => {
 /** Outside every slide, so leaving one does not throw it away. */
 let votes = 0;
 
-const AtomWrite = slide({ path: "atom" }, ({ update }) => {
+const Cast = slide({ path: "vote" }, ({ update }) => {
   return () => (
     <Pad>
       <h2>A value that outlives a slide</h2>
@@ -207,7 +207,7 @@ const Poll = slide({ path: "poll" }, ({ update }) => () => (
 
 // ---------------------------------------------------------------- 8. state, read back
 
-const AtomRead = slide({ path: "kept" }, () => {
+const Kept = slide({ path: "kept" }, () => {
   const n = votes;
   return (
     <Pad>
@@ -458,8 +458,8 @@ deck([
   Layout,
   FullBleed,
   LiveState,
-  AtomWrite,
-  AtomRead,
+  Cast,
+  Kept,
   Themes,
   Override,
   Colocated,
