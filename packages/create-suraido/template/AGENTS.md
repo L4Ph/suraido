@@ -36,6 +36,8 @@ const Intro = slide({ path: "intro" }, () => (
 deck([Intro]);
 ```
 
+`slide(() => …)` when there is nothing to say about the slide itself.
+
 Return a function instead and it becomes the view, run again on every redraw. Because the setup
 ran once, a plain `let` in it is state with the life of the slide.
 
