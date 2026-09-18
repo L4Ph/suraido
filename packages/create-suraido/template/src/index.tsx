@@ -24,11 +24,11 @@ class Points extends Slide {
       <Pad>
         <h2>What you want to say</h2>
         <ul>
-          <Step n={1} as="li">
-            First point
+          <Step n={1}>
+            <li>First point</li>
           </Step>
-          <Step n={2} as="li">
-            Second point
+          <Step n={2}>
+            <li>Second point</li>
           </Step>
         </ul>
       </Pad>

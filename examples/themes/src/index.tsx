@@ -20,11 +20,11 @@ class Sampler extends Slide {
         <hr />
         <Cols>
           <ul>
-            <Step n={1} as="li">
-              Staged reveals
+            <Step n={1}>
+              <li>Staged reveals</li>
             </Step>
-            <Step n={2} as="li">
-              List markers take the accent too
+            <Step n={2}>
+              <li>List markers take the accent too</li>
             </Step>
           </ul>
           <blockquote>

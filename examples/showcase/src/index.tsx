@@ -57,14 +57,19 @@ class Shape extends Slide {
 
 deck([Intro]);`}</Code>
           <ul>
-            <Step n={1} as="li">
-              State lives on the class, as state always has
+            <Step n={1}>
+              <li>State lives on the class, as state always has</li>
             </Step>
-            <Step n={2} as="li">
-              <code>class</code>, not <code>className</code> — props go straight to the DOM
+            <Step n={2}>
+              <li>
+                <code>class</code>, not <code>className</code> — props go straight to the DOM
+              </li>
             </Step>
-            <Step n={3} as="li">
-              Everything else is plain HTML: <code>img</code>, <code>video</code>, <code>svg</code>
+            <Step n={3}>
+              <li>
+                Everything else is plain HTML: <code>img</code>, <code>video</code>,{" "}
+                <code>svg</code>
+              </li>
             </Step>
           </ul>
         </Cols>
@@ -88,17 +93,21 @@ class Steps extends Slide {
           them, so <strong>nothing shifts</strong> as they appear.
         </p>
         <ul class="wide">
-          <Step n={1} as="li">
-            Pressing → does not re-render the slide
+          <Step n={1}>
+            <li>Pressing → does not re-render the slide</li>
           </Step>
-          <Step n={2} as="li">
-            It toggles one attribute, and CSS does the fade
+          <Step n={2}>
+            <li>It toggles one attribute, and CSS does the fade</li>
           </Step>
-          <Step n={3} as="li">
-            So a <code>video</code> keeps playing and a transition keeps running
+          <Step n={3}>
+            <li>
+              So a <code>video</code> keeps playing and a transition keeps running
+            </li>
           </Step>
-          <Step n={4} as="li">
-            <code>static steps</code> says how many presses this slide absorbs
+          <Step n={4}>
+            <li>
+              <code>static steps</code> says how many presses this slide absorbs
+            </li>
           </Step>
         </ul>
       </Pad>
@@ -333,11 +342,13 @@ class Override extends Slide {
   --suraido-pad: 88px 112px;
 }`}</Code>
           <ul>
-            <Step n={1} as="li">
-              No <code>!important</code>, no specificity games
+            <Step n={1}>
+              <li>
+                No <code>!important</code>, no specificity games
+              </li>
             </Step>
-            <Step n={2} as="li">
-              Reach for the tokens first — one value moves the whole deck
+            <Step n={2}>
+              <li>Reach for the tokens first — one value moves the whole deck</li>
             </Step>
           </ul>
         </Cols>
@@ -483,15 +494,21 @@ class Diagnostics extends Slide {
           Those are reported to the console, with the position and the fix.
         </p>
         <ul class="wide">
-          <Step n={1} as="li">
-            A slide that runs past the canvas — <strong>clipped, and invisible</strong>, because the
-            stage is scaled down
+          <Step n={1}>
+            <li>
+              A slide that runs past the canvas — <strong>clipped, and invisible</strong>, because
+              the stage is scaled down
+            </li>
           </Step>
-          <Step n={2} as="li">
-            A <code>&lt;Step&gt;</code> that wrapped an <code>li</code> in a <code>div</code>
+          <Step n={2}>
+            <li>
+              A <code>&lt;Step&gt;</code> that wrapped an <code>li</code> in a <code>div</code>
+            </li>
           </Step>
-          <Step n={3} as="li">
-            A <code>static steps</code> that disagrees with the reveals on the slide
+          <Step n={3}>
+            <li>
+              A <code>static steps</code> that disagrees with the reveals on the slide
+            </li>
           </Step>
         </ul>
         <p class="hint">

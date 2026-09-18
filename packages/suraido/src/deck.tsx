@@ -1,4 +1,4 @@
-import { Component, flushSync, render, type Child } from "./dom.ts";
+import { Component, flushSync, render, type Child, type VNode } from "./dom.ts";
 import { advance, parseHash, formatHash, type Pos, type Paths } from "./nav.ts";
 
 /** The base class for a slide. State lives on the class, as usual. */
@@ -67,35 +67,57 @@ const BACK_ZONE = 0.25;
  */
 let renderStep = 0;
 
+const classes = (...parts: unknown[]) => parts.filter(Boolean).join(" ");
+
+/**
+ * The one element a mark can be put on, or nothing when there is not exactly one — bare text,
+ * several children, or a component, which may never pass the attributes on to anything.
+ */
+function markable(children: Child): VNode | undefined {
+  // Whitespace on the same line survives the JSX transform, so `<Step> <li/> </Step>` arrives
+  // as three children. Counting it would quietly put the wrapper back, and there is no longer
+  // a warning to catch that.
+  const real = (Array.isArray(children) ? children : [children]).filter(
+    (c) => !(c == null || typeof c === "boolean" || (typeof c === "string" && !c.trim())),
+  );
+  const only = real.length === 1 ? real[0] : undefined;
+  return only && typeof only === "object" && !Array.isArray(only) && typeof only.type === "string"
+    ? only
+    : undefined;
+}
+
 /**
  * Transparent until step n is reached, but it keeps its space so nothing shifts.
  * It decides its own state at mount; after that the Deck toggles the attribute.
  *
- * By default it builds a div. Where a div is not allowed — inside a ul, say — name the
- * element with `as`: `<ul><Step n={1} as="li">…</Step></ul>` gives you ul > li.
+ * It marks the element you already wrote rather than adding one around it, so a reveal inside
+ * a <ul> is still an <li> and `ul > li` goes on matching. Only when there is no single element
+ * to mark does it build a div to hold the mark.
  */
 export function Step({
   n,
-  as: Tag = "div",
   class: cls,
   children,
   ...rest
 }: {
   n: number;
-  as?: string;
   class?: string;
   children?: Child;
   [attr: string]: unknown;
-}) {
+}): Child {
+  const mark = { "data-n": n, "data-shown": n <= renderStep || null, ...rest };
+  const target = markable(children);
+
+  if (target) {
+    return {
+      ...target,
+      props: { ...target.props, ...mark, class: classes(target.props.class, "step", cls) },
+    };
+  }
   return (
-    <Tag
-      class={cls ? `step ${cls}` : "step"}
-      data-n={n}
-      data-shown={n <= renderStep || null}
-      {...rest}
-    >
+    <div class={classes("step", cls)} {...mark}>
       {children}
-    </Tag>
+    </div>
   );
 }
 
@@ -147,13 +169,6 @@ function audit(slides: SlideComponent[], i: number, paths: Paths, steps: (i: num
         "Nothing on screen shows this — the whole stage is scaled down. Cut the content or raise --suraido-pad.",
       );
     }
-  }
-
-  if (document.querySelector("ul > div.step, ol > div.step")) {
-    say(
-      "a <Step> wrapped an <li> in a <div>, so ul > li no longer matches",
-      'Pass as="li": <Step n={1} as="li">…</Step>',
-    );
   }
 
   const shown = [...document.querySelectorAll<HTMLElement>(".step[data-n]")];

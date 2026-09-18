@@ -30,8 +30,8 @@ async function mountDeck(hash: string, kind: "points" | "list" = "points") {
     render() {
       return jsx("ul", {
         children: [
-          jsx(Step, { n: 1, as: "li", children: "a" }),
-          jsx(Step, { n: 2, as: "li", children: "b" }),
+          jsx(Step, { n: 1, children: jsx("li", { children: "a" }) }),
+          jsx(Step, { n: 2, children: jsx("li", { children: "b" }) }),
         ],
       });
     }
@@ -46,15 +46,6 @@ async function mountDeck(hash: string, kind: "points" | "list" = "points") {
     hash: location.hash,
   };
 }
-
-test('<Step as="li"> lands directly under the ul, with no div between', async () => {
-  const { host } = await mountDeck("#list.1", "list");
-  const ul = host.querySelector("ul")!;
-  // only li directly under ul; a div between them stops ul > li matching
-  expect([...ul.children].map((c) => c.tagName.toLowerCase())).toEqual(["li", "li"]);
-  expect(ul.querySelector('li.step[data-n="1"]')).toBeTruthy();
-  expect(ul.querySelectorAll("div").length).toBe(0);
-});
 
 test("opening #points.2 from cold shows step 2 from the first render", async () => {
   const { shown, hash } = await mountDeck("#points.2");

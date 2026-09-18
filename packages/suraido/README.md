@@ -108,13 +108,13 @@ deck([Intro]);
 Only the arrangements you would otherwise rewrite on every deck. Each carries a `suraido.js-`
 class inside an `@layer`, so plain CSS overrides it.
 
-|                |                                                                                                                                      |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `<Pad>`        | The body of a slide: full height, `--suraido-pad` of padding                                                                         |
-| `<Center>`     | `<Pad>` with its contents centred vertically. For covers and section dividers                                                        |
-| `<Cols>`       | Columns — one per child. `ratio="2fr 1fr"` sets the proportions                                                                      |
-| `<Full>`       | Full bleed, ignoring the padding. A direct `img` / `video` child covers the slide                                                    |
-| `<Step n={1}>` | Transparent until the step is reached, but holds its space so nothing shifts. Inside `<ul>`, add `as="li"` so no `div` comes between |
+|                |                                                                                                                                                                                            |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `<Pad>`        | The body of a slide: full height, `--suraido-pad` of padding                                                                                                                               |
+| `<Center>`     | `<Pad>` with its contents centred vertically. For covers and section dividers                                                                                                              |
+| `<Cols>`       | Columns — one per child. `ratio="2fr 1fr"` sets the proportions                                                                                                                            |
+| `<Full>`       | Full bleed, ignoring the padding. A direct `img` / `video` child covers the slide                                                                                                          |
+| `<Step n={1}>` | Transparent until the step is reached, but holds its space so nothing shifts. It marks the element you wrote rather than adding one, so `<Step n={1}><li>…</li></Step>` is still `ul > li` |
 
 Everything else is plain HTML. `<img>`, `<video>`, `<table>` and `<svg>` work as they are, and
 anything under `<svg>` gets the SVG namespace automatically. Headings, body text, lists, quotes
@@ -384,8 +384,8 @@ is read back several slides later.
   problem, bring diffing back: `flush()` in [dom.ts](src/dom.ts) becomes a patch, roughly 50 lines
 - **Reveals go through `<Step>` only.** You cannot branch on the step inside `render()`
 - **A component's root is a single element.** Return several and only the first is drawn
-- **`<Step>` builds a `div` by default.** Inside `<ul>` or `<ol>`, pass `as="li"`, or you get
-  `ul > div > li` and `ul > li` stops matching
+- **`<Step>` marks one element, or builds a `div`.** Give it a single element and that element
+  carries the reveal; give it bare text or several children and it makes a `div` to carry it
 - **`<Step>` reads the current step from a module-level variable.** Two decks on one screen
   would need that moved
 - **Put the classes themselves in `slides`.** `(p) => <Demo {...p} />` drops `static steps`

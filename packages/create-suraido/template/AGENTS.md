@@ -50,15 +50,9 @@ deck([Intro]);
   `(p) => <Intro {...p} />`, drops `static steps` and `static path`, which silently breaks
   reveals and URLs. Subclass instead when you need to pass props.
 - **`render()` returns a single element.** Return several and only the first one is drawn.
-- **Inside `<ul>` or `<ol>`, reveal with `<Step n={1} as="li">`.** Without `as` a `div` is
-  wrapped around the `li` and `ul > li` stops matching.
-- **You cannot branch on the current step inside `render()`.** Reveals go through `<Step>`
-  only; changing step does not re-render (suraido.js just toggles an attribute).
-- **`static steps` is the highest `<Step n>` on that slide, plus one.** Too high and a key
-  press does nothing; too low and a `<Step>` never appears.
-- **Slides must fit 1920x1080.** Anything past it is clipped with no warning, and the whole
-  stage is scaled down so you cannot see that it happened. Measure the fit again whenever you
-  add text.
+- **`<Step>` marks the element you wrote, it does not add one.** Inside a list, write the
+  `<li>` yourself: `<Step n={1}><li>…</li></Step>` gives you `ul > li`. With nothing to
+  mark — bare text — it builds a `div` to hold the mark.
 
 ## When something is wrong
 

@@ -39,20 +39,6 @@ test("a slide wrapped in a function is called out, because it drops static steps
   expect(said).toContain("slides[0] is not a Slide subclass");
 });
 
-test("a Step that wrapped an li in a div is called out", async () => {
-  const said = await run(({ Slide, Step, jsx }) => {
-    class Bad extends Slide {
-      static path = "bad";
-      static steps = 2;
-      render() {
-        return jsx("ul", { children: jsx(Step, { n: 1, children: jsx("li", { children: "x" }) }) });
-      }
-    }
-    return { slides: [Bad] };
-  });
-  expect(said).toContain('Pass as="li"');
-});
-
 test("static steps that does not match the highest Step is called out, in both directions", async () => {
   const tooHigh = await run(({ Slide, Step, jsx }) => {
     class Slide1 extends Slide {
