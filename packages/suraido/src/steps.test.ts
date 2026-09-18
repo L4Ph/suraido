@@ -339,3 +339,31 @@ test("a number declared by hand still wins", async () => {
   deck.move(1);
   expect(deck.snapshot().index).toBe(1);
 });
+
+/**
+ * A browser can refuse to run a transition — a tab that is not visible, one already running.
+ * The callback that swaps the slide is inside the transition, so refusing it used to mean the
+ * deck's position moved and the slide on screen did not.
+ */
+test("a transition the browser refuses still changes the slide", async () => {
+  const { deck, host } = await mount([Three, Plain]);
+  const refused = () => Promise.reject(new DOMException("aborted", "InvalidStateError"));
+  Object.assign(document, {
+    startViewTransition: () => ({
+      ready: refused(),
+      finished: refused(),
+      updateCallbackDone: refused(),
+      skipTransition() {},
+    }),
+  });
+
+  try {
+    deck.go([1, 0]);
+    await tick();
+
+    expect(host.textContent).toContain("nothing to reveal");
+    expect(location.hash).toBe("#plain");
+  } finally {
+    Reflect.deleteProperty(document, "startViewTransition");
+  }
+});

@@ -253,8 +253,23 @@ export class Deck extends Component<DeckProps, { i: number }> {
       this.settle();
     };
     document.documentElement.dataset.suraidoDir = dir;
-    if (document.startViewTransition) document.startViewTransition(swap);
-    else swap();
+
+    // A browser can refuse to run a transition: a tab that is not visible, or one already
+    // running. The swap is inside the callback, so being refused would leave the deck's
+    // position moved and the slide on screen unchanged, for the rest of the talk.
+    let swapped = false;
+    const once = () => {
+      if (swapped) return;
+      swapped = true;
+      swap();
+    };
+
+    if (!document.startViewTransition) return once();
+    const shift = document.startViewTransition(once);
+    // Nothing waits on these, and "Uncaught (in promise)" is not a diagnosis.
+    shift.ready.catch(() => {});
+    shift.finished.catch(() => {});
+    shift.updateCallbackDone.catch(once);
   };
 
   move = (dir: 1 | -1) => this.go(advance(this.pos, dir, this.steps, this.props.slides.length));
