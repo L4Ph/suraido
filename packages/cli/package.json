@@ -1,0 +1,35 @@
+{
+  "name": "@suraido/cli",
+  "version": "0.1.0",
+  "description": "スライド — tools for a deck: turn one into a PDF, or images",
+  "keywords": [
+    "cli",
+    "pdf",
+    "presentation",
+    "slides",
+    "suraido"
+  ],
+  "homepage": "https://github.com/L4Ph/suraido#readme",
+  "bugs": "https://github.com/L4Ph/suraido/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/L4Ph/suraido.git",
+    "directory": "packages/cli"
+  },
+  "bin": {
+    "suraido": "./dist/cli.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@puppeteer/browsers": "^2.4.0",
+    "pdf-lib": "^1.17.1",
+    "puppeteer-core": "^23.0.0"
+  }
+}
