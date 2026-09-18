@@ -30,7 +30,6 @@ class Section extends Slide {
 
 class TwoCols extends Slide {
   static path = "cols";
-  static steps = 2;
   render() {
     return (
       <Pad>
@@ -105,7 +104,6 @@ class Quote extends Slide {
 /** Styles kept inside the slide. Only one slide is mounted, so nothing collides. */
 class Stats extends Slide {
   static path = "stats";
-  static steps = 4;
   render() {
     return (
       <Pad>

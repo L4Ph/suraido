@@ -17,8 +17,6 @@ class Cover extends Slide {
 }
 
 class Points extends Slide {
-  static steps = 3;
-
   render() {
     return (
       <Pad>

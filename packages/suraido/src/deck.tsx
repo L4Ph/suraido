@@ -1,10 +1,13 @@
 import { Component, flushSync, render, type Child, type VNode } from "./dom.ts";
-import { advance, parseHash, formatHash, type Pos, type Paths } from "./nav.ts";
+import { advance, parseHash, formatHash, LAST, type Pos, type Paths } from "./nav.ts";
 
 /** The base class for a slide. State lives on the class, as usual. */
 export abstract class Slide<P = {}, S = {}> extends Component<P, S> {
-  /** How many key presses this slide absorbs. */
-  static steps = 1;
+  /**
+   * How many stops this slide has, when you want to say. Left out — which is usually right —
+   * it is counted from the reveals the slide draws.
+   */
+  static steps?: number;
   /** The name that shows in the URL. Omit it and the index is used. */
   static path?: string;
   /** What you want to be reminded of while this slide is up. Shown in the presenter view. */
@@ -31,10 +34,15 @@ export type At = {
   path: string;
 };
 
-/** What a plugin can learn about a slide without holding the class. */
+/**
+ * What a plugin can learn about a slide without holding the class.
+ *
+ * How many stops a slide has is not here: it is counted from what the slide drew, so for a
+ * slide that has not been on screen yet there is no answer. `At.steps` says it for the one
+ * that is.
+ */
 export type SlideInfo = {
   path: string;
-  steps: number;
   notes?: string;
 };
 
@@ -179,66 +187,16 @@ function SlideAt({ slide: S, step }: { slide: SlideComponent; step: number }) {
   return <S />;
 }
 
-/**
- * suraido.js has a handful of mistakes that produce no error at all: the deck simply does the
- * wrong thing quietly. A rule in a document is weaker than a word at the moment it happens,
- * so these say it out loud — to whoever, or whatever, is reading the console.
- */
-function audit(slides: SlideComponent[], i: number, paths: Paths, steps: (i: number) => number) {
-  const where = formatHash([i, 0], paths);
-  const say = (problem: string, fix: string) =>
-    console.warn(`suraido.js ${where}: ${problem}\n  ${fix}`);
-
-  const stage = document.querySelector(".stage");
-  if (stage) {
-    const down = stage.scrollHeight - stage.clientHeight;
-    const across = stage.scrollWidth - stage.clientWidth;
-    if (down > 0 || across > 0) {
-      say(
-        `the slide runs ${down > 0 ? `${down}px past the bottom` : `${across}px past the right`} of the 1920x1080 canvas, and that part is clipped`,
-        "Nothing on screen shows this — the whole stage is scaled down. Cut the content or raise --suraido-pad.",
-      );
-    }
-  }
-
-  const shown = [...document.querySelectorAll<HTMLElement>(".step[data-n]")];
-  // A reveal that goes away again needs the step it goes away on to be reachable too, or the
-  // slide ends before anyone sees it gone.
-  const highest = Math.max(
-    0,
-    ...shown.flatMap((el) => [Number(el.dataset.n), Number(el.dataset.until ?? 0)]),
-  );
-  const declared = steps(i) - 1;
-  if (highest !== declared) {
-    say(
-      `static steps declares ${declared + 1}, but the highest <Step n> here is ${highest}`,
-      highest > declared
-        ? `Raise it to ${highest + 1}, or those reveals never appear.`
-        : `Lower it to ${highest + 1}, or ${declared - highest} key press(es) do nothing.`,
-    );
-  }
-}
-
 type DeckProps = { slides: SlideComponent[]; width?: number; height?: number };
 
 export class Deck extends Component<DeckProps, { i: number }> {
   paths: Paths = this.props.slides.map((s) => s.path);
-  steps = (i: number) => this.props.slides[i]?.steps ?? 1;
+  /** Counted from what each slide drew, once it has been drawn. */
+  measured: number[] = [];
+  steps = (i: number) => this.props.slides[i]?.steps ?? this.measured[i] ?? 1;
   /** Where we are. Only a change of slide reaches state and redraws. */
-  pos: Pos = parseHash(location.hash, this.paths, this.steps);
+  pos: Pos = parseHash(location.hash, this.paths);
   state = { i: this.pos[0] };
-
-  constructor(props: DeckProps) {
-    super(props);
-    props.slides.forEach((slide, i) => {
-      if (typeof slide !== "function" || typeof slide.prototype?.render !== "function") {
-        console.warn(
-          `suraido.js: slides[${i}] is not a Slide subclass.\n` +
-            "  Wrapping one in a function drops its static steps and path, so reveals and URLs stop working.",
-        );
-      }
-    });
-  }
 
   /** This deck's own slide area, so stepping does not reach into anyone else's. */
   get stage(): ParentNode {
@@ -248,6 +206,34 @@ export class Deck extends Component<DeckProps, { i: number }> {
     return root.querySelector(".stage") ?? root;
   }
 
+  /** How many stops this slide has, counted from what it actually drew. */
+  measure() {
+    const marks = [...this.stage.querySelectorAll<HTMLElement>(".step[data-n]")];
+    // A reveal that goes away again needs the step it goes away on to exist, or it is never
+    // seen gone.
+    const highest = Math.max(
+      0,
+      ...marks.flatMap((el) => [Number(el.dataset.n), Number(el.dataset.until ?? 0)]),
+    );
+    this.measured[this.pos[0]] = highest + 1;
+  }
+
+  /**
+   * Once the slide is on screen its reveals can be counted, and only then is it known what
+   * "the last step" — or a step in the URL that runs past the end — actually means. So the URL
+   * and everything listening are told here rather than before the slide was drawn.
+   */
+  settle() {
+    this.measure();
+    const [i, step] = this.pos;
+    this.pos = [i, Math.min(step, this.steps(i) - 1)];
+    syncSteps(this.stage, this.pos[1]);
+
+    const hash = formatHash(this.pos, this.paths);
+    if (location.hash !== hash) history.replaceState(null, "", hash);
+    this.announce(this.pos);
+  }
+
   go = (next: Pos) => {
     const slideChanged = next[0] !== this.pos[0];
     // Which way the deck is moving, so the transition can move the same way.
@@ -255,13 +241,8 @@ export class Deck extends Component<DeckProps, { i: number }> {
     const dir = next[0] > this.pos[0] ? "forward" : "back";
     this.pos = next;
 
-    const hash = formatHash(next, this.paths);
-    if (location.hash !== hash) history.replaceState(null, "", hash);
-
-    this.announce(next);
-
     // A step on its own is just an attribute.
-    if (!slideChanged) return syncSteps(this.stage, next[1]);
+    if (!slideChanged) return this.settle();
 
     // Swap the slide. View Transitions want the DOM change finished inside the callback.
     const swap = () => {
@@ -269,7 +250,7 @@ export class Deck extends Component<DeckProps, { i: number }> {
       flushSync();
       // Inside the swap, not after it: startViewTransition defers the callback, so measuring
       // outside would read the slide that is still on screen.
-      this.check();
+      this.settle();
     };
     document.documentElement.dataset.suraidoDir = dir;
     if (document.startViewTransition) document.startViewTransition(swap);
@@ -290,8 +271,7 @@ export class Deck extends Component<DeckProps, { i: number }> {
     }[e.key];
     if (dir) this.move(dir as 1 | -1);
     else if (e.key === "Home") this.go([0, 0]);
-    else if (e.key === "End")
-      this.go([this.props.slides.length - 1, this.steps(this.props.slides.length - 1) - 1]);
+    else if (e.key === "End") this.go([this.props.slides.length - 1, LAST]);
     else if (e.key === "f")
       void (document.fullscreenElement
         ? document.exitFullscreen()
@@ -300,7 +280,7 @@ export class Deck extends Component<DeckProps, { i: number }> {
     e.preventDefault();
   };
 
-  onHash = () => this.go(parseHash(location.hash, this.paths, this.steps));
+  onHash = () => this.go(parseHash(location.hash, this.paths));
 
   /**
    * Tapping the left edge goes back, anywhere else goes forward. A phone has no shift key, so
@@ -330,7 +310,6 @@ export class Deck extends Component<DeckProps, { i: number }> {
     this.fit();
     // Normalise the URL and match the attributes to it, rounding an out-of-range step.
     this.go(this.pos);
-    this.check();
   }
 
   /** @internal */ listeners = new Set<(at: At) => void>();
@@ -353,11 +332,6 @@ export class Deck extends Component<DeckProps, { i: number }> {
     // oxlint-disable-next-line no-useless-spread -- the copy is the point
     for (const run of [...this.listeners]) run(at);
   }
-
-  /** Measured a frame later, once layout has settled. */
-  check = () => {
-    requestAnimationFrame(() => audit(this.props.slides, this.pos[0], this.paths, this.steps));
-  };
 
   unmounted() {
     // Reverse of the order they were attached, so a plugin unwinds after anything it set up.
@@ -410,14 +384,11 @@ export function deck(slides: SlideComponent[], { use = [], ...opts }: DeckOption
     get slides() {
       return slides.map((slide, i) => ({
         path: formatHash([i, 0], self.paths),
-        steps: slide.steps ?? 1,
         notes: slide.notes,
       }));
     },
     go(to) {
-      self.go(
-        typeof to === "string" ? parseHash(to, self.paths, self.steps) : [to.index, to.step ?? 0],
-      );
+      self.go(typeof to === "string" ? parseHash(to, self.paths) : [to.index, to.step ?? 0]);
     },
     move(by) {
       self.move(by);

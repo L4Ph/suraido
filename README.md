@@ -31,7 +31,7 @@ npm create suraido@latest ./decks/2026-04 --name react-conf-talk --theme laser
 | [basic](examples/basic)             | The smallest deck: a cover, staged reveals, state on a class                           |
 | [layouts](examples/layouts)         | Cover, section divider, two columns, full bleed, quote, figures. **Made to be copied** |
 | [themes](examples/themes)           | The same deck under six themes                                                         |
-| [interactive](examples/interactive) | A live tally, an rAF animation, a text field. The things a Markdown deck cannot do     |
+| [interactive](examples/interactive) | A live tally, an animation, a text field. The things a Markdown deck cannot do         |
 
 ## Development
 

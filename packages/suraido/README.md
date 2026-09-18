@@ -69,7 +69,6 @@ import "suraido.js/themes/olivia.css";
 
 class Intro extends Slide<{}, { count: number }> {
   static path = "intro"; // → #intro.1 (without it, the index is used)
-  static steps = 2; // how many key presses this slide absorbs
   state = { count: 0 };
 
   mounted() {
@@ -262,7 +261,7 @@ type Plugin = (deck: DeckContext) => (() => void) | void;
 
 type DeckContext = {
   readonly at: At;                    // index, step, steps, total, path
-  readonly slides: readonly SlideInfo[];   // path, steps, notes
+  readonly slides: readonly SlideInfo[];   // path, notes
   go(to: string | { index: number; step?: number }): void;
   move(by: 1 | -1): void;
   on("move", run: (at: At) => void): () => void;   // returns the way to stop
@@ -386,9 +385,7 @@ is read back several slides later.
 - **A component's root is a single element.** Return several and only the first is drawn
 - **`<Step>` marks one element, or builds a `div`.** Give it a single element and that element
   carries the reveal; give it bare text or several children and it makes a `div` to carry it
-- **`<Step>` reads the current step from a module-level variable.** Two decks on one screen
-  would need that moved
-- **Put the classes themselves in `slides`.** `(p) => <Demo {...p} />` drops `static steps`
-  and `path`
+- **Put the classes themselves in `slides`.** `(p) => <Demo {...p} />` drops the statics, so
+  reveals and URLs stop working — TypeScript rejects it
 - **There is no `ref`.** Add one (about five lines) when you need a handle on a `<video>` or
   `<canvas>`

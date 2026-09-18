@@ -20,7 +20,6 @@ class Cover extends Slide {
 
 class Agenda extends Slide {
   static path = "parts";
-  static steps = 4;
 
   render() {
     return (
@@ -51,7 +50,6 @@ class Agenda extends Slide {
 /** State lives on the class. Leaving the slide unmounts it, and the state resets. */
 class Demo extends Slide<{}, { count: number }> {
   static path = "state";
-  static steps = 2;
   state = { count: 0 };
 
   render() {
@@ -74,5 +72,5 @@ class Demo extends Slide<{}, { count: number }> {
   }
 }
 
-// List the classes themselves. Wrapping one drops its static steps / path.
+// List the classes themselves. Wrapping one drops its statics, and TypeScript says so.
 deck([Cover, Agenda, Demo]);

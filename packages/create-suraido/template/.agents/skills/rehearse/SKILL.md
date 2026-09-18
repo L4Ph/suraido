@@ -46,8 +46,9 @@ const s = document.querySelector(".stage");
 });
 ```
 
-Read the console at each position too. suraido.js reports the mistakes it would otherwise make
-silently, and it has already done the measuring for you.
+Watch for a slide whose content runs past the 1920x1080 canvas. Nothing on screen shows
+it — the stage is scaled down, so the overflow is simply cut off. Compare what you can read
+against the source.
 
 Also weigh body text against its background: below 4.5:1 will not carry to the back of
 a room, however good it looks on a laptop.
