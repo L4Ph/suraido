@@ -10,35 +10,40 @@ export const DOCS: Record<string, Doc> = {
     description: "What a slide is, and the three rules about putting one in a deck",
     body: `# Slides
 
-A slide is a class. State lives on it, as usual.
+A slide is a function. It runs once, when the slide arrives, and returns what to draw.
 
-    import { deck, Pad, Slide } from "suraido.js";
+    import { deck, Pad, slide } from "suraido.js";
 
-    class Intro extends Slide<{}, { count: number }> {
-      static path = "intro";   // the URL becomes #intro; without it, the index is used
-      state = { count: 0 };
-
-      mounted() {}    // timers and video start here
-      updated() {}    // right after a rebuild: put focus and scroll back
-      unmounted() {}  // and always stop here what you started in mounted()
-
-      render() {
-        return <Pad><h2>Hello</h2></Pad>;
-      }
-    }
+    const Intro = slide({ path: "intro" }, () => (
+      <Pad><h2>Hello</h2></Pad>
+    ));
 
     deck([Intro]);
 
-Three things go wrong quietly if you do not know them:
+Return a function instead and it becomes the view, run again every time the slide is redrawn.
+Because the setup ran once, a plain \`let\` in it is state with the life of the slide — it
+starts again when you come back. Nothing is watching that variable, so say \`update()\`.
 
-- **Put the classes themselves in the array.** Wrapping one — \`(p) => <Intro {...p} />\` —
-  drops its statics, so reveals and URLs stop working. TypeScript rejects it.
+    const Counter = slide({ path: "count" }, ({ update }) => {
+      let n = 0;
+      return () => <button onClick={() => { n++; update() }}>Pressed {n} times</button>;
+    });
+
+A slide is handed three things, and most need none of them:
+
+- \`update()\` — draw again
+- \`signal\` — an AbortSignal, aborted when the slide leaves. Give it to addEventListener and
+  there is no cleanup to write: \`addEventListener("resize", fn, { signal })\`
+- \`after(fn)\` — run once the next draw is on screen, for measuring or focusing
+
+Two things go wrong quietly if you do not know them:
+
 - **\`render()\` returns a single element.** Return several and only the first is drawn.
-- **\`setState\` rebuilds that slide's DOM.** Nothing is diffed, so a \`<video>\` restarts and a
-  focused \`<input>\` loses focus. Put them back in \`updated()\`.
+- **A redraw does not restart anything.** The elements are kept, so a \`<video>\` keeps playing
+  and a field keeps what was typed in it. Nothing has to be put back.
 
-Crossing to another slide unmounts it and its state is gone. Anything you want to show again
-belongs in \`@suraido/atom\`, at module scope, watched with \`this.watch(...)\`.
+State that outlives a slide is a variable at module scope. Nothing needs telling: two slides
+are never on screen at once, so the later one reads it when it is drawn.
 `,
   },
 

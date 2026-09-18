@@ -19,26 +19,40 @@ them in `deck([...])`.
 
 ## Writing a slide
 
+A slide is a function. It runs once, when the slide arrives, and returns what to draw.
+
 ```tsx
-import { Slide, Step, Pad, Center, Cols, Full, deck } from "suraido.js";
+import { Center, Cols, deck, Full, Pad, slide, Step } from "suraido.js";
 
-class Intro extends Slide<{}, { count: number }> {
-  static path = "intro"; // the URL becomes #intro; without it, the index is used
-  state = { count: 0 };
-
-  render() {
-    return (
-      <Pad>
-        <h2>Heading</h2>
-        <Step n={1}>
-          <p>Appears on the second key press</p>
-        </Step>
-      </Pad>
-    );
-  }
-}
+const Intro = slide({ path: "intro" }, () => (
+  <Pad>
+    <h2>Heading</h2>
+    <Step>
+      <p>Appears on the second key press</p>
+    </Step>
+  </Pad>
+));
 
 deck([Intro]);
+```
+
+Return a function instead and it becomes the view, run again on every redraw. Because the setup
+ran once, a plain `let` in it is state with the life of the slide.
+
+```tsx
+const Counter = slide({ path: "count" }, ({ update }) => {
+  let n = 0;
+  return () => (
+    <button
+      onClick={() => {
+        n++;
+        update();
+      }}
+    >
+      Pressed {n} times
+    </button>
+  );
+});
 ```
 
 ## Rules
@@ -70,43 +84,57 @@ scaled down. Compare what you can read against the source, or cut the content.
 
 ## State
 
-`setState` re-runs `render()` and the result is put onto the DOM that is already there, so an
-element changes only when something about it changed. Focus, a half-typed word, a playing
-`<video>` and a transition in flight all survive, because the elements holding them are the ones
-that were always there.
+The setup runs once, so a `let` in it lasts exactly as long as the slide — and starts again when
+you come back to it. Nothing is watching it, so say `update()` once you have changed one.
 
-`updated()` still runs right after a redraw, for work that needs the new DOM in place —
-scrolling something into view, measuring it.
+A redraw does not restart anything: the elements are kept and only what changed is written. A
+`<video>` keeps playing, a field keeps what was typed in it and where the caret sits, and a
+transition in flight keeps running. There is nothing to put back.
 
-```tsx
-updated() {
-  this.$el.querySelector(".answers")?.scrollIntoView({ block: "end" });
-}
-```
-
-- Do not call `setState` while someone is typing. Leave the value in the DOM and move it into
-  state only when the entry is committed.
-- Start timers and animation loops in `mounted()`, and **always stop them in `unmounted()`**.
-- Crossing to another slide unmounts the old one and its state is gone. **Anything you want to
-  show again later belongs in an `atom`**, not in a slide:
+- **State that outlives a slide is a variable at module scope.** Nothing subscribes to it: two
+  slides are never on screen at once, so the later one reads it when it is drawn.
+- **Do not write a field's value back while someone is typing.** Leave it in the DOM and read it
+  when the entry is committed, or the caret jumps to the end.
 
 ```tsx
-import { atom } from "@suraido/atom"; // npm i @suraido/atom
+let votes = 0;
 
-const votes = atom([0, 0, 0]); // module scope, outside every slide
+const Poll = slide({ path: "poll" }, ({ update }) => () => (
+  <button
+    onClick={() => {
+      votes++;
+      update();
+    }}
+  >
+    Vote — {votes}
+  </button>
+));
 
-class Poll extends Slide {
-  mounted() {
-    this.watch(votes);
-  } // redraw when it changes; dropped on the way out
-  render() {
-    /* votes.get() */
-  }
-}
+const Results = slide({ path: "results" }, () => <h1>{votes}</h1>); // several slides later
 ```
 
-Use `votes.update(fn)` or `votes.set(next)` to write. Do not subscribe by hand — `watch`
-cleans up when the slide leaves, and a subscription left behind keeps the dead slide alive.
+## What a slide is handed
+
+Three things, and most slides need none of them.
+
+```tsx
+slide({ path: "clock" }, ({ update, signal, after }) => { … })
+```
+
+- `update()` — draw this slide again
+- `signal` — an `AbortSignal`, aborted when the slide leaves. Hand it to `addEventListener` and
+  there is nothing to take off again:
+  `addEventListener("resize", measure, { signal })`. For anything else you started,
+  `signal.addEventListener("abort", stop)`
+- `after(fn)` — run once the next draw is on screen. Asked for during setup, that is the first
+  draw. Use it for measuring, focusing, or reaching for an element
+
+Reach an element with `ref`, which is handed the node once it exists and `null` once it does not:
+
+```tsx
+let canvas!: HTMLCanvasElement;
+return <canvas ref={(el) => (canvas = el)} />;
+```
 
 ## Styling
 

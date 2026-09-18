@@ -16,11 +16,11 @@ npm create suraido@latest ./decks/2026-04 --name react-conf-talk --theme laser
 
 ## Packages
 
-|                                           |                                                                                  |
-| ----------------------------------------- | -------------------------------------------------------------------------------- |
-| [suraido.js](packages/suraido)            | The framework. JSX runtime, `Slide` / `Step` / `Deck`, layout components, themes |
-| [create-suraido](packages/create-suraido) | `npm create suraido`                                                             |
-| [@suraido/cli](packages/cli)              | `suraido export` — a deck as a PDF, or as images                                 |
+|                                           |                                                                           |
+| ----------------------------------------- | ------------------------------------------------------------------------- |
+| [suraido.js](packages/suraido)            | The framework. JSX runtime, `slide()` / `Step` / `deck()`, layout, themes |
+| [create-suraido](packages/create-suraido) | `npm create suraido`                                                      |
+| [@suraido/cli](packages/cli)              | `suraido export` — a deck as a PDF, or as images                          |
 
 ## Examples
 

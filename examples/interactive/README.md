@@ -1,6 +1,6 @@
 # interactive
 
-A live tally, an animation driven by `mounted()` / `unmounted()`, a text field, and the
+A live tally, an animation tied to the slide's `signal`, a text field, and the
 result of the tally read back several slides later — the things a Markdown deck cannot do.
 
 The text field shows what a redraw leaves alone — it keeps its focus and what has been typed,

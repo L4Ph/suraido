@@ -14,10 +14,10 @@ Zero dependencies; the build comes to 6.4 kB (2.9 kB gzipped).
 
 | File                                     | Lines |                                                              |
 | ---------------------------------------- | ----- | ------------------------------------------------------------ |
-| [src/jsx-runtime.ts](src/jsx-runtime.ts) | 31    | JSX → `{type, props, key}`, plus the `JSX` types             |
-| [src/dom.ts](src/dom.ts)                 | 166   | vnode → DOM, `Component`, `setState`, `flushSync`            |
-| [src/nav.ts](src/nav.ts)                 | 26    | Moving between slides and steps, and the URL. Pure functions |
-| [src/deck.tsx](src/deck.tsx)             | 134   | `Slide` / `Step` / `Deck` / `deck()`                         |
+| [src/jsx-runtime.ts](src/jsx-runtime.ts) | 40    | JSX → `{type, props, key}`, plus the `JSX` types             |
+| [src/dom.ts](src/dom.ts)                 | 318   | vnode → DOM, and putting a redraw onto the DOM already there |
+| [src/nav.ts](src/nav.ts)                 | 42    | Moving between slides and steps, and the URL. Pure functions |
+| [src/deck.tsx](src/deck.tsx)             | 493   | `slide()` / `Step` / `Deck` / `deck()`                       |
 | [src/layout.tsx](src/layout.tsx)         | 57    | `Pad` / `Center` / `Cols` / `Full`                           |
 | [src/themes/](src/themes)                | —     | Six keycap colorways                                         |
 
@@ -63,42 +63,31 @@ One file. The slides and the `deck()` call that starts them live together.
 
 ```tsx
 // src/index.tsx
-import { Cols, deck, Pad, Slide, Step } from "suraido.js";
+import { Cols, deck, Pad, slide, Step } from "suraido.js";
 import "suraido.js/deck.css";
 import "suraido.js/themes/olivia.css";
 
-class Intro extends Slide<{}, { count: number }> {
-  static path = "intro"; // → #intro.1 (without it, the index is used)
-  state = { count: 0 };
-
-  mounted() {
-    /* timers and video control go here */
-  }
-  updated() {
-    /* right after a redraw, with the new DOM in place */
-  }
-  unmounted() {}
-
-  render() {
-    return (
-      <Pad>
-        <h2>Heading</h2>
-        <Cols ratio="2fr 1fr">
-          <p>
-            Body text. <strong>Emphasis</strong> takes the accent color.
-          </p>
-          <img src="/photo.jpg" />
-        </Cols>
-        <Step n={1}>
-          <p>Appears on the second key press</p>
-        </Step>
-      </Pad>
-    );
-  }
-}
+const Intro = slide({ path: "intro" }, () => (
+  <Pad>
+    <h2>Heading</h2>
+    <Cols ratio="2fr 1fr">
+      <p>
+        Body text. <strong>Emphasis</strong> takes the accent color.
+      </p>
+      <img src="/photo.jpg" />
+    </Cols>
+    <Step>
+      <p>Appears on the second key press</p>
+    </Step>
+  </Pad>
+));
 
 deck([Intro]);
 ```
+
+Slides can go straight into `deck([...])` too — see
+[examples/layouts](../../examples/layouts). Naming them first gives the call a table of contents
+and lets one move to a file of its own.
 
 `deck()` looks for `#root` and creates a container on `body` if there is none.
 
@@ -200,19 +189,15 @@ You do not need a separate file or CSS Modules: write `<style>` inside the slide
 leaves with it.
 
 ```tsx
-class Stats extends Slide {
-  render() {
-    return (
-      <Pad>
-        <div class="stats">…</div>
-        <style>{`
-          .stats { display: flex; gap: 80px; }
-          .stats b { font-size: 96px; color: var(--suraido-accent); }
-        `}</style>
-      </Pad>
-    );
-  }
-}
+const Stats = slide({ path: "stats" }, () => (
+  <Pad>
+    <div class="stats">…</div>
+    <style>{`
+      .stats { display: flex; gap: 80px; }
+      .stats b { font-size: 96px; color: var(--suraido-accent); }
+    `}</style>
+  </Pad>
+));
 ```
 
 Three ways to keep styles close, and they are not equivalent:
@@ -281,7 +266,7 @@ Reveals and scaling deliberately avoid `render()`:
 - **Stepping** toggles `data-shown` on `.step`. The CSS transition survives
 - **Resizing** rewrites `--suraido-scale` on `:root`. The slide's DOM is untouched
 
-`render()` runs when you cross to another slide, and when a slide calls its own `setState`.
+The view runs when you cross to another slide, and when a slide says `update()`.
 
 ## Controls
 
@@ -299,53 +284,54 @@ than fighting the arrow keys.
 
 ## The life of state
 
-- `setState` re-runs `render()` and the result is put onto the DOM already there
-- Crossing to another slide unmounts it and the state is gone
+The setup runs once, when the slide arrives, so a plain `let` in it is state with exactly the
+life of the slide: it starts again when you come back to it. Nothing is watching that variable,
+so say `update()` once you have changed one.
+
+```tsx
+const Counter = slide({ path: "count" }, ({ update }) => {
+  let n = 0;
+  return () => (
+    <button
+      onClick={() => {
+        n++;
+        update();
+      }}
+    >
+      Pressed {n} times
+    </button>
+  );
+});
+```
+
+A redraw does not restart anything. The elements that were there are kept and only what changed
+is written, so a `<video>` keeps playing, a field keeps what was typed in it and where the caret
+sits, and a transition in flight keeps running. There is nothing to put back afterwards.
 
 ### Something that outlives a slide
 
-Anything you want to show again later cannot live in a slide's own state. Put it in an `atom`
-at module scope, and `watch` it from whichever slides care. `watch` is in the core; the store
-is [a package of its own](../atom), so a deck that never shares state never carries it:
-
-```sh
-npm i @suraido/atom
-```
+A variable at module scope.
 
 ```tsx
-import { atom } from "@suraido/atom";
+let votes = 0;
 
-const votes = atom([0, 0, 0]);
+const Poll = slide({ path: "poll" }, ({ update }) => () => (
+  <button
+    onClick={() => {
+      votes++;
+      update();
+    }}
+  >
+    Vote — {votes}
+  </button>
+));
 
-class Poll extends Slide {
-  mounted() {
-    this.watch(votes);
-  }
-  cast(i: number) {
-    votes.update((counts) => counts.map((n, j) => (j === i ? n + 1 : n)));
-  }
-  render() {
-    /* votes.get() */
-  }
-}
-
-class Results extends Slide {
-  // several slides later
-  mounted() {
-    this.watch(votes);
-  } // same atom, nothing passed along
-  render() {
-    /* votes.get() */
-  }
-}
+const Results = slide({ path: "results" }, () => <h1>{votes}</h1>); // several slides later
 ```
 
-`watch` redraws the component whenever the atom changes, and drops the subscription when the
-component leaves — so a slide you have moved on from stops being redrawn, and the atom stops
-holding on to it. Writing a value equal to the current one notifies nobody.
-
-`watch` asks for nothing but `subscribe(fn)` returning an unsubscribe, so any store shaped
-that way — a signal library, something you wrote this morning — works in an atom's place.
+Nothing subscribes to it, and nothing needs to: **two slides are never on screen at once**, so
+the later one simply reads it when it is drawn. Only the slide doing the writing has to redraw,
+and it knows.
 
 See [examples/interactive](../../examples/interactive), where a vote taken on the first slide
 is read back several slides later.

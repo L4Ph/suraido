@@ -15,7 +15,7 @@ Measure. Do not look — clipping is invisible to the eye.
 ## 1. Build the running order
 
 Read the `deck([...])` array and write down **one position per slide**: `#<path>` for a
-class with `static path`, `#<index>` otherwise.
+slide given a `path`, `#<index>` otherwise.
 
 Do not walk every step. `<Step>` holds its space while hidden, so revealing one changes
 nothing about height. The exception is a deck that overrides `.step` to `display: none`
