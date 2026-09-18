@@ -154,8 +154,10 @@ const LiveState = slide({ path: "state" }, ({ update }) => {
             the screen goes back — a phone has no shift key.
           </p>
         </div>
-        <Code>{`const Live = slide({ path: "live" }, ({ update }) => {
-  let count = 0;
+        {/* The declaration is annotated with what the variable is right now — the source is
+            still the source, and the number beside it is the one the button is moving. */}
+        <Code>{`const Live = slide(({ update }) => {
+  let count = 0;${count ? `   // ← ${count}` : ""}
 
   return () => (
     <button onClick={() => { count++; update() }}>
@@ -193,13 +195,15 @@ const Cast = slide({ path: "vote" }, ({ update }) => {
             is about to be thrown away.
           </p>
         </div>
-        <Code>{`let votes = 0;
+        <Code>{`let votes = 0;${votes ? `   // ← ${votes}` : ""}
 
-const Poll = slide({ path: "poll" }, ({ update }) => () => (
-  <button onClick={() => { votes++; update() }}>
-    Vote — {votes}
-  </button>
-));`}</Code>
+const Poll = slide({ path: "poll" }, ({ update }) => {
+  return () => (
+    <button onClick={() => { votes++; update() }}>
+      Vote — {votes}
+    </button>
+  );
+});`}</Code>
       </Cols>
     </Pad>
   );
