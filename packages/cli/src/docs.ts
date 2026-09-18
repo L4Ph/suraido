@@ -88,10 +88,9 @@ Build the deck the way you build any app — \`vite build\` — then:
 A browser opens the built deck, walks it the way you would, and takes what is on screen. So
 what comes out is what the room would have seen; there is no second rendering path.
 
-- One page per slide, fully revealed. \`--steps\` gives one per reveal instead.
+- One page per slide, with every reveal already out.
 - \`--pptx\` is for an upload form that only takes PowerPoint: every slide goes in as a
   full-bleed picture, so it opens anywhere and the text is no longer text.
-- \`--scale 2\` for images meant to be looked at closely.
 - Chrome is used if it is installed. If it is not, one is fetched once.
 
 It also reports any slide whose content runs past the 1920x1080 canvas. Nothing on screen

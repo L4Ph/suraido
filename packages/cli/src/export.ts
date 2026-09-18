@@ -13,19 +13,13 @@ import { dirname, join } from "node:path";
 import { PDFDocument } from "pdf-lib";
 import PptxGenJS from "pptxgenjs";
 import { open } from "./browser.ts";
-import { settled, stand, walk, type Shot } from "./deck.ts";
+import { canvas, settled, stand, walk, type Shot } from "./deck.ts";
 import { host } from "./host.ts";
 
 export type ExportOptions = {
   as: "pdf" | "png" | "pptx";
   /** A file for a pdf, a directory for images. */
   out: string;
-  /** A page per reveal rather than a page per slide. */
-  steps?: boolean;
-  width?: number;
-  height?: number;
-  /** More pixels per point, for images meant to be looked at closely. */
-  scale?: number;
   browserPath?: string;
 };
 
@@ -40,7 +34,7 @@ export async function exportDeck(
   opts: ExportOptions,
   say: (line: string) => void = console.error,
 ): Promise<Exported> {
-  const { as, out, width = 1920, height = 1080, scale = 1 } = opts;
+  const { as, out } = opts;
 
   const server = host(dir);
   server.listen(0);
@@ -50,14 +44,16 @@ export async function exportDeck(
   const browser = await open(opts.browserPath, say);
   try {
     const page = await browser.newPage();
-    await page.setViewport({ width, height, deviceScaleFactor: scale });
     // The deck is designed for a screen and sizes itself against the viewport. Printing it as
     // print media would have it lay itself out against the paper instead.
     await page.emulateMediaType("screen");
     await page.goto(`http://127.0.0.1:${port}/`, { waitUntil: "networkidle0" });
 
-    const stops = await walk(page);
-    const wanted = opts.steps ? stops : settled(stops);
+    // Whatever the deck was built at, which is 1920x1080 unless it was told otherwise.
+    const { width, height } = await canvas(page);
+    await page.setViewport({ width, height });
+
+    const wanted = settled(await walk(page));
     const over: Shot[] = [];
     const sheets: Uint8Array[] = [];
     const shots: string[] = [];

@@ -17,7 +17,7 @@ stop. **What comes out is what the room would have seen** — there is no second
 to disagree with the first, and nothing special has to be added to the deck for it.
 
 The text stays text: a slide of code comes out selectable and searchable, not as a picture of
-code.
+code. One page per slide, with every reveal already out.
 
 |                      |                        |                                                        |
 | -------------------- | ---------------------- | ------------------------------------------------------ |
@@ -25,8 +25,6 @@ code.
 | `--png`              |                        | One image per slide                                    |
 | `--pptx`             |                        | A PowerPoint file: one picture per slide, edge to edge |
 | `--out <path>`       | `deck.pdf` / `slides/` | A file for `--pdf`, a directory for `--png`            |
-| `--steps`            |                        | A page per reveal instead of per slide — for a handout |
-| `--scale <n>`        | `1`                    | Pixels per point, for `--png`                          |
 | `--browser-path <p>` |                        | A browser to render with, instead of looking for one   |
 | `--json`             |                        | The result as one line of JSON                         |
 

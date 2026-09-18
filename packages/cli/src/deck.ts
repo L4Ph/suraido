@@ -10,6 +10,19 @@ import type { Page } from "puppeteer-core";
 /** Where a slide is, and whether it fits. */
 export type Shot = { at: string; over?: { down: number; across: number } };
 
+/**
+ * The canvas the deck was built at, read from the deck rather than assumed.
+ *
+ * offsetWidth, not a bounding rect: the stage is scaled to whatever window it is in, and a
+ * rect would report the size it was shrunk to rather than the size it was written at.
+ */
+export async function canvas(page: Page): Promise<{ width: number; height: number }> {
+  return page.evaluate(() => {
+    const stage = document.querySelector<HTMLElement>(".stage");
+    return { width: stage?.offsetWidth || 1920, height: stage?.offsetHeight || 1080 };
+  });
+}
+
 /** Press forward until the deck stops moving, collecting every position it stops at. */
 export async function walk(page: Page): Promise<string[]> {
   return page.evaluate(async () => {

@@ -13,8 +13,6 @@ const HELP = `suraido — tools for a deck
     --png                one image per slide
     --pptx               a PowerPoint file: one picture per slide, edge to edge
     --out <path>         a file, or a directory for --png
-    --steps              a page per reveal rather than a page per slide
-    --scale <n>          pixels per point, for --png (default 1)
     --browser-path <p>   a browser to render with, instead of looking for one
     --json               print the result as one line of JSON
 
@@ -49,8 +47,6 @@ try {
       pdf: { type: "boolean" },
       png: { type: "boolean" },
       pptx: { type: "boolean" },
-      scale: { type: "string" },
-      steps: { type: "boolean" },
       version: { type: "boolean", short: "v" },
     },
   });
@@ -96,9 +92,6 @@ if (command !== "export") fail(`no command "${command}"`);
 if ([values.pdf, values.png, values.pptx].filter(Boolean).length > 1)
   fail("pick one of --pdf, --png and --pptx");
 const as = values.png ? "png" : values.pptx ? "pptx" : "pdf";
-const scale = Number(values.scale ?? 1);
-if (!Number.isFinite(scale) || scale <= 0) fail(`"${values.scale}" is not a scale`);
-
 const dir = arg ?? "dist";
 const out = values.out ?? { png: "slides", pptx: "deck.pptx", pdf: "deck.pdf" }[as];
 
@@ -106,8 +99,6 @@ try {
   const done = await exportDeck(dir, {
     as,
     out,
-    scale,
-    steps: values.steps,
     browserPath: values["browser-path"],
   });
 
