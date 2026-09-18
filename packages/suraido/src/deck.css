@@ -199,6 +199,56 @@
   }
 
   /*
+   * All of the deck at once. The thumbnails are the real slides, drawn at full size and scaled
+   * down, so what you are looking at is what you would get — no second rendering to disagree.
+   */
+  .overview {
+    --suraido-thumb: 0.3;
+
+    display: grid;
+    grid-template-columns: repeat(auto-fill, calc(1920px * var(--suraido-thumb)));
+    gap: 40px;
+    justify-content: center;
+    align-content: start;
+    width: 100%;
+    height: 100%;
+    padding: 48px;
+    overflow-y: auto;
+    box-sizing: border-box;
+    background: var(--suraido-bg);
+  }
+
+  .sheet {
+    position: relative;
+    width: calc(1920px * var(--suraido-thumb));
+    height: calc(1080px * var(--suraido-thumb));
+    overflow: hidden;
+    border: 2px solid var(--suraido-rule);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .sheet > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1920px;
+    height: 1080px;
+    transform: scale(var(--suraido-thumb));
+    transform-origin: top left;
+    pointer-events: none;
+  }
+
+  .sheet:hover {
+    border-color: var(--suraido-accent);
+  }
+
+  .sheet[data-here] {
+    border-color: var(--suraido-accent);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--suraido-accent) 30%, transparent);
+  }
+
+  /*
    * Crossing to another slide cross-fades.
    * Leave the group out and it keeps the UA's 250ms, holding the transition open longer.
    */

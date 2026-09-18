@@ -270,7 +270,14 @@ The view runs when you cross to another slide, and when a slide says `update()`.
 
 ## Controls
 
-`→ ↓ Space` forward, `← ↑` back, `Home` `End`, `f` fullscreen.
+`→ ↓ Space` forward, `← ↑` back, `Home` `End`, `f` fullscreen, `o` all of it at once.
+
+`o` shows every slide as a thumbnail with the one you are on marked. Click any of them to go
+there. It is for the moment someone asks about something from eight slides ago and the
+alternative is pressing `←` eight times in front of the room. `o` or `Escape` puts it away.
+
+The thumbnails are the real slides, drawn at full size and scaled down, so what you are
+looking at is what you would get.
 
 Tapping the left quarter of the screen goes back and anywhere else goes forward, so a deck
 works on a phone, where there is no shift key. Shift-clicking goes back too.

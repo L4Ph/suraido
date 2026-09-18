@@ -217,7 +217,7 @@ export function Step({
   const mark = {
     "data-n": enter,
     "data-until": Number.isFinite(until) ? until : null,
-    "data-shown": (enter <= scope.step && scope.step < until) || null,
+    "data-shown": showing(scope.step, enter, until) || null,
     ...rest,
   };
   const target = markable(children);
@@ -236,6 +236,15 @@ export function Step({
 }
 
 /**
+ * Whether a reveal is out at this step.
+ *
+ * One with no end goes on forever, and forever has to include the step the overview draws every
+ * slide at — where every reveal is meant to be out at once.
+ */
+const showing = (step: number, enter: number, until: number) =>
+  enter <= step && (!Number.isFinite(until) || step < until);
+
+/**
  * Stepping only touches the attribute, never re-rendering, so the CSS transition survives.
  * Scoped to one deck's own stage: another deck on the page is not this deck's business.
  *
@@ -251,7 +260,7 @@ function syncSteps(root: ParentNode, step: number) {
   scope.step = step;
   for (const el of root.querySelectorAll<HTMLElement>(".step[data-n]")) {
     const until = el.dataset.until ? Number(el.dataset.until) : Infinity;
-    el.toggleAttribute("data-shown", Number(el.dataset.n) <= step && step < until);
+    el.toggleAttribute("data-shown", showing(step, Number(el.dataset.n), until));
   }
 }
 
@@ -266,14 +275,14 @@ function SlideAt({ slide: S, step }: { slide: SlideComponent; step: number }) {
 
 type DeckProps = { slides: SlideComponent[]; width?: number; height?: number };
 
-export class Deck extends Component<DeckProps, { i: number }> {
+export class Deck extends Component<DeckProps, { i: number; over: boolean }> {
   paths: Paths = this.props.slides.map((s) => s.path);
   /** Counted from what each slide drew, once it has been drawn. */
   measured: number[] = [];
   steps = (i: number) => this.props.slides[i]?.steps ?? this.measured[i] ?? 1;
   /** Where we are. Only a change of slide reaches state and redraws. */
   pos: Pos = parseHash(location.hash, this.paths);
-  state = { i: this.pos[0] };
+  state = { i: this.pos[0], over: false };
 
   /** This deck's own slide area, so stepping does not reach into anyone else's. */
   get stage(): ParentNode {
@@ -301,6 +310,9 @@ export class Deck extends Component<DeckProps, { i: number }> {
    * and everything listening are told here rather than before the slide was drawn.
    */
   settle() {
+    // Stepping walks every `.step` under the stage, and while the overview is up that is every
+    // slide at once. They are all meant to be showing everything.
+    if (this.state.over) return;
     this.measure();
     const [i, step] = this.pos;
     this.pos = [i, Math.min(step, this.steps(i) - 1)];
@@ -364,6 +376,8 @@ export class Deck extends Component<DeckProps, { i: number }> {
     if (dir) this.move(dir as 1 | -1);
     else if (e.key === "Home") this.go([0, 0]);
     else if (e.key === "End") this.go([this.props.slides.length - 1, LAST]);
+    else if (e.key === "o") this.show(!this.state.over);
+    else if (e.key === "Escape" && this.state.over) this.show(false);
     else if (e.key === "f")
       void (document.fullscreenElement
         ? document.exitFullscreen()
@@ -381,8 +395,33 @@ export class Deck extends Component<DeckProps, { i: number }> {
    * Anything you could have meant to press is left alone, so a link or a button in a slide
    * does not also turn the page.
    */
+  /**
+   * All of the deck at once, to find the slide you want to go back to without walking past
+   * every one in between in front of the room.
+   */
+  show(over: boolean) {
+    this.setState({ over });
+    flushSync();
+    // A long deck does not fit, and opening it on slide fourteen to a view of the first nine
+    // would be the opposite of the point.
+    if (over) {
+      const here = (this.$el as Element).querySelector("[data-here]");
+      here?.scrollIntoView({ block: "nearest" });
+    }
+  }
+
   onClick = (e: MouseEvent) => {
     const target = e.target as Element | null;
+
+    if (this.state.over) {
+      const sheet = target?.closest<HTMLElement>(".sheet");
+      if (!sheet) return;
+      this.show(false);
+      // Where the thumbnail was: it was showing everything, so that is what you get.
+      this.go([Number(sheet.dataset.to), LAST]);
+      return;
+    }
+
     if (target?.closest("a, button, input, select, textarea, label, [data-suraido-keep]")) return;
     const back = e.shiftKey || e.clientX < innerWidth * BACK_ZONE;
     this.move(back ? -1 : 1);
@@ -442,9 +481,21 @@ export class Deck extends Component<DeckProps, { i: number }> {
     return (
       <div class="deck" onClick={this.onClick}>
         <div class="stage" style={{ width: `${width}px`, height: `${height}px` }}>
-          {/* The step goes in with the slide so a deep link that carries one is honoured from
-              the very first render. Drop it and reveals are missing on exactly those links. */}
-          <SlideAt slide={Current} step={this.pos[1]} />
+          {this.state.over ? (
+            <div class="overview">
+              {slides.map((S, i) => (
+                <div class="sheet" data-to={i} data-here={i === this.state.i || null}>
+                  {/* Everything out: a thumbnail of a slide half revealed is not a thumbnail
+                      of the slide. */}
+                  <SlideAt slide={S} step={LAST} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            /* The step goes in with the slide so a deep link that carries one is honoured from
+               the very first render. Drop it and reveals are missing on exactly those links. */
+            <SlideAt slide={Current} step={this.pos[1]} />
+          )}
         </div>
         <div class="pager">{`${this.state.i + 1} / ${slides.length}`}</div>
       </div>

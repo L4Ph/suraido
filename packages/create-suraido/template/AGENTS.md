@@ -194,7 +194,8 @@ alone.
 
 The URL is `#<slide>.<step>`, for example `#intro.2`. Reloading keeps the position.
 
-`→ ↓ Space` forward, `← ↑` back, `Home` `End`, `f` fullscreen. Clicking advances;
+`→ ↓ Space` forward, `← ↑` back, `Home` `End`, `f` fullscreen, `o` every slide at once
+(`o` or `Escape` to put it away, click a thumbnail to go there). Clicking advances;
 shift-clicking goes back.
 
 Tapping the left quarter of the screen goes back, anywhere else goes forward — a phone has no
