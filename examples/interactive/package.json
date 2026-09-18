@@ -8,7 +8,6 @@
     "preview": "vp preview"
   },
   "dependencies": {
-    "@suraido/atom": "*",
     "suraido.js": "*"
   },
   "devDependencies": {

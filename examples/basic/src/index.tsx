@@ -1,4 +1,4 @@
-import { Center, deck, Pad, Slide, slide, Step } from "suraido.js";
+import { Center, deck, Pad, slide, Step } from "suraido.js";
 import "suraido.js/deck.css";
 import "./slides.css";
 
@@ -36,29 +36,27 @@ const Agenda = slide({ path: "parts" }, () => (
 ));
 
 /** State lives on the class. Leaving the slide unmounts it, and the state resets. */
-class Demo extends Slide<{}, { count: number }> {
-  static path = "state";
-  state = { count: 0 };
+const Demo = slide({ path: "state" }, ({ update }) => {
+  let count = 0;
 
-  render() {
-    return (
-      <Pad>
-        <h2>State on a class</h2>
-        <button
-          class="big"
-          onClick={() => {
-            this.setState((s) => ({ count: s.count + 1 }));
-          }}
-        >
-          Pressed {this.state.count} times
-        </button>
-        <Step n={1}>
-          <p class="lead">This appears on the second key press</p>
-        </Step>
-      </Pad>
-    );
-  }
-}
+  return () => (
+    <Pad>
+      <h2>State in a variable</h2>
+      <button
+        class="big"
+        onClick={() => {
+          count += 1;
+          update();
+        }}
+      >
+        Pressed {count} times
+      </button>
+      <Step>
+        <p class="lead">This appears on the second key press</p>
+      </Step>
+    </Pad>
+  );
+});
 
 // List the classes themselves. Wrapping one drops its statics, and TypeScript says so.
 deck([Cover, Agenda, Demo]);
