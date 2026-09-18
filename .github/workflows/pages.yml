@@ -35,7 +35,6 @@ jobs:
       # Without it vp check cannot find the JSX namespace and reports the examples as 424
       # errors.
       - run: vp -C packages/suraido pack
-      - run: vp -C packages/atom pack
       - run: vp -C packages/cli pack
 
       - run: vp check

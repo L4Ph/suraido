@@ -1,61 +1,41 @@
 import { afterEach, expect, test } from "vite-plus/test";
-import { Deck, Slide, Step, type SlideComponent } from "./deck.tsx";
+import { Deck, slide, Step, type SlideComponent } from "./deck.tsx";
 import { flushSync, render } from "./dom.ts";
 import { jsx } from "./jsx-runtime.ts";
 
-class Points extends Slide {
-  static path = "points";
-  static steps = 3;
-  render() {
-    return jsx("div", {
-      children: [jsx(Step, { n: 1, children: "a" }), jsx(Step, { n: 2, children: "b" })],
-    });
-  }
-}
+const Points = slide({ path: "points", steps: 3 }, () =>
+  jsx("div", {
+    children: [jsx(Step, { n: 1, children: "a" }), jsx(Step, { n: 2, children: "b" })],
+  }),
+);
 
-/** Something outside the slide that it redraws for: a vote arriving, a timer ticking. */
-const votes = {
-  count: 0,
-  runs: new Set<() => void>(),
-  subscribe(run: () => void) {
-    this.runs.add(run);
-    return () => void this.runs.delete(run);
-  },
-  cast() {
-    this.count++;
-    for (const run of this.runs) run();
-  },
+/** Something the slide shows that changes while it is up: a vote arriving, a timer ticking. */
+const votes = { count: 0, redraw: () => {} };
+const cast = () => {
+  votes.count += 1;
+  votes.redraw();
 };
 
-class Counting extends Slide {
-  static path = "counting";
-  static steps = 3;
-  mounted() {
-    this.watch(votes);
-  }
-  render() {
-    return jsx("div", {
+const Counting = slide({ path: "counting", steps: 3 }, ({ update }) => {
+  votes.redraw = update;
+  return () =>
+    jsx("div", {
       children: [
         String(votes.count),
         jsx(Step, { n: 1, children: "a" }),
         jsx(Step, { n: 2, children: "b" }),
       ],
     });
-  }
-}
+});
 
-class Listed extends Slide {
-  static path = "listed";
-  static steps = 3;
-  render() {
-    return jsx("ul", {
-      children: [
-        jsx(Step, { n: 1, children: jsx("li", { class: "lead", children: "a" }) }),
-        jsx(Step, { n: 2, children: jsx("li", { children: "b" }) }),
-      ],
-    });
-  }
-}
+const Listed = slide({ path: "listed", steps: 3 }, () =>
+  jsx("ul", {
+    children: [
+      jsx(Step, { n: 1, children: jsx("li", { class: "lead", children: "a" }) }),
+      jsx(Step, { n: 2, children: jsx("li", { children: "b" }) }),
+    ],
+  }),
+);
 
 /** Which reveals are showing, read the way the CSS reads them. */
 const shownIn = (el: Element) =>
@@ -78,6 +58,7 @@ afterEach(() => {
   for (const deck of attached.splice(0)) deck.unmounted();
   document.body.innerHTML = "";
   votes.count = 0;
+  votes.redraw = () => {};
 });
 
 /**
@@ -104,7 +85,7 @@ test("a slide that redraws itself after stepping keeps its reveals", async () =>
   deck.go([0, 2]);
   expect(shownIn(host)).toEqual([true, true]);
 
-  votes.cast();
+  cast();
   flushSync();
 
   expect(host.textContent).toContain("1");
@@ -136,15 +117,11 @@ test("a Step around bare text still gets something to hang the mark on", async (
 
 /** JSX keeps same-line whitespace, so this arrives as three children rather than one. */
 test("whitespace around the element does not stop it being marked", async () => {
-  class Spaced extends Slide {
-    static path = "spaced";
-    static steps = 2;
-    render() {
-      return jsx("ul", {
-        children: jsx(Step, { n: 1, children: [" ", jsx("li", { children: "a" }), " "] }),
-      });
-    }
-  }
+  const Spaced = slide({ path: "spaced", steps: 2 }, () =>
+    jsx("ul", {
+      children: jsx(Step, { n: 1, children: [" ", jsx("li", { children: "a" }), " "] }),
+    }),
+  );
 
   const { host } = await mount([Spaced], "#spaced.1");
   expect([...host.querySelector("ul")!.children].map((c) => c.tagName.toLowerCase())).toEqual([
@@ -154,19 +131,15 @@ test("whitespace around the element does not stop it being marked", async () => 
 
 /** Numbering every reveal by hand means renumbering all of them to insert one. */
 test("a Step with no number takes the one after the last", async () => {
-  class Bare extends Slide {
-    static path = "bare";
-    static steps = 4;
-    render() {
-      return jsx("div", {
-        children: [
-          jsx(Step, { children: "a" }),
-          jsx(Step, { children: "b" }),
-          jsx(Step, { children: "c" }),
-        ],
-      });
-    }
-  }
+  const Bare = slide({ path: "bare", steps: 4 }, () =>
+    jsx("div", {
+      children: [
+        jsx(Step, { children: "a" }),
+        jsx(Step, { children: "b" }),
+        jsx(Step, { children: "c" }),
+      ],
+    }),
+  );
 
   const { deck, host } = await mount([Bare], "#bare.2");
   expect(shownIn(host)).toEqual([true, true, false]);
@@ -176,15 +149,11 @@ test("a Step with no number takes the one after the last", async () => {
 });
 
 test("naming a number carries the ones after it forward", async () => {
-  class Mixed extends Slide {
-    static path = "mixed";
-    static steps = 5;
-    render() {
-      return jsx("div", {
-        children: [jsx(Step, { n: 3, children: "a" }), jsx(Step, { children: "b" })],
-      });
-    }
-  }
+  const Mixed = slide({ path: "mixed", steps: 5 }, () =>
+    jsx("div", {
+      children: [jsx(Step, { n: 3, children: "a" }), jsx(Step, { children: "b" })],
+    }),
+  );
 
   const { deck, host } = await mount([Mixed], "#mixed.3");
   expect(shownIn(host)).toEqual([true, false]);
@@ -195,13 +164,9 @@ test("naming a number carries the ones after it forward", async () => {
 
 /** Everything so far appears and stays. Sometimes a thing should go away again. */
 test("a range shows from the first number until the second, which is exclusive", async () => {
-  class Ranged extends Slide {
-    static path = "ranged";
-    static steps = 5;
-    render() {
-      return jsx("div", { children: jsx(Step, { n: [2, 4], children: "a" }) });
-    }
-  }
+  const Ranged = slide({ path: "ranged", steps: 5 }, () =>
+    jsx("div", { children: jsx(Step, { n: [2, 4], children: "a" }) }),
+  );
 
   const { deck, host } = await mount([Ranged], "#ranged.1");
   expect(shownIn(host)).toEqual([false]);
@@ -216,23 +181,18 @@ test("a range shows from the first number until the second, which is exclusive",
 
 /** The count is per slide, so a slide rebuilding itself must start counting again. */
 test("a slide that redraws itself numbers its reveals the same way twice", async () => {
-  class Bare extends Slide {
-    static path = "bare";
-    static steps = 3;
-    mounted() {
-      this.watch(votes);
-    }
-    render() {
-      return jsx("div", {
+  const Bare = slide({ path: "bare", steps: 3 }, ({ update }) => {
+    votes.redraw = update;
+    return () =>
+      jsx("div", {
         children: [String(votes.count), jsx(Step, { children: "a" }), jsx(Step, { children: "b" })],
       });
-    }
-  }
+  });
 
   const { host } = await mount([Bare], "#bare.2");
   expect(shownIn(host)).toEqual([true, true]);
 
-  votes.cast();
+  cast();
   flushSync();
 
   expect(host.querySelector('[data-n="1"]')).toBeTruthy();
@@ -241,15 +201,11 @@ test("a slide that redraws itself numbers its reveals the same way twice", async
 
 /** The press that takes one thing away is the natural press to bring its replacement in. */
 test("the reveal after a range arrives on the step the range leaves", async () => {
-  class Swap extends Slide {
-    static path = "swap";
-    static steps = 4;
-    render() {
-      return jsx("div", {
-        children: [jsx(Step, { n: [1, 3], children: "before" }), jsx(Step, { children: "after" })],
-      });
-    }
-  }
+  const Swap = slide({ path: "swap", steps: 4 }, () =>
+    jsx("div", {
+      children: [jsx(Step, { n: [1, 3], children: "before" }), jsx(Step, { children: "after" })],
+    }),
+  );
 
   const { deck, host } = await mount([Swap], "#swap.1");
   expect(shownIn(host)).toEqual([true, false]);
@@ -259,25 +215,17 @@ test("the reveal after a range arrives on the step the range leaves", async () =
 });
 
 /** The markup already says how many stops there are. Saying it again is a second truth. */
-class Three extends Slide {
-  static path = "three";
-  render() {
-    return jsx("div", {
-      children: [
-        jsx(Step, { children: "a" }),
-        jsx(Step, { children: "b" }),
-        jsx(Step, { children: "c" }),
-      ],
-    });
-  }
-}
+const Three = slide({ path: "three" }, () =>
+  jsx("div", {
+    children: [
+      jsx(Step, { children: "a" }),
+      jsx(Step, { children: "b" }),
+      jsx(Step, { children: "c" }),
+    ],
+  }),
+);
 
-class Plain extends Slide {
-  static path = "plain";
-  render() {
-    return "nothing to reveal";
-  }
-}
+const Plain = slide({ path: "plain" }, () => "nothing to reveal");
 
 test("a slide with three reveals and nothing declared takes three presses", async () => {
   const { deck, host } = await mount([Three, Plain]);
@@ -324,13 +272,9 @@ test("a deep link past the end is brought back once the slide has been drawn", a
 });
 
 test("a number declared by hand still wins", async () => {
-  class Padded extends Slide {
-    static path = "padded";
-    static steps = 6;
-    render() {
-      return jsx("div", { children: jsx(Step, { children: "a" }) });
-    }
-  }
+  const Padded = slide({ path: "padded", steps: 6 }, () =>
+    jsx("div", { children: jsx(Step, { children: "a" }) }),
+  );
 
   const { deck } = await mount([Padded, Plain]);
   for (let i = 0; i < 5; i++) deck.move(1);

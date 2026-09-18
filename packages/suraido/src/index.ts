@@ -1,6 +1,6 @@
-export { Component, flushSync, render } from "./dom.ts";
+export { flushSync, render } from "./dom.ts";
 export type { VNode, Child } from "./dom.ts";
-export { Deck, deck, slide, Slide, Step } from "./deck.tsx";
+export { Deck, deck, slide, Step } from "./deck.tsx";
 export type {
   At,
   DeckContext,
