@@ -83,11 +83,14 @@ Build the deck the way you build any app — \`vite build\` — then:
 
     npx @suraido/cli export dist --pdf
     npx @suraido/cli export dist --png --out slides/
+    npx @suraido/cli export dist --pptx
 
 A browser opens the built deck, walks it the way you would, and takes what is on screen. So
 what comes out is what the room would have seen; there is no second rendering path.
 
 - One page per slide, fully revealed. \`--steps\` gives one per reveal instead.
+- \`--pptx\` is for an upload form that only takes PowerPoint: every slide goes in as a
+  full-bleed picture, so it opens anywhere and the text is no longer text.
 - \`--scale 2\` for images meant to be looked at closely.
 - Chrome is used if it is installed. If it is not, one is fetched once.
 

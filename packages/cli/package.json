@@ -5,6 +5,8 @@
   "keywords": [
     "cli",
     "pdf",
+    "powerpoint",
+    "pptx",
     "presentation",
     "slides",
     "suraido"
@@ -30,6 +32,7 @@
   "dependencies": {
     "@puppeteer/browsers": "^2.4.0",
     "pdf-lib": "^1.17.1",
+    "pptxgenjs": "^4.0.1",
     "puppeteer-core": "^23.0.0"
   }
 }

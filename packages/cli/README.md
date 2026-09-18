@@ -23,6 +23,7 @@ code.
 | -------------------- | ---------------------- | ------------------------------------------------------ |
 | `--pdf`              | default                | One page per slide, fully revealed                     |
 | `--png`              |                        | One image per slide                                    |
+| `--pptx`             |                        | A PowerPoint file: one picture per slide, edge to edge |
 | `--out <path>`       | `deck.pdf` / `slides/` | A file for `--pdf`, a directory for `--png`            |
 | `--steps`            |                        | A page per reveal instead of per slide — for a handout |
 | `--scale <n>`        | `1`                    | Pixels per point, for `--png`                          |
@@ -31,6 +32,12 @@ code.
 
 Chrome is used if it is installed — any channel. If none is, one is fetched into
 `~/.cache/suraido` the first time and reused after that.
+
+### pptx is a deck of pictures
+
+`--pptx` is for the upload form that only takes PowerPoint. Every slide goes in as a full-bleed
+picture, so it opens anywhere — and the text is no longer text. Nobody can edit your slides, and
+nobody can lift a line of code off them either.
 
 ### It also tells you what does not fit
 

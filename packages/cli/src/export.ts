@@ -11,12 +11,13 @@ import { mkdir, writeFile } from "node:fs/promises";
 import type { AddressInfo } from "node:net";
 import { dirname, join } from "node:path";
 import { PDFDocument } from "pdf-lib";
+import PptxGenJS from "pptxgenjs";
 import { open } from "./browser.ts";
 import { settled, stand, walk, type Shot } from "./deck.ts";
 import { host } from "./host.ts";
 
 export type ExportOptions = {
-  as: "pdf" | "png";
+  as: "pdf" | "png" | "pptx";
   /** A file for a pdf, a directory for images. */
   out: string;
   /** A page per reveal rather than a page per slide. */
@@ -59,12 +60,15 @@ export async function exportDeck(
     const wanted = opts.steps ? stops : settled(stops);
     const over: Shot[] = [];
     const sheets: Uint8Array[] = [];
+    const shots: string[] = [];
 
     for (const [i, at] of wanted.entries()) {
       const shot = await stand(page, at);
       if (shot.over) over.push(shot);
 
-      if (as === "png") {
+      if (as === "pptx") {
+        shots.push(await page.screenshot({ encoding: "base64" }));
+      } else if (as === "png") {
         const file = join(out, `${named(shot.at, i, wanted.length)}.png`);
         await mkdir(dirname(file), { recursive: true });
         await page.screenshot({ path: file });
@@ -79,6 +83,22 @@ export async function exportDeck(
           }),
         );
       }
+    }
+
+    if (as === "pptx") {
+      // A slide per picture, edge to edge. The text is not text any more — this is a deck of
+      // images in a wrapper that PowerPoint will open, which is what a conference upload form
+      // usually means by "pptx".
+      const pptx = new PptxGenJS();
+      pptx.defineLayout({ name: "suraido", width: 13.333, height: 7.5 });
+      pptx.layout = "suraido";
+      for (const shot of shots) {
+        pptx
+          .addSlide()
+          .addImage({ data: `image/png;base64,${shot}`, x: 0, y: 0, w: "100%", h: "100%" });
+      }
+      await mkdir(dirname(out), { recursive: true });
+      await writeFile(out, (await pptx.write({ outputType: "nodebuffer" })) as Uint8Array);
     }
 
     if (as === "pdf") {

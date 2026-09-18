@@ -6,12 +6,13 @@ import { exportDeck } from "./export.ts";
 
 const HELP = `suraido — tools for a deck
 
-  suraido export [dir]   a built deck as a PDF, or as images
+  suraido export [dir]   a built deck as a PDF, images, or PowerPoint
                          dir defaults to ./dist
 
     --pdf                one page per slide, fully revealed (the default)
     --png                one image per slide
-    --out <path>         a file for --pdf, a directory for --png
+    --pptx               a PowerPoint file: one picture per slide, edge to edge
+    --out <path>         a file, or a directory for --png
     --steps              a page per reveal rather than a page per slide
     --scale <n>          pixels per point, for --png (default 1)
     --browser-path <p>   a browser to render with, instead of looking for one
@@ -47,6 +48,7 @@ try {
       out: { type: "string" },
       pdf: { type: "boolean" },
       png: { type: "boolean" },
+      pptx: { type: "boolean" },
       scale: { type: "string" },
       steps: { type: "boolean" },
       version: { type: "boolean", short: "v" },
@@ -91,13 +93,14 @@ function formatted({ name, description }: { name: string; description: string })
 
 if (command !== "export") fail(`no command "${command}"`);
 
-if (values.pdf && values.png) fail("pick one of --pdf and --png");
-const as = values.png ? "png" : "pdf";
+if ([values.pdf, values.png, values.pptx].filter(Boolean).length > 1)
+  fail("pick one of --pdf, --png and --pptx");
+const as = values.png ? "png" : values.pptx ? "pptx" : "pdf";
 const scale = Number(values.scale ?? 1);
 if (!Number.isFinite(scale) || scale <= 0) fail(`"${values.scale}" is not a scale`);
 
 const dir = arg ?? "dist";
-const out = values.out ?? (as === "png" ? "slides" : "deck.pdf");
+const out = values.out ?? { png: "slides", pptx: "deck.pptx", pdf: "deck.pdf" }[as];
 
 try {
   const done = await exportDeck(dir, {
@@ -111,7 +114,8 @@ try {
   if (values.json) {
     console.log(JSON.stringify(done));
   } else {
-    console.log(`suraido: ${done.count} ${as === "pdf" ? "pages" : "images"} → ${done.out}`);
+    const what = { pdf: "pages", png: "images", pptx: "slides" }[as];
+    console.log(`suraido: ${done.count} ${what} → ${done.out}`);
     for (const { at, over } of done.over) {
       // Nothing on screen shows this, so saying it here is the only chance anyone gets.
       console.error(

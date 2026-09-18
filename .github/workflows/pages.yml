@@ -46,7 +46,8 @@ jobs:
       - run: vp build
         working-directory: examples/basic
       - run: node packages/cli/dist/cli.mjs export examples/basic/dist --pdf --out /tmp/deck.pdf
-      - run: test -s /tmp/deck.pdf
+      - run: node packages/cli/dist/cli.mjs export examples/basic/dist --pptx --out /tmp/deck.pptx
+      - run: test -s /tmp/deck.pdf && test -s /tmp/deck.pptx
 
       - run: vp build
         working-directory: examples/showcase
