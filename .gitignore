@@ -1,3 +1,6 @@
 node_modules
 dist
 .DS_Store
+
+# Dumps of other repositories, pulled in to read and not to keep.
+repomix-output-*.xml
