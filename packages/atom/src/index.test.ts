@@ -1,7 +1,7 @@
 import { expect, test } from "vite-plus/test";
-import { atom } from "./atom.ts";
-import { Component, render, type Child } from "./dom.ts";
-import { jsx } from "./jsx-runtime.ts";
+import { atom } from "./index.ts";
+import { Component, render, type Child } from "suraido.js";
+import { jsx } from "suraido.js/jsx-runtime";
 
 const tick = () => new Promise((r) => setTimeout(r, 0));
 

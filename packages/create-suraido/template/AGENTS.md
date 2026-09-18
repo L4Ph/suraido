@@ -74,8 +74,8 @@ looks correct on screen.
 presenter window, which is opt-in:
 
 ```tsx
-import { presenter } from "suraido.js/presenter";
-presenter(); // press p during the talk
+import { presenter } from "@suraido/presenter"; // npm i @suraido/presenter
+deck(slides, { use: [presenter()] }); // press p during the talk
 ```
 
 ## State
@@ -98,7 +98,7 @@ updated() {
   show again later belongs in an `atom`**, not in a slide:
 
 ```tsx
-import { atom } from "suraido.js";
+import { atom } from "@suraido/atom"; // npm i @suraido/atom
 
 const votes = atom([0, 0, 0]); // module scope, outside every slide
 

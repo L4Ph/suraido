@@ -31,15 +31,15 @@ jobs:
 
       - run: vp install
 
-      # First, because everything else resolves suraido.js through dist — including its
-      # types. Without it vp check cannot find the JSX namespace and reports the examples
-      # as 424 errors.
-      - run: vp pack
-        working-directory: packages/suraido
+      # First, because everything else resolves these through dist — including their types.
+      # Without it vp check cannot find the JSX namespace and reports the examples as 424
+      # errors.
+      - run: vp -C packages/suraido pack
+      - run: vp -C packages/atom pack
+      - run: vp -C packages/presenter pack
 
       - run: vp check
       - run: vp test
-        working-directory: packages/suraido
 
       - run: vp build
         working-directory: examples/showcase

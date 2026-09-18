@@ -8,6 +8,8 @@
     "preview": "vp preview"
   },
   "dependencies": {
+    "@suraido/atom": "*",
+    "@suraido/presenter": "*",
     "suraido.js": "*"
   },
   "devDependencies": {
