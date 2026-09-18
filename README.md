@@ -21,7 +21,6 @@ npm create suraido@latest ./decks/2026-04 --name react-conf-talk --theme laser
 | [suraido.js](packages/suraido)            | The framework. JSX runtime, `Slide` / `Step` / `Deck`, layout components, themes |
 | [create-suraido](packages/create-suraido) | `npm create suraido`                                                             |
 | [@suraido/atom](packages/atom)            | State that outlives a slide. Opt in                                              |
-| [@suraido/presenter](packages/presenter)  | A second window with your notes. Opt in                                          |
 | [@suraido/cli](packages/cli)              | The CLI. `suraido serve` puts the whole room on the same slide                   |
 
 ## Examples

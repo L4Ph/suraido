@@ -226,31 +226,6 @@ Three ways to keep styles close, and they are not equivalent:
 `style={{ }}` is for injecting one value, such as the `width: ${pct}%` above. For anything
 else, `<style>` covers it without a separate file.
 
-## Presenter view
-
-A second window with your notes, what is coming and a clock, while the deck stays on the
-projector. It is [its own package](../presenter) — not everyone presents from a machine with
-two screens, and nothing of it reaches your bundle unless you install it.
-
-```sh
-npm i @suraido/presenter
-```
-
-```tsx
-import { deck, Slide } from "suraido.js";
-import { presenter } from "@suraido/presenter";
-
-class Intro extends Slide {
-  static notes = "Thank the organisers. Mention the wifi password.";
-}
-
-deck([Intro], { use: [presenter()] }); // press p to open it
-```
-
-Arrow keys work in either window and both stay together; `r` restarts the clock. The two talk
-over a `BroadcastChannel`, which reaches **same-origin windows in the same browser** — a
-laptop and a projector, not the audience's phones.
-
 ## Attaching things
 
 Whatever is in `use` is handed the deck, and can read it, move it and hear about it moving.

@@ -68,16 +68,6 @@ What is left is the one thing only a browser can see: **a slide whose content ru
 1920x1080 canvas is clipped, and nothing on screen shows it**, because the whole stage is
 scaled down. Compare what you can read against the source, or cut the content.
 
-## Presenter view
-
-`static notes` on a slide is what you want to be reminded of while it is up. It shows in the
-presenter window, which is opt-in:
-
-```tsx
-import { presenter } from "@suraido/presenter"; // npm i @suraido/presenter
-deck(slides, { use: [presenter()] }); // press p during the talk
-```
-
 ## State
 
 `setState` **rebuilds that slide's DOM** — suraido.js does not diff. So:
