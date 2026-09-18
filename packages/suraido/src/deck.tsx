@@ -19,11 +19,105 @@ export abstract class Slide<P = {}, S = {}> extends Component<P, S> {
   };
 }
 
-export type SlideComponent = (new (props: {}) => Slide<any, any>) & {
+export type SlideComponent = (new (props: {}) => Component<any, any>) & {
   steps?: number;
   path?: string;
   notes?: string;
 };
+
+/** What a slide is described by. */
+export type Meta = {
+  /** The name in the URL. Without it, the index is used. */
+  path?: string;
+  /** What you want to be reminded of while it is up. */
+  notes?: string;
+  /** How many stops it has. Left out — usually right — it is counted from the reveals drawn. */
+  steps?: number;
+};
+
+/**
+ * What a slide is handed. Most slides need none of it.
+ *
+ * These are plain functions rather than methods because taking one on its own — which is how
+ * they are meant to be used — must keep working.
+ */
+export type Self = {
+  /** Draw this slide again. Nothing else notices that you changed a variable. */
+  update: () => void;
+  /**
+   * Aborted when the slide leaves.
+   *
+   * Pass it to addEventListener and there is no cleanup to write — and none to forget.
+   */
+  signal: AbortSignal;
+  /** Run once the next draw is on screen. Asked for in setup, that is the first draw. */
+  after: (run: () => void) => void;
+};
+
+/**
+ * Runs once, when the slide arrives. Return a function and it is the view, run on every draw;
+ * return markup and the slide never changes.
+ */
+export type Setup = (self: Self) => (() => Child) | Child;
+
+/**
+ * A slide.
+ *
+ * The setup runs once, so a plain `let` in it is state with exactly the life of the slide: it
+ * starts again when you come back. Nothing watches that variable, so say `update()` when you
+ * have changed one.
+ *
+ *     const Counter = slide({ path: "count" }, ({ update }) => {
+ *       let n = 0;
+ *       return () => <button onClick={() => { n++; update() }}>Pressed {n} times</button>;
+ *     });
+ *
+ * It is a class underneath, and that is the point rather than an implementation detail: a
+ * function component is called again on every draw, which would run the setup again and put
+ * every `let` back to where it started.
+ */
+export function slide(meta: Meta, setup: Setup): SlideComponent {
+  class One extends Component<{}, {}> {
+    private stop = new AbortController();
+    private queued: (() => void)[] = [];
+    private view: (() => Child) | Child;
+
+    /** @internal Counting reveals starts from the top on every draw. */
+    $enter = () => {
+      scope.counted = 0;
+    };
+
+    constructor(props: {}) {
+      super(props);
+      this.view = setup({
+        update: () => this.setState({}),
+        signal: this.stop.signal,
+        after: (run) => this.queued.push(run),
+      });
+    }
+
+    render(): Child {
+      return typeof this.view === "function" ? (this.view as () => Child)() : this.view;
+    }
+
+    mounted() {
+      this.drain();
+    }
+    updated() {
+      this.drain();
+    }
+    unmounted() {
+      this.stop.abort();
+    }
+
+    /** Whatever was asked for, now that the drawing is done. */
+    private drain() {
+      for (const run of this.queued.splice(0)) run();
+    }
+  }
+
+  return Object.assign(One, meta) as SlideComponent;
+}
 
 /** Where the deck is. */
 export type At = {
