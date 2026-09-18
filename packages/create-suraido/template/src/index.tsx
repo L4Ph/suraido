@@ -14,15 +14,15 @@ const Points = slide(() => (
   <Pad>
     <h2>What you want to say</h2>
     <ul>
-      <Step n={1}>
+      <Step>
         <li>First point</li>
       </Step>
-      <Step n={2}>
+      <Step>
         <li>Second point</li>
       </Step>
     </ul>
   </Pad>
 ));
 
-// List the classes themselves. Wrapping one drops its static steps / path.
+// The order here is the order they are shown in.
 deck([Cover, Points]);

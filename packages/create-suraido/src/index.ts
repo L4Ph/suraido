@@ -7,9 +7,6 @@ import { fileURLToPath } from "node:url";
 import { DEFAULT_DIR, DEFAULT_THEME, THEMES } from "./themes.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const { version } = JSON.parse(await readFile(join(HERE, "..", "package.json"), "utf8")) as {
-  version: string;
-};
 
 const args = process.argv.slice(2);
 
@@ -98,14 +95,12 @@ await cp(join(HERE, "..", "template"), target, {
 const dotless = join(target, "_gitignore");
 if (existsSync(dotless)) await rename(dotless, join(target, ".gitignore"));
 
-// Inside the template this is a workspace reference; a created project points at the release.
+// Only the name. Which release of the library to ask for is the template's own business —
+// writing this scaffolder's version there would tie the two together, and a version of one
+// that the other has never had is an install that fails on the first try.
 const pkgPath = join(target, "package.json");
-const pkg = JSON.parse(await readFile(pkgPath, "utf8")) as {
-  name: string;
-  dependencies: Record<string, string>;
-};
+const pkg = JSON.parse(await readFile(pkgPath, "utf8")) as { name: string };
 pkg.name = name;
-pkg.dependencies["suraido.js"] = `^${version}`;
 await writeFile(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
 
 if (theme !== DEFAULT_THEME) {
