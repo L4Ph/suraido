@@ -230,19 +230,22 @@ else, `<style>` covers it without a separate file.
 ## Presenter view
 
 A second window with your notes, what is coming and a clock, while the deck stays on the
-projector. Opt in — not everyone presents from a machine with two screens, and it is not in
-your bundle unless you import it.
+projector. It is [its own package](../presenter) — not everyone presents from a machine with
+two screens, and nothing of it reaches your bundle unless you install it.
+
+```sh
+npm i @suraido/presenter
+```
 
 ```tsx
 import { deck, Slide } from "suraido.js";
-import { presenter } from "suraido.js/presenter";
+import { presenter } from "@suraido/presenter";
 
 class Intro extends Slide {
   static notes = "Thank the organisers. Mention the wifi password.";
 }
 
-presenter(); // press p to open it
-deck([Intro]);
+deck([Intro], { use: [presenter()] }); // press p to open it
 ```
 
 Arrow keys work in either window and both stay together; `r` restarts the clock. The two talk
@@ -328,9 +331,16 @@ than fighting the arrow keys.
 ### Something that outlives a slide
 
 Anything you want to show again later cannot live in a slide's own state. Put it in an `atom`
-at module scope, and `watch` it from whichever slides care:
+at module scope, and `watch` it from whichever slides care. `watch` is in the core; the store
+is [a package of its own](../atom), so a deck that never shares state never carries it:
+
+```sh
+npm i @suraido/atom
+```
 
 ```tsx
+import { atom } from "@suraido/atom";
+
 const votes = atom([0, 0, 0]);
 
 class Poll extends Slide {
@@ -359,6 +369,9 @@ class Results extends Slide {
 `watch` redraws the component whenever the atom changes, and drops the subscription when the
 component leaves — so a slide you have moved on from stops being redrawn, and the atom stops
 holding on to it. Writing a value equal to the current one notifies nobody.
+
+`watch` asks for nothing but `subscribe(fn)` returning an unsubscribe, so any store shaped
+that way — a signal library, something you wrote this morning — works in an atom's place.
 
 See [examples/interactive](../../examples/interactive), where a vote taken on the first slide
 is read back several slides later.

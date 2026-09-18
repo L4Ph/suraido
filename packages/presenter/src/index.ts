@@ -1,4 +1,4 @@
-import type { At, DeckContext, Plugin, SlideInfo } from "./deck.tsx";
+import type { At, DeckContext, Plugin, SlideInfo } from "suraido.js";
 
 /**
  * A second window for the person talking: the notes for this slide, what is coming, the clock,
@@ -6,7 +6,7 @@ import type { At, DeckContext, Plugin, SlideInfo } from "./deck.tsx";
  *
  * Opt in, because not everyone presents from a machine with two screens:
  *
- *     import { presenter } from "suraido.js/presenter";
+ *     import { presenter } from "@suraido/presenter";
  *     deck(slides, { use: [presenter()] });
  *
  * The two windows talk over a BroadcastChannel, which reaches same-origin windows in the same

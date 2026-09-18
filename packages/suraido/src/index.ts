@@ -1,5 +1,3 @@
-export { atom } from "./atom.ts";
-export type { Atom } from "./atom.ts";
 export { Component, flushSync, render } from "./dom.ts";
 export type { VNode, Child } from "./dom.ts";
 export { Deck, deck, Slide, Step } from "./deck.tsx";

@@ -1,6 +1,6 @@
 import { afterEach, expect, test, vi } from "vite-plus/test";
-import type { At, DeckContext, SlideInfo } from "./deck.tsx";
-import { presenter } from "./presenter.ts";
+import type { At, DeckContext, SlideInfo } from "suraido.js";
+import { presenter } from "./index.ts";
 
 /** A window.open that hands back a document we can read, since a test has no pop-ups. */
 function stubWindow() {

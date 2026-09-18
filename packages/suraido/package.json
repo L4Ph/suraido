@@ -1,6 +1,6 @@
 {
   "name": "suraido.js",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "スライド — write slides in JSX. No React, no virtual DOM.",
   "keywords": [
     "deck",
@@ -26,10 +26,6 @@
     ".": {
       "types": "./dist/index.d.mts",
       "default": "./dist/index.mjs"
-    },
-    "./presenter": {
-      "types": "./dist/presenter.d.mts",
-      "default": "./dist/presenter.mjs"
     },
     "./jsx-runtime": {
       "types": "./dist/jsx-runtime.d.mts",

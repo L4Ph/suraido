@@ -1,4 +1,5 @@
-import { atom, deck, Pad, Slide, Step } from "suraido.js";
+import { atom } from "@suraido/atom";
+import { deck, Pad, Slide, Step } from "suraido.js";
 import "suraido.js/deck.css";
 import "./slides.css";
 
