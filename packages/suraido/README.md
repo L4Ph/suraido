@@ -236,7 +236,7 @@ type Plugin = (deck: DeckContext) => (() => void) | void;
 
 type DeckContext = {
   readonly at: At;                    // index, step, steps, total, path
-  readonly slides: readonly SlideInfo[];   // path, notes
+  readonly slides: readonly SlideInfo[];   // path
   go(to: string | { index: number; step?: number }): void;
   move(by: 1 | -1): void;
   on("move", run: (at: At) => void): () => void;   // returns the way to stop

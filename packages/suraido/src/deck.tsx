@@ -10,8 +10,6 @@ export abstract class Slide<P = {}, S = {}> extends Component<P, S> {
   static steps?: number;
   /** The name that shows in the URL. Omit it and the index is used. */
   static path?: string;
-  /** What you want to be reminded of while this slide is up. Read by whatever shows notes. */
-  static notes?: string;
 
   /** @internal Redrawing itself must number its reveals the same way it did the first time. */
   $enter = () => {
@@ -22,15 +20,12 @@ export abstract class Slide<P = {}, S = {}> extends Component<P, S> {
 export type SlideComponent = (new (props: {}) => Component<any, any>) & {
   steps?: number;
   path?: string;
-  notes?: string;
 };
 
 /** What a slide is described by. */
 export type Meta = {
   /** The name in the URL. Without it, the index is used. */
   path?: string;
-  /** What you want to be reminded of while it is up. */
-  notes?: string;
   /** How many stops it has. Left out — usually right — it is counted from the reveals drawn. */
   steps?: number;
 };
@@ -137,7 +132,6 @@ export type At = {
  */
 export type SlideInfo = {
   path: string;
-  notes?: string;
 };
 
 /**
@@ -491,10 +485,7 @@ export function deck(slides: SlideComponent[], { use = [], ...opts }: DeckOption
       return self.snapshot();
     },
     get slides() {
-      return slides.map((slide, i) => ({
-        path: formatHash([i, 0], self.paths),
-        notes: slide.notes,
-      }));
+      return slides.map((_slide, i) => ({ path: formatHash([i, 0], self.paths) }));
     },
     go(to) {
       self.go(typeof to === "string" ? parseHash(to, self.paths) : [to.index, to.step ?? 0]);
