@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "@suraido/atom": "*",
-    "@suraido/presenter": "*",
     "suraido.js": "*"
   },
   "devDependencies": {

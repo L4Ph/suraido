@@ -1,5 +1,4 @@
 import { atom } from "@suraido/atom";
-import { presenter } from "@suraido/presenter";
 import { Center, Cols, deck, Full, Pad, Slide, Step } from "suraido.js";
 import "suraido.js/deck.css";
 import "suraido.js/themes/noel.css";
@@ -547,23 +546,20 @@ class Outro extends Slide {
   }
 }
 
-deck(
-  [
-    Cover,
-    Shape,
-    Steps,
-    Layout,
-    FullBleed,
-    LiveState,
-    AtomWrite,
-    AtomRead,
-    Themes,
-    Override,
-    Colocated,
-    Canvas,
-    Address,
-    Diagnostics,
-    Outro,
-  ],
-  { use: [presenter()] },
-);
+deck([
+  Cover,
+  Shape,
+  Steps,
+  Layout,
+  FullBleed,
+  LiveState,
+  AtomWrite,
+  AtomRead,
+  Themes,
+  Override,
+  Colocated,
+  Canvas,
+  Address,
+  Diagnostics,
+  Outro,
+]);

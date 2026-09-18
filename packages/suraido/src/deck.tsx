@@ -10,7 +10,7 @@ export abstract class Slide<P = {}, S = {}> extends Component<P, S> {
   static steps?: number;
   /** The name that shows in the URL. Omit it and the index is used. */
   static path?: string;
-  /** What you want to be reminded of while this slide is up. Shown in the presenter view. */
+  /** What you want to be reminded of while this slide is up. Read by whatever shows notes. */
   static notes?: string;
 
   /** @internal Redrawing itself must number its reveals the same way it did the first time. */
