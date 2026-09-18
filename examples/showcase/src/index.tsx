@@ -5,25 +5,20 @@ import { Code } from "./code.tsx";
 import "./slides.css";
 import { applyTheme, THEMES } from "./themes.ts";
 
-// ---------------------------------------------------------------- 1. cover
-
 const Cover = slide({ path: "intro" }, () => (
   <Center>
     <p class="eyebrow">スライド</p>
     <h1>suraido.js</h1>
     <p class="lead">
-      Slides written in JSX. No React, no virtual DOM, no dependencies — and this deck is one of
-      them.
+      Slides written in JSX. No React, no dependencies — and this deck is one of them.
     </p>
     <p class="hint">Press → to move. Everything here is running, not pictured.</p>
   </Center>
 ));
 
-// ---------------------------------------------------------------- 2. shape
-
 const Shape = slide({ path: "shape" }, () => (
   <Pad>
-    <h2>A slide is a class</h2>
+    <h2>A slide is a function</h2>
     <Cols ratio="1.1fr 1fr">
       <Code>{`const Intro = slide({ path: "intro" }, () => (
   <Pad>
@@ -36,15 +31,17 @@ const Shape = slide({ path: "shape" }, () => (
 
 deck([Intro]);`}</Code>
       <ul>
-        <Step n={1}>
-          <li>State lives on the class, as state always has</li>
+        <Step>
+          <li>
+            It runs once. A plain <code>let</code> in it is the slide's state
+          </li>
         </Step>
-        <Step n={2}>
+        <Step>
           <li>
             <code>class</code>, not <code>className</code> — props go straight to the DOM
           </li>
         </Step>
-        <Step n={3}>
+        <Step>
           <li>
             Everything else is plain HTML: <code>img</code>, <code>video</code>, <code>svg</code>
           </li>
@@ -53,8 +50,6 @@ deck([Intro]);`}</Code>
     </Cols>
   </Pad>
 ));
-
-// ---------------------------------------------------------------- 3. steps
 
 const Steps = slide({ path: "steps" }, () => (
   <Pad>
@@ -90,8 +85,6 @@ const Steps = slide({ path: "steps" }, () => (
   </Pad>
 ));
 
-// ---------------------------------------------------------------- 4. layout
-
 const Layout = slide({ path: "layout" }, () => (
   <Pad>
     <h2>The arrangements you keep rewriting</h2>
@@ -118,8 +111,6 @@ const Layout = slide({ path: "layout" }, () => (
   </Pad>
 ));
 
-// ---------------------------------------------------------------- 5. full bleed
-
 const FullBleed = slide({ path: "full" }, () => (
   <Full>
     <img src="./cover.svg" alt="" />
@@ -129,8 +120,6 @@ const FullBleed = slide({ path: "full" }, () => (
     </div>
   </Full>
 ));
-
-// ---------------------------------------------------------------- 6. live state
 
 const LiveState = slide({ path: "state" }, ({ update }) => {
   let count = 0;
@@ -170,8 +159,6 @@ const LiveState = slide({ path: "state" }, ({ update }) => {
   );
 });
 
-// ---------------------------------------------------------------- 7. state, written
-
 /** Outside every slide, so leaving one does not throw it away. */
 let votes = 0;
 
@@ -209,8 +196,6 @@ const Poll = slide({ path: "poll" }, ({ update }) => {
   );
 });
 
-// ---------------------------------------------------------------- 8. state, read back
-
 const Kept = slide({ path: "kept" }, () => {
   const n = votes;
   return (
@@ -229,8 +214,6 @@ const Kept = slide({ path: "kept" }, () => {
     </Pad>
   );
 });
-
-// ---------------------------------------------------------------- 9. themes, live
 
 const Themes = slide({ path: "themes" }, ({ update, signal }) => {
   let at = 0;
@@ -264,8 +247,6 @@ const Themes = slide({ path: "themes" }, ({ update, signal }) => {
   };
 });
 
-// ---------------------------------------------------------------- 10. overriding
-
 const Override = slide({ path: "override" }, () => (
   <Pad>
     <h2>Your CSS always wins</h2>
@@ -292,8 +273,6 @@ const Override = slide({ path: "override" }, () => (
     </Cols>
   </Pad>
 ));
-
-// ---------------------------------------------------------------- 11. co-located style
 
 const Colocated = slide({ path: "colocated" }, () => (
   <Pad>
@@ -325,8 +304,6 @@ const Colocated = slide({ path: "colocated" }, () => (
         `}</style>
   </Pad>
 ));
-
-// ---------------------------------------------------------------- 12. the canvas
 
 const Canvas = slide({ path: "canvas" }, ({ update, after, signal }) => {
   let scale = "";
@@ -365,8 +342,6 @@ const Canvas = slide({ path: "canvas" }, ({ update, after, signal }) => {
   );
 });
 
-// ---------------------------------------------------------------- 13. url and motion
-
 const Address = slide({ path: "address" }, ({ update, signal }) => {
   let hash = location.hash;
 
@@ -387,7 +362,7 @@ const Address = slide({ path: "address" }, ({ update, signal }) => {
         <span>where you are, right now</span>
       </div>
       <p>
-        <code>static path</code> names a slide, so the URL reads <code>#themes</code> rather than{" "}
+        A slide's <code>path</code> names it, so the URL reads <code>#themes</code> rather than{" "}
         <code>#8</code> — and{" "}
         <strong>reordering the deck does not break the link you shared</strong>. Reload and you land
         back here.
@@ -399,8 +374,6 @@ const Address = slide({ path: "address" }, ({ update, signal }) => {
     </Pad>
   );
 });
-
-// ---------------------------------------------------------------- 14. diagnostics
 
 const Diagnostics = slide({ path: "diagnostics" }, () => (
   <Pad>
@@ -437,8 +410,6 @@ const Diagnostics = slide({ path: "diagnostics" }, () => (
     </p>
   </Pad>
 ));
-
-// ---------------------------------------------------------------- 15. outro
 
 const Outro = slide({ path: "start" }, () => (
   <Center>

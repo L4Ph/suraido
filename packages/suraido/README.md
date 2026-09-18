@@ -2,7 +2,7 @@
 
 **スライド (suraido)** — the Japanese for _slide_, spelled the way it is said.
 
-Write slides in JSX. No React, no virtual DOM.
+Write slides in JSX. No React, no dependencies.
 
 ```
 npm create suraido@latest my-deck

@@ -4,8 +4,8 @@
 
 **スライド (suraido)** — the Japanese for _slide_, spelled the way it is said.
 
-A framework for writing slides in JSX. No React, no virtual DOM: JSX goes through suraido.js's own
-runtime and becomes DOM directly.
+A framework for writing slides in JSX. No React and no dependencies: JSX goes through
+suraido.js's own runtime and becomes DOM directly.
 
 Integration is one line of `tsconfig.json`, so it works as-is under Vite and Rsbuild.
 

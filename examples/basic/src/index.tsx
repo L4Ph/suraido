@@ -6,7 +6,7 @@ const Cover = slide({ path: "intro" }, () => (
   <Center>
     <h1>Slides, written in JSX</h1>
     <p class="lead">
-      No React, no virtual DOM. JSX becomes calls to suraido.js's own <code>jsx()</code>.
+      No React, no dependencies. JSX becomes calls to suraido.js's own <code>jsx()</code>.
     </p>
     <img src="/logo.svg" alt="" width="160" height="160" />
   </Center>
