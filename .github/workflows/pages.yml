@@ -36,9 +36,18 @@ jobs:
       # errors.
       - run: vp -C packages/suraido pack
       - run: vp -C packages/atom pack
+      - run: vp -C packages/cli pack
 
       - run: vp check
       - run: vp test
+
+      # Exporting for real is the only way to know a browser still walks a deck and lays it
+      # out. basic rather than showcase, because the deployed one is built with a base path
+      # and would ask for its assets somewhere the exporter is not serving them.
+      - run: vp build
+        working-directory: examples/basic
+      - run: node packages/cli/dist/cli.mjs export examples/basic/dist --pdf --out /tmp/deck.pdf
+      - run: test -s /tmp/deck.pdf
 
       - run: vp build
         working-directory: examples/showcase
