@@ -1,5 +1,4 @@
-import { atom } from "@suraido/atom";
-import { Center, Cols, deck, Full, Pad, Slide, slide, Step } from "suraido.js";
+import { Center, Cols, deck, Full, Pad, slide, Step } from "suraido.js";
 import "suraido.js/deck.css";
 import "suraido.js/themes/noel.css";
 import { Code } from "./code.tsx";
@@ -26,20 +25,14 @@ const Shape = slide({ path: "shape" }, () => (
   <Pad>
     <h2>A slide is a class</h2>
     <Cols ratio="1.1fr 1fr">
-      <Code>{`class Intro extends Slide {
-  static path = "intro";
-
-  render() {
-    return (
-      <Pad>
-        <h2>Heading</h2>
-        <Step n={1}>
-          <p>Later</p>
-        </Step>
-      </Pad>
-    );
-  }
-}
+      <Code>{`const Intro = slide({ path: "intro" }, () => (
+  <Pad>
+    <h2>Heading</h2>
+    <Step>
+      <p>Later</p>
+    </Step>
+  </Pad>
+));
 
 deck([Intro]);`}</Code>
       <ul>
@@ -139,143 +132,120 @@ const FullBleed = slide({ path: "full" }, () => (
 
 // ---------------------------------------------------------------- 6. live state
 
-class LiveState extends Slide<{}, { count: number }> {
-  static path = "state";
-  state = { count: 0 };
+const LiveState = slide({ path: "state" }, ({ update }) => {
+  let count = 0;
 
-  render() {
-    return (
-      <Pad>
-        <h2>It is a running program</h2>
-        <Cols ratio="1fr 1fr">
-          <div>
-            <button
-              class="big"
-              onClick={() => {
-                this.setState((s) => ({ count: s.count + 1 }));
-              }}
-            >
-              Pressed {this.state.count} times
-            </button>
-            <p class="hint">
-              Clicks on a button do not turn the page, so this just works. Tapping the left quarter
-              of the screen goes back — a phone has no shift key.
-            </p>
-          </div>
-          <Code>{`class Live extends Slide<{}, { count: number }> {
-  state = { count: 0 };
+  return () => (
+    <Pad>
+      <h2>It is a running program</h2>
+      <Cols ratio="1fr 1fr">
+        <div>
+          <button
+            class="big"
+            onClick={() => {
+              count += 1;
+              update();
+            }}
+          >
+            Pressed {count} times
+          </button>
+          <p class="hint">
+            Clicks on a button do not turn the page, so this just works. Tapping the left quarter of
+            the screen goes back — a phone has no shift key.
+          </p>
+        </div>
+        <Code>{`const Live = slide({ path: "live" }, ({ update }) => {
+  let count = 0;
 
-  render() {
-    return (
-      <button onClick={() =>
-        this.setState(s => ({ count: s.count + 1 }))
-      }>
-        Pressed {this.state.count} times
-      </button>
-    );
-  }
-}`}</Code>
-        </Cols>
-      </Pad>
-    );
-  }
-}
+  return () => (
+    <button onClick={() => { count++; update() }}>
+      Pressed {count} times
+    </button>
+  );
+});`}</Code>
+      </Cols>
+    </Pad>
+  );
+});
 
-// ---------------------------------------------------------------- 7. atom, written
+// ---------------------------------------------------------------- 7. state, written
 
 /** Outside every slide, so leaving one does not throw it away. */
-const votes = atom(0);
+let votes = 0;
 
-class AtomWrite extends Slide {
-  static path = "atom";
-  mounted() {
-    this.watch(votes);
-  }
-
-  render() {
-    return (
-      <Pad>
-        <h2>A value that outlives a slide</h2>
-        <Cols ratio="1fr 1.1fr">
-          <div>
-            <button
-              class="big"
-              onClick={() => {
-                votes.update((n) => n + 1);
-              }}
-            >
-              Vote — {votes.get()}
-            </button>
-            <p class="hint">
-              Press it a few times, then keep going. Only one slide is mounted at a time, so this
-              one is about to be thrown away.
-            </p>
-          </div>
-          <Code>{`const votes = atom(0);
-
-class Poll extends Slide {
-  mounted() { this.watch(votes); }
-  cast() { votes.update(n => n + 1); }
-}`}</Code>
-        </Cols>
-      </Pad>
-    );
-  }
-}
-
-// ---------------------------------------------------------------- 8. atom, read back
-
-class AtomRead extends Slide {
-  static path = "kept";
-  mounted() {
-    this.watch(votes);
-  }
-
-  render() {
-    const n = votes.get();
-    return (
-      <Pad>
-        <h2>Still here</h2>
-        <div class="figure">
-          <b class="accent">{n}</b>
-          <span>
-            {n === 0
-              ? "nothing was cast — go back one slide"
-              : "read from the atom, one slide later"}
-          </span>
+const AtomWrite = slide({ path: "atom" }, ({ update }) => {
+  return () => (
+    <Pad>
+      <h2>A value that outlives a slide</h2>
+      <Cols ratio="1fr 1.1fr">
+        <div>
+          <button
+            class="big"
+            onClick={() => {
+              votes += 1;
+              update();
+            }}
+          >
+            Vote — {votes}
+          </button>
+          <p class="hint">
+            Press it a few times, then keep going. Only one slide is mounted at a time, so this one
+            is about to be thrown away.
+          </p>
         </div>
-        <p>
-          Nothing was passed along. Both slides read the same atom, and <code>watch</code> drops the
-          subscription when a slide leaves, so a deck does not accumulate dead listeners.
-        </p>
-      </Pad>
-    );
-  }
-}
+        <Code>{`let votes = 0;
+
+const Poll = slide({ path: "poll" }, ({ update }) => () => (
+  <button onClick={() => { votes++; update() }}>
+    Vote — {votes}
+  </button>
+));`}</Code>
+      </Cols>
+    </Pad>
+  );
+});
+
+// ---------------------------------------------------------------- 8. state, read back
+
+const AtomRead = slide({ path: "kept" }, () => {
+  const n = votes;
+  return (
+    <Pad>
+      <h2>Still here</h2>
+      <div class="figure">
+        <b class="accent">{n}</b>
+        <span>
+          {n === 0 ? "nothing was cast — go back one slide" : "read back, one slide later"}
+        </span>
+      </div>
+      <p>
+        Nothing was passed along and nothing subscribed to anything. Two slides are never on screen
+        at once, so this one simply reads the variable when it is drawn.
+      </p>
+    </Pad>
+  );
+});
 
 // ---------------------------------------------------------------- 9. themes, live
 
-class Themes extends Slide<{}, { at: number }> {
-  static path = "themes";
-  state = { at: 0 };
+const Themes = slide({ path: "themes" }, ({ update, signal }) => {
+  let at = 0;
 
-  cycle = () => {
-    const at = (this.state.at + 1) % THEMES.length;
+  const cycle = () => {
+    at = (at + 1) % THEMES.length;
     applyTheme(THEMES[at]![1]);
-    this.setState({ at });
+    update();
   };
 
   /** Leave the deck as it was found. */
-  unmounted() {
-    applyTheme("");
-  }
+  signal.addEventListener("abort", () => applyTheme(""));
 
-  render() {
-    const [name, , note] = THEMES[this.state.at]!;
+  return () => {
+    const [name, , note] = THEMES[at]!;
     return (
       <Pad>
         <h2>Six themes, from keycap colorways</h2>
-        <button class="big" onClick={this.cycle}>
+        <button class="big" onClick={cycle}>
           {name} — next
         </button>
         <p class="lead">{note}</p>
@@ -287,8 +257,8 @@ class Themes extends Slide<{}, { at: number }> {
         <p class="hint">Press the button. The whole deck changes; no slide was told about it.</p>
       </Pad>
     );
-  }
-}
+  };
+});
 
 // ---------------------------------------------------------------- 10. overriding
 
@@ -354,88 +324,77 @@ const Colocated = slide({ path: "colocated" }, () => (
 
 // ---------------------------------------------------------------- 12. the canvas
 
-class Canvas extends Slide<{}, { scale: string; size: string }> {
-  static path = "canvas";
-  state = { scale: "", size: "" };
+const Canvas = slide({ path: "canvas" }, ({ update, after, signal }) => {
+  let scale = "";
+  let size = "";
 
-  measure = () => {
-    const scale = getComputedStyle(document.documentElement).getPropertyValue("--suraido-scale");
-    this.setState({
-      scale: Number(scale).toFixed(3),
-      size: `${window.innerWidth}x${window.innerHeight}`,
-    });
+  const measure = () => {
+    const now = getComputedStyle(document.documentElement).getPropertyValue("--suraido-scale");
+    scale = Number(now).toFixed(3);
+    size = `${window.innerWidth}x${window.innerHeight}`;
+    update();
   };
 
-  mounted() {
-    this.measure();
-    addEventListener("resize", this.measure);
-  }
+  // --suraido-scale is set by the deck, so it is not there yet while this is being set up.
+  after(measure);
+  // Nothing to take off again: the signal does it.
+  addEventListener("resize", measure, { signal });
 
-  /** Started here, so stopped here. */
-  unmounted() {
-    removeEventListener("resize", this.measure);
-  }
-
-  render() {
-    return (
-      <Pad>
-        <h2>One canvas, 1920 by 1080</h2>
-        <Cols ratio="1fr 1fr">
-          <div>
-            <p>
-              Slides are drawn at a fixed size and scaled to the window, so{" "}
-              <strong>px is an absolute unit here</strong>. No <code>clamp()</code>, no{" "}
-              <code>vw</code>, no media queries.
-            </p>
-            <p class="hint">Resize the window and watch the number move.</p>
-          </div>
-          <div class="figure">
-            <b class="accent">{this.state.scale}</b>
-            <span>--suraido-scale, at {this.state.size}</span>
-          </div>
-        </Cols>
-      </Pad>
-    );
-  }
-}
+  return () => (
+    <Pad>
+      <h2>One canvas, 1920 by 1080</h2>
+      <Cols ratio="1fr 1fr">
+        <div>
+          <p>
+            Slides are drawn at a fixed size and scaled to the window, so{" "}
+            <strong>px is an absolute unit here</strong>. No <code>clamp()</code>, no{" "}
+            <code>vw</code>, no media queries.
+          </p>
+          <p class="hint">Resize the window and watch the number move.</p>
+        </div>
+        <div class="figure">
+          <b class="accent">{scale}</b>
+          <span>--suraido-scale, at {size}</span>
+        </div>
+      </Cols>
+    </Pad>
+  );
+});
 
 // ---------------------------------------------------------------- 13. url and motion
 
-class Address extends Slide<{}, { hash: string }> {
-  static path = "address";
-  state = { hash: location.hash };
+const Address = slide({ path: "address" }, ({ update, signal }) => {
+  let hash = location.hash;
 
-  sync = () => this.setState({ hash: location.hash });
-  mounted() {
-    addEventListener("hashchange", this.sync);
-    this.sync();
-  }
-  unmounted() {
-    removeEventListener("hashchange", this.sync);
-  }
+  addEventListener(
+    "hashchange",
+    () => {
+      hash = location.hash;
+      update();
+    },
+    { signal },
+  );
 
-  render() {
-    return (
-      <Pad>
-        <h2>Every position has an address</h2>
-        <div class="figure">
-          <b class="mono">{this.state.hash || "#0"}</b>
-          <span>where you are, right now</span>
-        </div>
-        <p>
-          <code>static path</code> names a slide, so the URL reads <code>#themes</code> rather than{" "}
-          <code>#8</code> — and{" "}
-          <strong>reordering the deck does not break the link you shared</strong>. Reload and you
-          land back here.
-        </p>
-        <p class="hint">
-          The deck also moves the way the keys do: → pushes this slide left, ← brings it back from
-          the other side.
-        </p>
-      </Pad>
-    );
-  }
-}
+  return () => (
+    <Pad>
+      <h2>Every position has an address</h2>
+      <div class="figure">
+        <b class="mono">{hash || "#0"}</b>
+        <span>where you are, right now</span>
+      </div>
+      <p>
+        <code>static path</code> names a slide, so the URL reads <code>#themes</code> rather than{" "}
+        <code>#8</code> — and{" "}
+        <strong>reordering the deck does not break the link you shared</strong>. Reload and you land
+        back here.
+      </p>
+      <p class="hint">
+        The deck also moves the way the keys do: → pushes this slide left, ← brings it back from the
+        other side.
+      </p>
+    </Pad>
+  );
+});
 
 // ---------------------------------------------------------------- 14. diagnostics
 
