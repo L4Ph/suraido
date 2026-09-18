@@ -31,16 +31,16 @@ test("setState re-renders the subtree", async () => {
   expect(el.querySelector("span")!.textContent).toBe("a:1");
 });
 
-test("setState rebuilds nodes rather than diffing them", async () => {
-  // A deliberate trade. Anything that needs DOM identity — video, input, a transition in
-  // flight — does not belong on a slide that calls setState. Bring diffing back if it must.
+test("setState leaves alone the nodes it did not change", async () => {
+  // The reason a <video> keeps playing and an <input> keeps its focus: the element is the one
+  // that was always there, not a new one that looks like it.
   const el = root();
   const box = render(h(Box, { label: "a" }), el).comp as Box;
   const img = el.querySelector("img");
 
   box.setState({ n: 1 });
   await tick();
-  expect(el.querySelector("img")).not.toBe(img);
+  expect(el.querySelector("img")).toBe(img);
 });
 
 test("a child can appear and disappear without disturbing its siblings", async () => {
