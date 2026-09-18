@@ -96,7 +96,7 @@ class Animation extends Slide {
         <h2>Something that moves</h2>
         <canvas id="wave" width="1600" height="420" />
         <p class="hint">
-          <code>mounted()</code> starts the rAF loop and <code>unmounted()</code> stops it. No
+          <code>mounted()</code> starts the animation and <code>unmounted()</code> stops it. No
           setState, so nothing is ever rebuilt.
         </p>
       </Pad>
@@ -114,7 +114,6 @@ class Animation extends Slide {
  */
 class Typing extends Slide<{}, { submitted: string[] }> {
   static path = "input";
-  static steps = 2;
   state = { submitted: [] as string[] };
 
   /** Runs right after the rebuild. Hands focus back so you can keep typing. */

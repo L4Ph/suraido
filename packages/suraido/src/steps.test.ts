@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "vite-plus/test";
-import { Deck, Slide, Step } from "./deck.tsx";
+import { Deck, Slide, Step, type SlideComponent } from "./deck.tsx";
 import { flushSync, render } from "./dom.ts";
 import { jsx } from "./jsx-runtime.ts";
 
@@ -66,7 +66,7 @@ const tick = () => new Promise((r) => setTimeout(r, 0));
 
 /** Every deck binds keydown, hashchange and resize. One left behind answers the next test. */
 const attached: Deck[] = [];
-async function mount(slides: (typeof Points)[], hash = "") {
+async function mount(slides: SlideComponent[], hash = "") {
   location.hash = hash;
   const host = document.body.appendChild(document.createElement("div"));
   const deck = render(jsx(Deck, { slides }), host).comp as Deck;
@@ -256,4 +256,86 @@ test("the reveal after a range arrives on the step the range leaves", async () =
 
   deck.go([0, 3]);
   expect(shownIn(host)).toEqual([false, true]);
+});
+
+/** The markup already says how many stops there are. Saying it again is a second truth. */
+class Three extends Slide {
+  static path = "three";
+  render() {
+    return jsx("div", {
+      children: [
+        jsx(Step, { children: "a" }),
+        jsx(Step, { children: "b" }),
+        jsx(Step, { children: "c" }),
+      ],
+    });
+  }
+}
+
+class Plain extends Slide {
+  static path = "plain";
+  render() {
+    return "nothing to reveal";
+  }
+}
+
+test("a slide with three reveals and nothing declared takes three presses", async () => {
+  const { deck, host } = await mount([Three, Plain]);
+
+  deck.move(1);
+  deck.move(1);
+  deck.move(1);
+  expect(shownIn(host)).toEqual([true, true, true]);
+  expect(deck.snapshot().index).toBe(0);
+
+  deck.move(1);
+  expect(deck.snapshot().index).toBe(1);
+});
+
+/**
+ * Going back has to land on the previous slide's *last* step, and that slide has never been
+ * rendered, so nothing has counted its reveals yet.
+ */
+test("arrow-left into a slide never seen lands on its last step", async () => {
+  const { deck, host } = await mount([Three, Plain], "#plain");
+
+  deck.move(-1);
+  await tick();
+
+  expect(deck.snapshot().index).toBe(0);
+  expect(shownIn(host)).toEqual([true, true, true]);
+  expect(location.hash).toBe("#three.3");
+});
+
+test("End lands on the last step of the last slide", async () => {
+  const { deck } = await mount([Plain, Three]);
+
+  deck.go([1, Number.POSITIVE_INFINITY]);
+  await tick();
+
+  expect(location.hash).toBe("#three.3");
+});
+
+test("a deep link past the end is brought back once the slide has been drawn", async () => {
+  const { host } = await mount([Three], "#three.9");
+
+  expect(shownIn(host)).toEqual([true, true, true]);
+  expect(location.hash).toBe("#three.3");
+});
+
+test("a number declared by hand still wins", async () => {
+  class Padded extends Slide {
+    static path = "padded";
+    static steps = 6;
+    render() {
+      return jsx("div", { children: jsx(Step, { children: "a" }) });
+    }
+  }
+
+  const { deck } = await mount([Padded, Plain]);
+  for (let i = 0; i < 5; i++) deck.move(1);
+  expect(deck.snapshot().index).toBe(0);
+
+  deck.move(1);
+  expect(deck.snapshot().index).toBe(1);
 });

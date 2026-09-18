@@ -33,7 +33,6 @@ class Cover extends Slide {
 class Shape extends Slide {
   static path = "shape";
   static notes = "Four presses here. Land on: state on the class, class not className, plain HTML.";
-  static steps = 4;
   render() {
     return (
       <Pad>
@@ -41,7 +40,6 @@ class Shape extends Slide {
         <Cols ratio="1.1fr 1fr">
           <Code>{`class Intro extends Slide {
   static path = "intro";
-  static steps = 2;
 
   render() {
     return (
@@ -83,7 +81,6 @@ deck([Intro]);`}</Code>
 class Steps extends Slide {
   static path = "steps";
   static notes = "The point: nothing moves as these appear. They were always in the DOM.";
-  static steps = 5;
   render() {
     return (
       <Pad>
@@ -106,8 +103,14 @@ class Steps extends Slide {
           </Step>
           <Step n={4}>
             <li>
-              <code>static steps</code> says how many presses this slide absorbs
+              Nothing is numbered here — a <code>&lt;Step&gt;</code> takes the one after the last
             </li>
+          </Step>
+          <Step n={[5, 6]}>
+            <li>And a range can take something away again</li>
+          </Step>
+          <Step>
+            <li>…so the next one arrives on the very press that removed it</li>
           </Step>
         </ul>
       </Pad>
@@ -119,7 +122,6 @@ class Steps extends Slide {
 
 class Layout extends Slide {
   static path = "layout";
-  static steps = 2;
   render() {
     return (
       <Pad>
@@ -326,7 +328,6 @@ class Themes extends Slide<{}, { at: number }> {
 
 class Override extends Slide {
   static path = "override";
-  static steps = 3;
   render() {
     return (
       <Pad>
@@ -484,35 +485,39 @@ class Address extends Slide<{}, { hash: string }> {
 
 class Diagnostics extends Slide {
   static path = "diagnostics";
-  static steps = 4;
   render() {
     return (
       <Pad>
         <h2>The mistakes that make no sound</h2>
         <p>
-          A few things go wrong quietly: the deck does the wrong thing and looks fine doing it.
-          Those are reported to the console, with the position and the fix.
+          Some things used to go wrong quietly: the deck did the wrong thing and looked fine doing
+          it. The deck used to warn about them. It is better not to be able to do them.
         </p>
         <ul class="wide">
-          <Step n={1}>
+          <Step>
             <li>
-              A slide that runs past the canvas — <strong>clipped, and invisible</strong>, because
-              the stage is scaled down
+              A <code>&lt;Step&gt;</code> that wrapped an <code>li</code> in a <code>div</code> — it
+              marks the element you wrote, so there is nothing to wrap
             </li>
           </Step>
-          <Step n={2}>
+          <Step>
+            <li>A count that disagreed with the reveals — there is no second place to say it</li>
+          </Step>
+          <Step>
             <li>
-              A <code>&lt;Step&gt;</code> that wrapped an <code>li</code> in a <code>div</code>
+              A slide that was not a slide — <strong>TypeScript rejects it</strong>, before it ever
+              runs
             </li>
           </Step>
-          <Step n={3}>
+          <Step>
             <li>
-              A <code>static steps</code> that disagrees with the reveals on the slide
+              A slide running past the canvas, clipped and invisible — measured by the tool, so none
+              of this ships in your deck
             </li>
           </Step>
         </ul>
         <p class="hint">
-          Open the console: this deck is quiet. A rehearsal skill ships with every new project to
+          Nothing here writes to your console. A rehearsal skill ships with every new project to
           walk the whole thing and measure.
         </p>
       </Pad>

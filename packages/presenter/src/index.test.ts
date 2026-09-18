@@ -22,7 +22,9 @@ function fakeDeck(slides: SlideInfo[]) {
   let at: At = {
     index: 0,
     step: 0,
-    steps: slides[0]!.steps,
+    // How many stops a slide has is only known once it has been drawn, so the deck says it
+    // about the one it is on rather than about the list.
+    steps: 4,
     total: slides.length,
     path: slides[0]!.path,
   };
@@ -45,8 +47,8 @@ function fakeDeck(slides: SlideInfo[]) {
 }
 
 const SLIDES: SlideInfo[] = [
-  { path: "#shape", steps: 4, notes: "Land on: state on the class." },
-  { path: "#steps", steps: 1, notes: "Nothing moves as these appear." },
+  { path: "#shape", notes: "Land on: state on the class." },
+  { path: "#steps", notes: "Nothing moves as these appear." },
 ];
 
 const press = (key: string) => window.dispatchEvent(new KeyboardEvent("keydown", { key }));

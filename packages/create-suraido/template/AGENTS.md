@@ -24,7 +24,6 @@ import { Slide, Step, Pad, Center, Cols, Full, deck } from "suraido.js";
 
 class Intro extends Slide<{}, { count: number }> {
   static path = "intro"; // the URL becomes #intro; without it, the index is used
-  static steps = 2; // how many key presses this slide absorbs
   state = { count: 0 };
 
   render() {
@@ -47,20 +46,27 @@ deck([Intro]);
 - **`class`, not `className`.** Props are written straight to DOM attributes. Handlers go
   through `addEventListener`, so `onClick` becomes a `click` listener.
 - **Put the classes themselves in the array passed to `deck()`.** Wrapping one, as in
-  `(p) => <Intro {...p} />`, drops `static steps` and `static path`, which silently breaks
-  reveals and URLs. Subclass instead when you need to pass props.
+  `(p) => <Intro {...p} />`, drops its statics, so reveals and URLs stop working. TypeScript
+  rejects it. Subclass instead when you need to pass props.
 - **`render()` returns a single element.** Return several and only the first one is drawn.
 - **`<Step>` marks the element you wrote, it does not add one.** Inside a list, write the
-  `<li>` yourself: `<Step n={1}><li>…</li></Step>` gives you `ul > li`. With nothing to
-  mark — bare text — it builds a `div` to hold the mark.
+  `<li>` yourself: `<Step><li>…</li></Step>` gives you `ul > li`. With nothing to mark — bare
+  text — it builds a `div` to hold the mark.
+- **Do not number the reveals.** A bare `<Step>` takes the one after the last, so inserting one
+  does not renumber the rest. `<Step n={3}>` when you mean a particular place, and
+  `<Step n={[2, 4]}>` to have something go away again — the second number is exclusive.
+- **Do not declare how many stops a slide has.** It is counted from the reveals it draws.
+  `static steps` is there to override that, which is rarely what you want.
 
 ## When something is wrong
 
-suraido.js speaks up in the console about the mistakes it would otherwise make in silence: a slide
-that overflows the canvas and is clipped, a `<Step>` that wrapped an `li` in a `div`, a
-`static steps` that does not match the highest `<Step n>`, and a slide passed to `deck()`
-that is not a class. **Read the console before assuming a deck is fine** — every one of these
-looks correct on screen.
+Nothing is written to your console: the deck ships no diagnostics. Most of what used to be
+reported cannot happen any more — there is no wrapper element to get wrong, no second place to
+declare a count, and TypeScript rejects a slide that is not one.
+
+What is left is the one thing only a browser can see: **a slide whose content runs past the
+1920x1080 canvas is clipped, and nothing on screen shows it**, because the whole stage is
+scaled down. Compare what you can read against the source, or cut the content.
 
 ## Presenter view
 
@@ -87,7 +93,7 @@ updated() {
 
 - Do not call `setState` while someone is typing. Leave the value in the DOM and move it into
   state only when the entry is committed.
-- Start timers and rAF loops in `mounted()`, and **always stop them in `unmounted()`**.
+- Start timers and animation loops in `mounted()`, and **always stop them in `unmounted()`**.
 - Crossing to another slide unmounts the old one and its state is gone. **Anything you want to
   show again later belongs in an `atom`**, not in a slide:
 

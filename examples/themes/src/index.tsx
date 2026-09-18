@@ -7,7 +7,6 @@ import "./slides.css";
 /** The same content under every theme. Not one color is written on the slide. */
 class Sampler extends Slide {
   static path = "sampler";
-  static steps = 3;
 
   render() {
     return (
