@@ -44,6 +44,19 @@ class Counting extends Slide {
   }
 }
 
+class Listed extends Slide {
+  static path = "listed";
+  static steps = 3;
+  render() {
+    return jsx("ul", {
+      children: [
+        jsx(Step, { n: 1, children: jsx("li", { class: "lead", children: "a" }) }),
+        jsx(Step, { n: 2, children: jsx("li", { children: "b" }) }),
+      ],
+    });
+  }
+}
+
 /** Which reveals are showing, read the way the CSS reads them. */
 const shownIn = (el: Element) =>
   [...el.querySelectorAll(".step[data-n]")].map((s) => s.hasAttribute("data-shown"));
@@ -96,4 +109,45 @@ test("a slide that redraws itself after stepping keeps its reveals", async () =>
 
   expect(host.textContent).toContain("1");
   expect(shownIn(host)).toEqual([true, true]);
+});
+
+/**
+ * A <Step> that builds its own element has to be told what element is allowed where it stands.
+ * One that marks the element already there never has to ask.
+ */
+test("a Step around an li lands directly under the ul", async () => {
+  const { host } = await mount([Listed], "#listed.1");
+  const ul = host.querySelector("ul")!;
+
+  expect([...ul.children].map((c) => c.tagName.toLowerCase())).toEqual(["li", "li"]);
+  expect(ul.querySelectorAll("div").length).toBe(0);
+  expect(ul.querySelector('li.step[data-n="1"]')).toBeTruthy();
+});
+
+test("marking an element keeps the class it already had", async () => {
+  const { host } = await mount([Listed], "#listed.1");
+  expect(host.querySelector("li")!.className.split(" ").sort()).toEqual(["lead", "step"]);
+});
+
+test("a Step around bare text still gets something to hang the mark on", async () => {
+  const { host } = await mount([Points], "#points.1");
+  expect(host.querySelectorAll("div.step").length).toBe(2);
+});
+
+/** JSX keeps same-line whitespace, so this arrives as three children rather than one. */
+test("whitespace around the element does not stop it being marked", async () => {
+  class Spaced extends Slide {
+    static path = "spaced";
+    static steps = 2;
+    render() {
+      return jsx("ul", {
+        children: jsx(Step, { n: 1, children: [" ", jsx("li", { children: "a" }), " "] }),
+      });
+    }
+  }
+
+  const { host } = await mount([Spaced], "#spaced.1");
+  expect([...host.querySelector("ul")!.children].map((c) => c.tagName.toLowerCase())).toEqual([
+    "li",
+  ]);
 });

@@ -27,14 +27,20 @@ class Agenda extends Slide {
       <Pad>
         <h2>What is inside</h2>
         <ul>
-          <Step n={1} as="li">
-            <code>jsx-runtime</code> — eight lines turning JSX into vnodes
+          <Step n={1}>
+            <li>
+              <code>jsx-runtime</code> — eight lines turning JSX into vnodes
+            </li>
           </Step>
-          <Step n={2} as="li">
-            <code>dom.ts</code> — vnodes into DOM, and state on a class
+          <Step n={2}>
+            <li>
+              <code>dom.ts</code> — vnodes into DOM, and state on a class
+            </li>
           </Step>
-          <Step n={3} as="li">
-            <code>deck.tsx</code> — scaling the fixed canvas, and the keys
+          <Step n={3}>
+            <li>
+              <code>deck.tsx</code> — scaling the fixed canvas, and the keys
+            </li>
           </Step>
         </ul>
       </Pad>
