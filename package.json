@@ -5,6 +5,7 @@
     "packages/suraido",
     "packages/atom",
     "packages/presenter",
+    "packages/cli",
     "packages/create-suraido",
     "packages/create-suraido/template",
     "examples/*"
