@@ -3,7 +3,6 @@
   "private": true,
   "workspaces": [
     "packages/suraido",
-    "packages/atom",
     "packages/cli",
     "packages/create-suraido",
     "packages/create-suraido/template",

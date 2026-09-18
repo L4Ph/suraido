@@ -1,22 +1,6 @@
 import { Component, flushSync, render, type Child, type VNode } from "./dom.ts";
 import { advance, parseHash, formatHash, LAST, type Pos, type Paths } from "./nav.ts";
 
-/** The base class for a slide. State lives on the class, as usual. */
-export abstract class Slide<P = {}, S = {}> extends Component<P, S> {
-  /**
-   * How many stops this slide has, when you want to say. Left out — which is usually right —
-   * it is counted from the reveals the slide draws.
-   */
-  static steps?: number;
-  /** The name that shows in the URL. Omit it and the index is used. */
-  static path?: string;
-
-  /** @internal Redrawing itself must number its reveals the same way it did the first time. */
-  $enter = () => {
-    scope.counted = 0;
-  };
-}
-
 export type SlideComponent = (new (props: {}) => Component<any, any>) & {
   steps?: number;
   path?: string;

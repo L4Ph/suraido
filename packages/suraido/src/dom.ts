@@ -97,8 +97,6 @@ function unmount(inst: Inst) {
   inst.was?.ref?.(null);
   if (inst.comp) {
     inst.comp.$dead = true;
-    for (const off of inst.comp.$unwatch) off();
-    inst.comp.$unwatch.length = 0;
     inst.comp.unmounted();
   }
   for (const k of inst.kids) unmount(k);
@@ -282,7 +280,6 @@ export abstract class Component<P = {}, S = {}> {
   }
   /** @internal */ $ns: string | null = null;
   /** @internal */ $dead = false;
-  /** @internal */ $unwatch: (() => void)[] = [];
   /** @internal Runs just before this component's subtree is rebuilt. */
   $enter?: () => void;
 
@@ -294,18 +291,6 @@ export abstract class Component<P = {}, S = {}> {
     this.state = { ...this.state, ...(typeof patch === "function" ? patch(this.state) : patch) };
     if (dirty.size === 0) queueMicrotask(flush);
     dirty.add(this);
-  }
-
-  /**
-   * Redraw this component whenever one of these atoms changes.
-   *
-   * The subscriptions are dropped when the component leaves, so a slide you have moved on from
-   * stops being redrawn — and the atom stops holding on to it.
-   */
-  watch(...atoms: { subscribe(run: () => void): () => void }[]) {
-    for (const source of atoms) {
-      this.$unwatch.push(source.subscribe(() => this.setState({} as Partial<S>)));
-    }
   }
 
   mounted() {}
