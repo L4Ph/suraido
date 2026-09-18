@@ -37,6 +37,7 @@ jobs:
       - run: vp -C packages/suraido pack
       - run: vp -C packages/atom pack
       - run: vp -C packages/presenter pack
+      - run: vp -C packages/cli pack
 
       - run: vp check
       - run: vp test
