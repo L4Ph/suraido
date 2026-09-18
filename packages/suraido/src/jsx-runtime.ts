@@ -12,6 +12,8 @@ export const jsxDEV = jsx;
 /** Attributes go straight to the DOM. Not React: `class`, and `onClick` means a `click` listener. */
 type Attrs = { [K in `on${string}`]?: (e: any) => void } & {
   class?: string;
+  /** Handed the element once it exists, and `null` once it does not. */
+  ref?: (node: any) => void;
   style?: string | Partial<CSSStyleDeclaration>;
   children?: Child;
   [attr: string]: unknown;

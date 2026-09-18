@@ -85,10 +85,16 @@ function mount(v: VNode | string, ns: string | null): Inst {
     el.appendChild(domOf(k));
     inst.kids.push(k);
   }
+  // Once it and everything under it exists. The element is kept from here on, so this is the
+  // only time it is handed over.
+  props.ref?.(el);
   return inst;
 }
 
 function unmount(inst: Inst) {
+  // Whoever was handed this element is told it has gone, so nothing is left holding a node
+  // that is no longer anywhere.
+  inst.was?.ref?.(null);
   if (inst.comp) {
     inst.comp.$dead = true;
     for (const off of inst.comp.$unwatch) off();
@@ -99,7 +105,7 @@ function unmount(inst: Inst) {
 }
 
 function applyProps(el: Element, props: Record<string, any>) {
-  for (const k in props) if (k !== "children") setProp(el, k, props[k]);
+  for (const k in props) if (k !== "children" && k !== "ref") setProp(el, k, props[k]);
 }
 
 /** Props go straight to DOM attributes. Only on* is routed to addEventListener. */
@@ -195,7 +201,8 @@ function patchProps(el: Element, was: Record<string, any>, now: Record<string, a
   const event = (k: string) => k.slice(2).toLowerCase();
 
   for (const k in was) {
-    if (k === "children" || k in now) continue;
+    // ref is not an attribute, and the element it named is still the same one.
+    if (k === "children" || k === "ref" || k in now) continue;
     if (k.startsWith("on")) el.removeEventListener(event(k), was[k]);
     else setProp(el, k, null);
   }
@@ -203,7 +210,7 @@ function patchProps(el: Element, was: Record<string, any>, now: Record<string, a
   for (const k in now) {
     // What has not changed is not written, and that is the point: `value` is left alone, so
     // what someone has typed since the last render is still there. A rebuild cannot say that.
-    if (k === "children" || same(was[k], now[k])) continue;
+    if (k === "children" || k === "ref" || same(was[k], now[k])) continue;
 
     // A handler written inline is a different function every render, so the old one has to go
     // or they pile up and one click counts twice.
