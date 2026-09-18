@@ -1,5 +1,5 @@
 import { atom } from "@suraido/atom";
-import { Center, Cols, deck, Full, Pad, Slide, Step } from "suraido.js";
+import { Center, Cols, deck, Full, Pad, Slide, slide, Step } from "suraido.js";
 import "suraido.js/deck.css";
 import "suraido.js/themes/noel.css";
 import { Code } from "./code.tsx";
@@ -8,36 +8,25 @@ import { applyTheme, THEMES } from "./themes.ts";
 
 // ---------------------------------------------------------------- 1. cover
 
-class Cover extends Slide {
-  static path = "intro";
-  static notes =
-    "Thank the organisers. Say the whole deck is running, not pictured — then press p.";
-  render() {
-    return (
-      <Center>
-        <p class="eyebrow">スライド</p>
-        <h1>suraido.js</h1>
-        <p class="lead">
-          Slides written in JSX. No React, no virtual DOM, no dependencies — and this deck is one of
-          them.
-        </p>
-        <p class="hint">Press → to move. Everything here is running, not pictured.</p>
-      </Center>
-    );
-  }
-}
+const Cover = slide({ path: "intro" }, () => (
+  <Center>
+    <p class="eyebrow">スライド</p>
+    <h1>suraido.js</h1>
+    <p class="lead">
+      Slides written in JSX. No React, no virtual DOM, no dependencies — and this deck is one of
+      them.
+    </p>
+    <p class="hint">Press → to move. Everything here is running, not pictured.</p>
+  </Center>
+));
 
 // ---------------------------------------------------------------- 2. shape
 
-class Shape extends Slide {
-  static path = "shape";
-  static notes = "Four presses here. Land on: state on the class, class not className, plain HTML.";
-  render() {
-    return (
-      <Pad>
-        <h2>A slide is a class</h2>
-        <Cols ratio="1.1fr 1fr">
-          <Code>{`class Intro extends Slide {
+const Shape = slide({ path: "shape" }, () => (
+  <Pad>
+    <h2>A slide is a class</h2>
+    <Cols ratio="1.1fr 1fr">
+      <Code>{`class Intro extends Slide {
   static path = "intro";
 
   render() {
@@ -53,119 +42,100 @@ class Shape extends Slide {
 }
 
 deck([Intro]);`}</Code>
-          <ul>
-            <Step n={1}>
-              <li>State lives on the class, as state always has</li>
-            </Step>
-            <Step n={2}>
-              <li>
-                <code>class</code>, not <code>className</code> — props go straight to the DOM
-              </li>
-            </Step>
-            <Step n={3}>
-              <li>
-                Everything else is plain HTML: <code>img</code>, <code>video</code>,{" "}
-                <code>svg</code>
-              </li>
-            </Step>
-          </ul>
-        </Cols>
-      </Pad>
-    );
-  }
-}
+      <ul>
+        <Step n={1}>
+          <li>State lives on the class, as state always has</li>
+        </Step>
+        <Step n={2}>
+          <li>
+            <code>class</code>, not <code>className</code> — props go straight to the DOM
+          </li>
+        </Step>
+        <Step n={3}>
+          <li>
+            Everything else is plain HTML: <code>img</code>, <code>video</code>, <code>svg</code>
+          </li>
+        </Step>
+      </ul>
+    </Cols>
+  </Pad>
+));
 
 // ---------------------------------------------------------------- 3. steps
 
-class Steps extends Slide {
-  static path = "steps";
-  static notes = "The point: nothing moves as these appear. They were always in the DOM.";
-  render() {
-    return (
-      <Pad>
-        <h2>Reveals hold their place</h2>
-        <p>
-          The four lines below are all in the DOM already. They are transparent until you reach
-          them, so <strong>nothing shifts</strong> as they appear.
-        </p>
-        <ul class="wide">
-          <Step n={1}>
-            <li>Pressing → does not re-render the slide</li>
-          </Step>
-          <Step n={2}>
-            <li>It toggles one attribute, and CSS does the fade</li>
-          </Step>
-          <Step n={3}>
-            <li>
-              So a <code>video</code> keeps playing and a transition keeps running
-            </li>
-          </Step>
-          <Step n={4}>
-            <li>
-              Nothing is numbered here — a <code>&lt;Step&gt;</code> takes the one after the last
-            </li>
-          </Step>
-          <Step n={[5, 6]}>
-            <li>And a range can take something away again</li>
-          </Step>
-          <Step>
-            <li>…so the next one arrives on the very press that removed it</li>
-          </Step>
-        </ul>
-      </Pad>
-    );
-  }
-}
+const Steps = slide({ path: "steps" }, () => (
+  <Pad>
+    <h2>Reveals hold their place</h2>
+    <p>
+      The four lines below are all in the DOM already. They are transparent until you reach them, so{" "}
+      <strong>nothing shifts</strong> as they appear.
+    </p>
+    <ul class="wide">
+      <Step n={1}>
+        <li>Pressing → does not re-render the slide</li>
+      </Step>
+      <Step n={2}>
+        <li>It toggles one attribute, and CSS does the fade</li>
+      </Step>
+      <Step n={3}>
+        <li>
+          So a <code>video</code> keeps playing and a transition keeps running
+        </li>
+      </Step>
+      <Step n={4}>
+        <li>
+          Nothing is numbered here — a <code>&lt;Step&gt;</code> takes the one after the last
+        </li>
+      </Step>
+      <Step n={[5, 6]}>
+        <li>And a range can take something away again</li>
+      </Step>
+      <Step>
+        <li>…so the next one arrives on the very press that removed it</li>
+      </Step>
+    </ul>
+  </Pad>
+));
 
 // ---------------------------------------------------------------- 4. layout
 
-class Layout extends Slide {
-  static path = "layout";
-  render() {
-    return (
-      <Pad>
-        <h2>The arrangements you keep rewriting</h2>
-        <Cols>
-          <div class="card">
-            <b>&lt;Pad&gt;</b>
-            <span>full height, with the padding token</span>
-          </div>
-          <div class="card">
-            <b>&lt;Center&gt;</b>
-            <span>the same, centred — covers and dividers</span>
-          </div>
-          <Step n={1}>
-            <div class="card">
-              <b>&lt;Cols&gt;</b>
-              <span>one column per child; ratio="2fr 1fr" to weight them</span>
-            </div>
-          </Step>
-        </Cols>
-        <p class="hint">
-          This row is a <code>&lt;Cols&gt;</code>. The third card arrived as a{" "}
-          <code>&lt;Step&gt;</code> and the columns did not move.
-        </p>
-      </Pad>
-    );
-  }
-}
+const Layout = slide({ path: "layout" }, () => (
+  <Pad>
+    <h2>The arrangements you keep rewriting</h2>
+    <Cols>
+      <div class="card">
+        <b>&lt;Pad&gt;</b>
+        <span>full height, with the padding token</span>
+      </div>
+      <div class="card">
+        <b>&lt;Center&gt;</b>
+        <span>the same, centred — covers and dividers</span>
+      </div>
+      <Step n={1}>
+        <div class="card">
+          <b>&lt;Cols&gt;</b>
+          <span>one column per child; ratio="2fr 1fr" to weight them</span>
+        </div>
+      </Step>
+    </Cols>
+    <p class="hint">
+      This row is a <code>&lt;Cols&gt;</code>. The third card arrived as a <code>&lt;Step&gt;</code>{" "}
+      and the columns did not move.
+    </p>
+  </Pad>
+));
 
 // ---------------------------------------------------------------- 5. full bleed
 
-class FullBleed extends Slide {
-  static path = "full";
-  render() {
-    return (
-      <Full>
-        <img src="./cover.svg" alt="" />
-        <div class="caption">
-          <h2>&lt;Full&gt; ignores the padding</h2>
-          <p>A direct img or video child covers the slide. Text sits on top.</p>
-        </div>
-      </Full>
-    );
-  }
-}
+const FullBleed = slide({ path: "full" }, () => (
+  <Full>
+    <img src="./cover.svg" alt="" />
+    <div class="caption">
+      <h2>&lt;Full&gt; ignores the padding</h2>
+      <p>A direct img or video child covers the slide. Text sits on top.</p>
+    </div>
+  </Full>
+));
 
 // ---------------------------------------------------------------- 6. live state
 
@@ -218,7 +188,6 @@ const votes = atom(0);
 
 class AtomWrite extends Slide {
   static path = "atom";
-  static notes = "Get the room to shout numbers. Press it that many times, then move on.";
   mounted() {
     this.watch(votes);
   }
@@ -258,7 +227,6 @@ class Poll extends Slide {
 
 class AtomRead extends Slide {
   static path = "kept";
-  static notes = "The number survived. The slide that collected it was unmounted two presses ago.";
   mounted() {
     this.watch(votes);
   }
@@ -289,7 +257,6 @@ class AtomRead extends Slide {
 
 class Themes extends Slide<{}, { at: number }> {
   static path = "themes";
-  static notes = "Cycle two or three. Mention the contrast tests — a projector eats pale palettes.";
   state = { at: 0 };
 
   cycle = () => {
@@ -325,14 +292,11 @@ class Themes extends Slide<{}, { at: number }> {
 
 // ---------------------------------------------------------------- 10. overriding
 
-class Override extends Slide {
-  static path = "override";
-  render() {
-    return (
-      <Pad>
-        <h2>Your CSS always wins</h2>
-        <Cols ratio="1fr 1fr">
-          <Code>{`/* every suraido.js style is inside @layer,
+const Override = slide({ path: "override" }, () => (
+  <Pad>
+    <h2>Your CSS always wins</h2>
+    <Cols ratio="1fr 1fr">
+      <Code>{`/* every suraido.js style is inside @layer,
    and layered styles lose to unlayered ones */
 
 .pager { display: none; }
@@ -341,42 +305,37 @@ class Override extends Slide {
   --suraido-accent: #d6452b;
   --suraido-pad: 88px 112px;
 }`}</Code>
-          <ul>
-            <Step n={1}>
-              <li>
-                No <code>!important</code>, no specificity games
-              </li>
-            </Step>
-            <Step n={2}>
-              <li>Reach for the tokens first — one value moves the whole deck</li>
-            </Step>
-          </ul>
-        </Cols>
-      </Pad>
-    );
-  }
-}
+      <ul>
+        <Step n={1}>
+          <li>
+            No <code>!important</code>, no specificity games
+          </li>
+        </Step>
+        <Step n={2}>
+          <li>Reach for the tokens first — one value moves the whole deck</li>
+        </Step>
+      </ul>
+    </Cols>
+  </Pad>
+));
 
 // ---------------------------------------------------------------- 11. co-located style
 
-class Colocated extends Slide {
-  static path = "colocated";
-  render() {
-    return (
-      <Pad>
-        <h2>Styles can live in the slide</h2>
-        <div class="tiles">
-          <div>151</div>
-          <div>6.4</div>
-          <div>0</div>
-        </div>
-        <p>
-          The tiles above are styled by a <code>&lt;style&gt;</code> element inside this slide's own{" "}
-          <code>render</code>. Only one slide is mounted at a time, so it applies while this slide
-          is up and leaves with it — co-location without CSS Modules.
-        </p>
+const Colocated = slide({ path: "colocated" }, () => (
+  <Pad>
+    <h2>Styles can live in the slide</h2>
+    <div class="tiles">
+      <div>151</div>
+      <div>6.4</div>
+      <div>0</div>
+    </div>
+    <p>
+      The tiles above are styled by a <code>&lt;style&gt;</code> element inside this slide's own{" "}
+      <code>render</code>. Only one slide is mounted at a time, so it applies while this slide is up
+      and leaves with it — co-location without CSS Modules.
+    </p>
 
-        <style>{`
+    <style>{`
           .tiles { display: flex; gap: 32px; margin: 16px 0 40px; }
           .tiles div {
             flex: 1;
@@ -390,10 +349,8 @@ class Colocated extends Slide {
             color: var(--suraido-accent);
           }
         `}</style>
-      </Pad>
-    );
-  }
-}
+  </Pad>
+));
 
 // ---------------------------------------------------------------- 12. the canvas
 
@@ -482,69 +439,58 @@ class Address extends Slide<{}, { hash: string }> {
 
 // ---------------------------------------------------------------- 14. diagnostics
 
-class Diagnostics extends Slide {
-  static path = "diagnostics";
-  render() {
-    return (
-      <Pad>
-        <h2>The mistakes that make no sound</h2>
-        <p>
-          Some things used to go wrong quietly: the deck did the wrong thing and looked fine doing
-          it. The deck used to warn about them. It is better not to be able to do them.
-        </p>
-        <ul class="wide">
-          <Step>
-            <li>
-              A <code>&lt;Step&gt;</code> that wrapped an <code>li</code> in a <code>div</code> — it
-              marks the element you wrote, so there is nothing to wrap
-            </li>
-          </Step>
-          <Step>
-            <li>A count that disagreed with the reveals — there is no second place to say it</li>
-          </Step>
-          <Step>
-            <li>
-              A slide that was not a slide — <strong>TypeScript rejects it</strong>, before it ever
-              runs
-            </li>
-          </Step>
-          <Step>
-            <li>
-              A slide running past the canvas, clipped and invisible — measured by the tool, so none
-              of this ships in your deck
-            </li>
-          </Step>
-        </ul>
-        <p class="hint">
-          Nothing here writes to your console. A rehearsal skill ships with every new project to
-          walk the whole thing and measure.
-        </p>
-      </Pad>
-    );
-  }
-}
+const Diagnostics = slide({ path: "diagnostics" }, () => (
+  <Pad>
+    <h2>The mistakes that make no sound</h2>
+    <p>
+      Some things used to go wrong quietly: the deck did the wrong thing and looked fine doing it.
+      The deck used to warn about them. It is better not to be able to do them.
+    </p>
+    <ul class="wide">
+      <Step>
+        <li>
+          A <code>&lt;Step&gt;</code> that wrapped an <code>li</code> in a <code>div</code> — it
+          marks the element you wrote, so there is nothing to wrap
+        </li>
+      </Step>
+      <Step>
+        <li>A count that disagreed with the reveals — there is no second place to say it</li>
+      </Step>
+      <Step>
+        <li>
+          A slide that was not a slide — <strong>TypeScript rejects it</strong>, before it ever runs
+        </li>
+      </Step>
+      <Step>
+        <li>
+          A slide running past the canvas, clipped and invisible — measured by the tool, so none of
+          this ships in your deck
+        </li>
+      </Step>
+    </ul>
+    <p class="hint">
+      Nothing here writes to your console. A rehearsal skill ships with every new project to walk
+      the whole thing and measure.
+    </p>
+  </Pad>
+));
 
 // ---------------------------------------------------------------- 15. outro
 
-class Outro extends Slide {
-  static path = "start";
-  render() {
-    return (
-      <Center>
-        <h1>npm create suraido</h1>
-        <p class="lead">
-          15.5 kB, zero dependencies. One line of tsconfig, and it builds under Vite or Rsbuild
-          untouched.
-        </p>
-        <p>
-          <a href="https://github.com/L4Ph/suraido">github.com/L4Ph/suraido</a>
-          {" · "}
-          <a href="https://www.npmjs.com/package/suraido.js">npm</a>
-        </p>
-      </Center>
-    );
-  }
-}
+const Outro = slide({ path: "start" }, () => (
+  <Center>
+    <h1>npm create suraido</h1>
+    <p class="lead">
+      15.5 kB, zero dependencies. One line of tsconfig, and it builds under Vite or Rsbuild
+      untouched.
+    </p>
+    <p>
+      <a href="https://github.com/L4Ph/suraido">github.com/L4Ph/suraido</a>
+      {" · "}
+      <a href="https://www.npmjs.com/package/suraido.js">npm</a>
+    </p>
+  </Center>
+));
 
 deck([
   Cover,

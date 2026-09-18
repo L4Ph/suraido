@@ -16,7 +16,6 @@ A slide is a class. State lives on it, as usual.
 
     class Intro extends Slide<{}, { count: number }> {
       static path = "intro";   // the URL becomes #intro; without it, the index is used
-      static notes = "Thank the organisers.";
       state = { count: 0 };
 
       mounted() {}    // timers and video start here
