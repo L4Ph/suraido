@@ -75,7 +75,7 @@ class Intro extends Slide<{}, { count: number }> {
     /* timers and video control go here */
   }
   updated() {
-    /* right after a rebuild: restore focus and other DOM-side state */
+    /* right after a redraw, with the new DOM in place */
   }
   unmounted() {}
 
@@ -299,7 +299,7 @@ than fighting the arrow keys.
 
 ## The life of state
 
-- `setState` **rebuilds that slide's DOM**; nothing is diffed
+- `setState` re-runs `render()` and the result is put onto the DOM already there
 - Crossing to another slide unmounts it and the state is gone
 
 ### Something that outlives a slide
@@ -352,10 +352,7 @@ is read back several slides later.
 
 ## What has been traded away
 
-- **`setState` does not preserve DOM identity.** A `<video>`, a focused `<input>` or a
-  transition in flight will break on a slide that calls it. Focus and scroll can be put back in
-  `updated()` (see [examples/interactive](../../examples/interactive)). To avoid the whole
-  problem, bring diffing back: `flush()` in [dom.ts](src/dom.ts) becomes a patch, roughly 50 lines
+- **Lists have no keys.** Reordering one rebuilds it, which slides do not do
 - **Reveals go through `<Step>` only.** You cannot branch on the step inside `render()`
 - **A component's root is a single element.** Return several and only the first is drawn
 - **`<Step>` marks one element, or builds a `div`.** Give it a single element and that element

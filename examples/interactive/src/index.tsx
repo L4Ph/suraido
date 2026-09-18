@@ -105,21 +105,16 @@ class Animation extends Slide {
 }
 
 /**
- * setState rebuilds the DOM, and a text field feels that twice over.
+ * A text field, with no code here to look after it.
  *
- *  1. Calling setState on every keystroke throws focus away each time
- *     → leave the value in the DOM and move it into state only once it is committed
- *  2. Even the setState on commit rebuilds the input
- *     → put focus back in updated()
+ * The input is never rebuilt, so what has been typed and where the caret sits are simply still
+ * there after a redraw. The value is still left in the DOM rather than mirrored into state —
+ * not for focus any more, but because writing `value` back on every keystroke would move the
+ * caret to the end.
  */
 class Typing extends Slide<{}, { submitted: string[] }> {
   static path = "input";
   state = { submitted: [] as string[] };
-
-  /** Runs right after the rebuild. Hands focus back so you can keep typing. */
-  updated() {
-    document.querySelector<HTMLInputElement>(".field")?.focus();
-  }
 
   onKey = (e: KeyboardEvent) => {
     const el = e.target as HTMLInputElement;
@@ -141,8 +136,8 @@ class Typing extends Slide<{}, { submitted: string[] }> {
         </ul>
         <Step n={1}>
           <p class="hint">
-            No setState while typing — the value stays in the DOM. It moves into state on Enter, and{" "}
-            <code>updated()</code> returns focus to the rebuilt field.
+            No setState while typing — the value stays in the DOM. On Enter it moves into state, and
+            the field carries on: it is the element that was always there.
           </p>
         </Step>
       </Pad>

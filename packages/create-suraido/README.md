@@ -18,7 +18,7 @@ ask on — piped, or in CI — the defaults are taken instead of hanging.
 Two things come with the project.
 
 **`AGENTS.md`** — tells a coding agent how suraido.js works: use `class`, do not wrap the classes
-passed to `deck()`, `setState` rebuilds the DOM, styles are overridden from outside the
+passed to `deck()`, how `setState` redraws, styles are overridden from outside the
 `@layer`, and so on.
 
 **`.agents/skills/rehearse/`** — a rehearsal skill. It opens every slide and measures it, to

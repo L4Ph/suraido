@@ -70,14 +70,17 @@ scaled down. Compare what you can read against the source, or cut the content.
 
 ## State
 
-`setState` **rebuilds that slide's DOM** — suraido.js does not diff. So:
+`setState` re-runs `render()` and the result is put onto the DOM that is already there, so an
+element changes only when something about it changed. Focus, a half-typed word, a playing
+`<video>` and a transition in flight all survive, because the elements holding them are the ones
+that were always there.
 
-- A `<video>` restarts, a focused `<input>` loses focus, and a transition in flight is cut off
-- Restore what was lost in `updated()`, which runs right after the rebuild
+`updated()` still runs right after a redraw, for work that needs the new DOM in place —
+scrolling something into view, measuring it.
 
 ```tsx
 updated() {
-  document.querySelector<HTMLInputElement>(".field")?.focus();
+  this.$el.querySelector(".answers")?.scrollIntoView({ block: "end" });
 }
 ```
 
