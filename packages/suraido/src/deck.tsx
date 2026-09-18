@@ -9,6 +9,11 @@ export abstract class Slide<P = {}, S = {}> extends Component<P, S> {
   static path?: string;
   /** What you want to be reminded of while this slide is up. Shown in the presenter view. */
   static notes?: string;
+
+  /** @internal Redrawing itself must number its reveals the same way it did the first time. */
+  $enter = () => {
+    scope.counted = 0;
+  };
 }
 
 export type SlideComponent = (new (props: {}) => Slide<any, any>) & {
@@ -58,14 +63,31 @@ export type Plugin = (deck: DeckContext) => (() => void) | void;
 const BACK_ZONE = 0.25;
 
 /**
- * The step of the slide currently being built, read by <Step> as it mounts.
+ * What the slide currently being built needs to know: which step it is showing, and how far
+ * the numbering has got, so a <Step> that was given no number can take the next one.
  *
  * It is set and never restored, which is safe because mount() descends depth-first in document
  * order: a slide's whole subtree is finished before the next SlideAt is reached. That is what
  * lets a single page hold several slides each showing a different amount — which is all that
  * printing and the overview are.
  */
-let renderStep = 0;
+let scope = { step: 0, counted: 0 };
+
+/**
+ * Where a reveal comes in and, if it ever does, where it goes away again.
+ *
+ * No number means the one after the last, so inserting a reveal does not renumber the ones
+ * below it. A number given by hand carries the counting forward from there, so mixing the two
+ * stays in order.
+ */
+function position(n: number | [number, number] | undefined): [enter: number, until: number] {
+  if (n === undefined) return [++scope.counted, Infinity];
+  const [enter, until = Infinity] = Array.isArray(n) ? n : [n];
+  // A range counts as reaching the step before it ends, so the next unnumbered reveal lands on
+  // the step it goes away — one press swapping this for that, rather than a blank press between.
+  scope.counted = Math.max(scope.counted, Number.isFinite(until) ? until - 1 : enter);
+  return [enter, until];
+}
 
 const classes = (...parts: unknown[]) => parts.filter(Boolean).join(" ");
 
@@ -100,12 +122,19 @@ export function Step({
   children,
   ...rest
 }: {
-  n: number;
+  /** Omit it for the next one. A pair is [comes in, goes away), like Slidev's v-click. */
+  n?: number | [number, number];
   class?: string;
   children?: Child;
   [attr: string]: unknown;
 }): Child {
-  const mark = { "data-n": n, "data-shown": n <= renderStep || null, ...rest };
+  const [enter, until] = position(n);
+  const mark = {
+    "data-n": enter,
+    "data-until": Number.isFinite(until) ? until : null,
+    "data-shown": (enter <= scope.step && scope.step < until) || null,
+    ...rest,
+  };
   const target = markable(children);
 
   if (target) {
@@ -134,9 +163,10 @@ export function Step({
  * if that combination ever has to work.
  */
 function syncSteps(root: ParentNode, step: number) {
-  renderStep = step;
+  scope.step = step;
   for (const el of root.querySelectorAll<HTMLElement>(".step[data-n]")) {
-    el.toggleAttribute("data-shown", Number(el.dataset.n) <= step);
+    const until = el.dataset.until ? Number(el.dataset.until) : Infinity;
+    el.toggleAttribute("data-shown", Number(el.dataset.n) <= step && step < until);
   }
 }
 
@@ -145,7 +175,7 @@ function syncSteps(root: ParentNode, step: number) {
  * does not have to ask a global what the deck as a whole is doing.
  */
 function SlideAt({ slide: S, step }: { slide: SlideComponent; step: number }) {
-  renderStep = step;
+  scope = { step, counted: 0 };
   return <S />;
 }
 
@@ -172,7 +202,12 @@ function audit(slides: SlideComponent[], i: number, paths: Paths, steps: (i: num
   }
 
   const shown = [...document.querySelectorAll<HTMLElement>(".step[data-n]")];
-  const highest = Math.max(0, ...shown.map((el) => Number(el.dataset.n)));
+  // A reveal that goes away again needs the step it goes away on to be reachable too, or the
+  // slide ends before anyone sees it gone.
+  const highest = Math.max(
+    0,
+    ...shown.flatMap((el) => [Number(el.dataset.n), Number(el.dataset.until ?? 0)]),
+  );
   const declared = steps(i) - 1;
   if (highest !== declared) {
     say(

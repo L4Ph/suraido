@@ -120,6 +120,9 @@ function flush() {
     if (c.$dead) continue;
     // Nothing is diffed: rebuild this subtree and swap it in.
     const prev = c.$inst.kids[0];
+    // Put back whatever scope this subtree was first built in. A rebuild does not pass through
+    // whoever set that up the first time, so without this it inherits the last one used.
+    c.$enter?.();
     const fresh = mount(one(c.render()), c.$ns);
     const gone = domOf(prev);
     gone.parentNode!.replaceChild(domOf(fresh), gone);
@@ -141,6 +144,8 @@ export abstract class Component<P = {}, S = {}> {
   /** @internal */ $ns: string | null = null;
   /** @internal */ $dead = false;
   /** @internal */ $unwatch: (() => void)[] = [];
+  /** @internal Runs just before this component's subtree is rebuilt. */
+  $enter?: () => void;
 
   constructor(props: P) {
     this.props = props;

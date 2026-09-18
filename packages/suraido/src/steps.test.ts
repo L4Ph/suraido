@@ -151,3 +151,109 @@ test("whitespace around the element does not stop it being marked", async () => 
     "li",
   ]);
 });
+
+/** Numbering every reveal by hand means renumbering all of them to insert one. */
+test("a Step with no number takes the one after the last", async () => {
+  class Bare extends Slide {
+    static path = "bare";
+    static steps = 4;
+    render() {
+      return jsx("div", {
+        children: [
+          jsx(Step, { children: "a" }),
+          jsx(Step, { children: "b" }),
+          jsx(Step, { children: "c" }),
+        ],
+      });
+    }
+  }
+
+  const { deck, host } = await mount([Bare], "#bare.2");
+  expect(shownIn(host)).toEqual([true, true, false]);
+
+  deck.go([0, 3]);
+  expect(shownIn(host)).toEqual([true, true, true]);
+});
+
+test("naming a number carries the ones after it forward", async () => {
+  class Mixed extends Slide {
+    static path = "mixed";
+    static steps = 5;
+    render() {
+      return jsx("div", {
+        children: [jsx(Step, { n: 3, children: "a" }), jsx(Step, { children: "b" })],
+      });
+    }
+  }
+
+  const { deck, host } = await mount([Mixed], "#mixed.3");
+  expect(shownIn(host)).toEqual([true, false]);
+
+  deck.go([0, 4]);
+  expect(shownIn(host)).toEqual([true, true]);
+});
+
+/** Everything so far appears and stays. Sometimes a thing should go away again. */
+test("a range shows from the first number until the second, which is exclusive", async () => {
+  class Ranged extends Slide {
+    static path = "ranged";
+    static steps = 5;
+    render() {
+      return jsx("div", { children: jsx(Step, { n: [2, 4], children: "a" }) });
+    }
+  }
+
+  const { deck, host } = await mount([Ranged], "#ranged.1");
+  expect(shownIn(host)).toEqual([false]);
+
+  deck.go([0, 2]);
+  expect(shownIn(host)).toEqual([true]);
+  deck.go([0, 3]);
+  expect(shownIn(host)).toEqual([true]);
+  deck.go([0, 4]);
+  expect(shownIn(host)).toEqual([false]);
+});
+
+/** The count is per slide, so a slide rebuilding itself must start counting again. */
+test("a slide that redraws itself numbers its reveals the same way twice", async () => {
+  class Bare extends Slide {
+    static path = "bare";
+    static steps = 3;
+    mounted() {
+      this.watch(votes);
+    }
+    render() {
+      return jsx("div", {
+        children: [String(votes.count), jsx(Step, { children: "a" }), jsx(Step, { children: "b" })],
+      });
+    }
+  }
+
+  const { host } = await mount([Bare], "#bare.2");
+  expect(shownIn(host)).toEqual([true, true]);
+
+  votes.cast();
+  flushSync();
+
+  expect(host.querySelector('[data-n="1"]')).toBeTruthy();
+  expect(shownIn(host)).toEqual([true, true]);
+});
+
+/** The press that takes one thing away is the natural press to bring its replacement in. */
+test("the reveal after a range arrives on the step the range leaves", async () => {
+  class Swap extends Slide {
+    static path = "swap";
+    static steps = 4;
+    render() {
+      return jsx("div", {
+        children: [jsx(Step, { n: [1, 3], children: "before" }), jsx(Step, { children: "after" })],
+      });
+    }
+  }
+
+  const { deck, host } = await mount([Swap], "#swap.1");
+  expect(shownIn(host)).toEqual([true, false]);
+
+  deck.go([0, 3]);
+  expect(shownIn(host)).toEqual([false, true]);
+});
