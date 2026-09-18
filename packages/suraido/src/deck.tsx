@@ -57,8 +57,15 @@ export type Plugin = (deck: DeckContext) => (() => void) | void;
 /** How much of the left edge sends you back rather than forward. */
 const BACK_ZONE = 0.25;
 
-// ponytail: assumes one deck at a time. For several, hang this off each Deck instance.
-let deckStep = 0;
+/**
+ * The step of the slide currently being built, read by <Step> as it mounts.
+ *
+ * It is set and never restored, which is safe because mount() descends depth-first in document
+ * order: a slide's whole subtree is finished before the next SlideAt is reached. That is what
+ * lets a single page hold several slides each showing a different amount — which is all that
+ * printing and the overview are.
+ */
+let renderStep = 0;
 
 /**
  * Transparent until step n is reached, but it keeps its space so nothing shifts.
@@ -84,7 +91,7 @@ export function Step({
     <Tag
       class={cls ? `step ${cls}` : "step"}
       data-n={n}
-      data-shown={n <= deckStep || null}
+      data-shown={n <= renderStep || null}
       {...rest}
     >
       {children}
@@ -92,12 +99,32 @@ export function Step({
   );
 }
 
-/** Stepping only touches the attribute, never re-rendering, so the CSS transition survives. */
-function syncSteps(step: number) {
-  deckStep = step;
-  for (const el of document.querySelectorAll<HTMLElement>(".step[data-n]")) {
+/**
+ * Stepping only touches the attribute, never re-rendering, so the CSS transition survives.
+ * Scoped to one deck's own stage: another deck on the page is not this deck's business.
+ *
+ * It also writes the step back, because a slide that redraws itself — a vote coming in, a
+ * timer — rebuilds its subtree without passing through SlideAt again, and every <Step> in it
+ * would otherwise be built against whatever step was last mounted and come back hidden.
+ *
+ * ponytail: that write is one value for the page. A slide calling setState while other slides
+ * are on screen (printing, overview) would read the wrong one. Give each Slide its own scope
+ * if that combination ever has to work.
+ */
+function syncSteps(root: ParentNode, step: number) {
+  renderStep = step;
+  for (const el of root.querySelectorAll<HTMLElement>(".step[data-n]")) {
     el.toggleAttribute("data-shown", Number(el.dataset.n) <= step);
   }
+}
+
+/**
+ * One slide, shown at one step. The wrapper exists only to say which step, so that <Step>
+ * does not have to ask a global what the deck as a whole is doing.
+ */
+function SlideAt({ slide: S, step }: { slide: SlideComponent; step: number }) {
+  renderStep = step;
+  return <S />;
 }
 
 /**
@@ -161,9 +188,14 @@ export class Deck extends Component<DeckProps, { i: number }> {
         );
       }
     });
-    // So a deep link that carries a step is honoured from the very first render.
-    // Forget this and reveals are missing on exactly those links.
-    deckStep = this.pos[1];
+  }
+
+  /** This deck's own slide area, so stepping does not reach into anyone else's. */
+  get stage(): ParentNode {
+    const root = this.$el as Element;
+    // Falling back to the deck's own root rather than the document: if the stage is ever not
+    // found, the blast radius stays inside this deck instead of becoming every deck on the page.
+    return root.querySelector(".stage") ?? root;
   }
 
   go = (next: Pos) => {
@@ -172,7 +204,6 @@ export class Deck extends Component<DeckProps, { i: number }> {
     // Read it before pos is overwritten.
     const dir = next[0] > this.pos[0] ? "forward" : "back";
     this.pos = next;
-    deckStep = next[1];
 
     const hash = formatHash(next, this.paths);
     if (location.hash !== hash) history.replaceState(null, "", hash);
@@ -180,7 +211,7 @@ export class Deck extends Component<DeckProps, { i: number }> {
     this.announce(next);
 
     // A step on its own is just an attribute.
-    if (!slideChanged) return syncSteps(next[1]);
+    if (!slideChanged) return syncSteps(this.stage, next[1]);
 
     // Swap the slide. View Transitions want the DOM change finished inside the callback.
     const swap = () => {
@@ -295,7 +326,9 @@ export class Deck extends Component<DeckProps, { i: number }> {
     return (
       <div class="deck" onClick={this.onClick}>
         <div class="stage" style={{ width: `${width}px`, height: `${height}px` }}>
-          <Current />
+          {/* The step goes in with the slide so a deep link that carries one is honoured from
+              the very first render. Drop it and reveals are missing on exactly those links. */}
+          <SlideAt slide={Current} step={this.pos[1]} />
         </div>
         <div class="pager">{`${this.state.i + 1} / ${slides.length}`}</div>
       </div>
