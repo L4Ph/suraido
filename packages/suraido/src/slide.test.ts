@@ -122,3 +122,9 @@ test("reveals are numbered from the top on every draw", async () => {
 
   expect(ns()).toEqual(["1", "2"]);
 });
+
+test("a slide with nothing to say about itself does not have to say it", async () => {
+  const Bare = slide(() => jsx("p", { children: "bare" }));
+  const { host } = await mount([Bare]);
+  expect(host.querySelector("p")!.textContent).toBe("bare");
+});

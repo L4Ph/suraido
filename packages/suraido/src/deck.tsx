@@ -55,7 +55,12 @@ export type Setup = (self: Self) => (() => Child) | Child;
  * function component is called again on every draw, which would run the setup again and put
  * every `let` back to where it started.
  */
-export function slide(meta: Meta, setup: Setup): SlideComponent {
+export function slide(setup: Setup): SlideComponent;
+export function slide(meta: Meta, setup: Setup): SlideComponent;
+export function slide(a: Meta | Setup, b?: Setup): SlideComponent {
+  // A slide with nothing to say about itself should not have to say `{}`.
+  const [meta, setup] = typeof a === "function" ? [{} as Meta, a] : [a, b!];
+
   class One extends Component<{}, {}> {
     private stop = new AbortController();
     private queued: (() => void)[] = [];

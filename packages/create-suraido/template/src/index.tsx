@@ -10,7 +10,7 @@ const Cover = slide({ path: "intro" }, () => (
   </Center>
 ));
 
-const Points = slide({}, () => (
+const Points = slide(() => (
   <Pad>
     <h2>What you want to say</h2>
     <ul>

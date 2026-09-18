@@ -20,6 +20,9 @@ A slide is a function. It runs once, when the slide arrives, and returns what to
 
     deck([Intro]);
 
+The meta can be left out when there is nothing to say about the slide itself:
+\`slide(() => <Pad>…</Pad>)\`.
+
 Return a function instead and it becomes the view, run again every time the slide is redrawn.
 Because the setup ran once, a plain \`let\` in it is state with the life of the slide — it
 starts again when you come back. Nothing is watching that variable, so say \`update()\`.
