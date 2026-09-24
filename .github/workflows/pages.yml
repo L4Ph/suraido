@@ -24,7 +24,7 @@ jobs:
 
       # Brings its own Node and package manager, so devEngines is satisfied without
       # installing a particular npm by hand.
-      - uses: voidzero-dev/setup-vp@v1.20.0
+      - uses: voidzero-dev/setup-vp@v1.21.1
         with:
           node-version: "24"
           cache: true
