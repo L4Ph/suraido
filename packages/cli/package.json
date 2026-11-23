@@ -1,6 +1,6 @@
 {
   "name": "@suraido/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "スライド — tools for a deck: turn one into a PDF, or images",
   "keywords": [
     "cli",
