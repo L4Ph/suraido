@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig } from "vite-plus";
 
 // Deployed under /suraido/ on GitHub Pages; served from / in development.
 export default defineConfig({

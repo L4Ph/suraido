@@ -4,3 +4,4 @@ dist
 
 # Dumps of other repositories, pulled in to read and not to keep.
 repomix-output-*.xml
+.vitest/

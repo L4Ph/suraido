@@ -7,7 +7,14 @@ export default defineConfig({
   fmt: {},
   // Every package brings its own environment, so `vp test` here has to run them as projects
   // rather than as one flat pile of files — otherwise nothing gets a DOM.
-  test: { projects: ["packages/*"] },
+  test: {
+    // Vitest v4 compatibility: preserve mock call history.
+    // Remove after tests no longer rely on calls from setup or earlier tests.
+    // https://viteplus.dev/guide/vitest-v5#remove-unneeded-compatibility-settings
+    // https://vitest.dev/guide/migration/#clearmocks-is-enabled-by-default
+    clearMocks: false,
+    projects: ["packages/*"],
+  },
   lint: {
     jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
     rules: { "vite-plus/prefer-vite-plus-imports": "error" },
