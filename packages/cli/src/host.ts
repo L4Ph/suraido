@@ -46,11 +46,18 @@ export function host(dir: string): Server {
       file = resolve(root, "index.html");
     }
 
+    // Read first, then answer. Doing it the other way round, a path that stats as a file but
+    // cannot be read — a directory, a race with a rebuild — sends 200 and then throws trying
+    // to send 404 over it, which takes the whole server down mid-export.
+    let body: Buffer;
     try {
-      res.writeHead(200, { "content-type": TYPES[extname(file)] ?? "application/octet-stream" });
-      res.end(await readFile(file));
+      body = await readFile(file);
     } catch {
       res.writeHead(404, { "content-type": "text/plain" }).end("not here\n");
+      return;
     }
+
+    res.writeHead(200, { "content-type": TYPES[extname(file)] ?? "application/octet-stream" });
+    res.end(body);
   });
 }

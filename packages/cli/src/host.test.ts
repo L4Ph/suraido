@@ -21,6 +21,7 @@ async function built() {
   await mkdir(deck);
   await writeFile(join(deck, "index.html"), "<html><body><div id=root></div></body></html>");
   await writeFile(join(deck, "deck.css"), ".deck{}");
+  await mkdir(join(deck, "assets"));
   await writeFile(join(dir, "notes.txt"), "PRIVATE-NOTES");
 
   const server = host(deck);
@@ -52,6 +53,13 @@ test("assets are served as themselves", async () => {
   const css = await get(port, "/deck.css");
   expect(css.type).toBe("text/css");
   expect(css.body).toBe(".deck{}");
+});
+
+test("a directory under the deck is not a file to serve", async () => {
+  const { port } = await built();
+  // A browser asks for odd things. Answering 404 must not throw after a 200 has gone out,
+  // because that unhandled rejection takes the server down in the middle of an export.
+  expect((await get(port, "/assets/")).status).toBe(404);
 });
 
 test("a path that climbs out of the deck cannot reach what is next to it", async () => {
