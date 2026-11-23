@@ -75,6 +75,47 @@ keeps running. You cannot branch on the step inside \`render()\`.
 `,
   },
 
+  blocks: {
+    description: "The shapes every deck writes again: <Figure> <Points> <Cover> and the rest",
+    body: `# Blocks
+
+Arrangement is \`<Pad>\` \`<Body>\` \`<Center>\` \`<Cols>\` \`<Full>\`. The shapes that go
+inside them are below, so that a deck does not have to carry a stylesheet per shape. The look
+comes from the tokens, and every one takes \`class\` if you want to say more.
+
+| Component | What it is |
+| --- | --- |
+| \`<Aside>\` | The small print — a source, a caveat, what the picture is. Muted, smaller |
+| \`<Figure caption paper fit max>\` | A picture or diagram with a caption under it |
+| \`<Cover title byline>\` | A title slide: one heading, and the lines under it |
+| \`<Divider>\` | The slide that says what the next part is called |
+| \`<Points items>\` | Term over explanation, repeated. A \`<dl>\`, so the pair is a pair |
+| \`<Side heading>\` | One column with a heading over it. Two inside \`<Cols>\` is a comparison |
+| \`<Stat value label>\` | One number worth reading from the back, and what it counts |
+| \`<Lead>\` | The one sentence a summary slide is built around |
+| \`<Matrix head rows>\` | Rows and columns. The first cell of a row is a \`<th scope="row">\` |
+| \`<Code label size>\` | A block of source, no colour |
+
+Three that are not obvious:
+
+- **\`<Body>\`** is what goes under the \`<h2>\`. It takes the rest of the slide and centres
+  itself in what is left, so slides of different heights line up instead of hanging from the
+  heading.
+- **\`<Figure fit="contain" paper>\`** is for a diagram or a screenshot: it keeps the whole
+  thing inside \`--suraido-figure-max\` instead of filling the width, and puts a white plate
+  behind it because a theme can have a coloured ground. \`max={620}\` caps the height.
+- **\`<Cols align="center">\`** is how a short column lines up with a tall one. It is a prop
+  rather than four lines of CSS on a class, which is what it used to be in every deck.
+
+Sizes come from \`--suraido-text\` through \`--suraido-aside-size\` \`--suraido-caption-size\`
+\`--suraido-lead-size\` \`--suraido-stat-size\` \`--suraido-code-size\`, so setting one number in
+\`slides.css\` moves all of them and keeps the ratio they were written with.
+
+A line of code that runs past its block is cut, and nothing on screen says so. Keep code to
+the width, and \`export\` will tell you if the slide as a whole runs past the canvas.
+`,
+  },
+
   export: {
     description: "Turning a built deck into a PDF or images",
     body: `# Export

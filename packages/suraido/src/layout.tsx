@@ -31,14 +31,41 @@ export function Center({ class: cls, children, ...rest }: Box) {
 /**
  * Columns — one per child.
  * Pass grid-template-columns through `ratio` to set the proportions, e.g. "2fr 1fr".
+ * `align` is how the tops of the columns line up: "start" for text next to text, "center"
+ * when one column holds a picture and the other is shorter.
  */
-export function Cols({ ratio, class: cls, children, ...rest }: Box & { ratio?: string }) {
+export function Cols({
+  ratio,
+  align,
+  class: cls,
+  children,
+  ...rest
+}: Box & {
+  ratio?: string;
+  align?: "start" | "center" | "end" | "stretch";
+}) {
+  const style: Record<string, string> = {};
+  if (ratio) Object.assign(style, { gridTemplateColumns: ratio, gridAutoFlow: "row" });
+  if (align) style.alignItems = align;
   return (
     <div
       class={cx("suraido-cols", cls)}
-      style={ratio ? { gridTemplateColumns: ratio, gridAutoFlow: "row" } : undefined}
+      style={Object.keys(style).length ? style : undefined}
       {...rest}
     >
+      {children}
+    </div>
+  );
+}
+
+/**
+ * What is under the heading: takes the rest of the slide and centres it in what is left.
+ * Inside `<Pad>`, after the `<h2>`. Content of different heights then sits at the same place
+ * from slide to slide instead of hanging from the heading.
+ */
+export function Body({ class: cls, children, ...rest }: Box) {
+  return (
+    <div class={cx("suraido-body", cls)} {...rest}>
       {children}
     </div>
   );

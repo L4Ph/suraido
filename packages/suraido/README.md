@@ -8,7 +8,8 @@ Write slides in JSX. No React, no dependencies.
 npm create suraido@latest my-deck
 ```
 
-Zero dependencies; the build comes to 6.4 kB (2.9 kB gzipped).
+Zero dependencies. A two-slide deck builds to 11 kB (4.5 kB gzipped) including the deck, and a
+deck using every block in the catalogue to 17 kB (6.7 kB gzipped).
 
 ## What is in here
 
@@ -18,7 +19,8 @@ Zero dependencies; the build comes to 6.4 kB (2.9 kB gzipped).
 | [src/dom.ts](src/dom.ts)                 | 318   | vnode → DOM, and putting a redraw onto the DOM already there |
 | [src/nav.ts](src/nav.ts)                 | 42    | Moving between slides and steps, and the URL. Pure functions |
 | [src/deck.tsx](src/deck.tsx)             | 493   | `slide()` / `Step` / `Deck` / `deck()`                       |
-| [src/layout.tsx](src/layout.tsx)         | 57    | `Pad` / `Center` / `Cols` / `Full`                           |
+| [src/layout.tsx](src/layout.tsx)         | 84    | `Pad` / `Body` / `Center` / `Cols` / `Full`                  |
+| [src/blocks.tsx](src/blocks.tsx)         | 221   | `Cover` / `Figure` / `Points` / `Code`, and the rest         |
 | [src/themes/](src/themes)                | —     | Six keycap colorways                                         |
 
 ## Build tools
@@ -93,16 +95,37 @@ and lets one move to a file of its own.
 
 ### Built-in components
 
-Only the arrangements you would otherwise rewrite on every deck. Each carries a `suraido.js-`
-class inside an `@layer`, so plain CSS overrides it.
+Two groups. The **arrangements** are the boxes a slide lives in; the **blocks** are the shapes
+found by reading real decks — every one of them was, before this, three lines of markup and
+four lines of CSS repeated under a different class name per deck.
+
+All of them carry a `suraido.js-` class inside an `@layer`, so plain CSS overrides them.
 
 |                |                                                                                                                                                                                            |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `<Pad>`        | The body of a slide: full height, `--suraido-pad` of padding                                                                                                                               |
+| `<Body>`       | What goes under the `<h2>`: takes the rest of the slide and centres itself in it, so slides of different heights line up                                                                   |
 | `<Center>`     | `<Pad>` with its contents centred vertically. For covers and section dividers                                                                                                              |
-| `<Cols>`       | Columns — one per child. `ratio="2fr 1fr"` sets the proportions                                                                                                                            |
+| `<Cols>`       | Columns — one per child. `ratio="2fr 1fr"` sets the proportions, `align="center"` lines a short column up with a tall one                                                                  |
 | `<Full>`       | Full bleed, ignoring the padding. A direct `img` / `video` child covers the slide                                                                                                          |
 | `<Step n={1}>` | Transparent until the step is reached, but holds its space so nothing shifts. It marks the element you wrote rather than adding one, so `<Step n={1}><li>…</li></Step>` is still `ul > li` |
+
+|                                  |                                                                                        |
+| -------------------------------- | -------------------------------------------------------------------------------------- |
+| `<Aside>`                        | The small print — a source, a caveat, what the picture is. Muted and smaller           |
+| `<Figure caption paper fit max>` | A picture or diagram with a caption under it                                           |
+| `<Cover title byline>`           | A title slide: one heading and the lines under it                                      |
+| `<Divider>`                      | The slide that says what the next part is called                                       |
+| `<Points items>`                 | Term over explanation, repeated. A `<dl>`, so a screen reader reads the pair as a pair |
+| `<Side heading>`                 | One column with a heading over it. Two inside `<Cols>` is a comparison                 |
+| `<Stat value label>`             | One number worth reading from the back, and what it counts                             |
+| `<Lead>`                         | The one sentence a summary slide is built around                                       |
+| `<Matrix head rows>`             | Rows and columns. The first cell of a row is a `<th scope="row">`                      |
+| `<Code label size>`              | A block of source, no colour                                                           |
+
+Sizes come off `--suraido-text` through `--suraido-aside-size`, `--suraido-caption-size`,
+`--suraido-lead-size`, `--suraido-stat-size` and `--suraido-code-size`, so one number in
+`slides.css` moves all of them.
 
 Everything else is plain HTML. `<img>`, `<video>`, `<table>` and `<svg>` work as they are, and
 anything under `<svg>` gets the SVG namespace automatically. Headings, body text, lists, quotes

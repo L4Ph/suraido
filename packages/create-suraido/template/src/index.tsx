@@ -1,16 +1,13 @@
-import { Center, deck, Pad, slide, Step } from "suraido.js";
+import { Cover, deck, Pad, slide, Step } from "suraido.js";
 import "suraido.js/deck.css";
 import "suraido.js/themes/olivia.css";
 import "./slides.css";
 
-const Cover = slide({ path: "intro" }, () => (
-  <Center>
-    <h1>Title</h1>
-    <p class="lead">Subtitle</p>
-  </Center>
+const Intro = slide({ path: "intro" }, () => (
+  <Cover title="Title" byline="Subtitle" align="center" />
 ));
 
-const Points = slide(() => (
+const Content = slide({ path: "content" }, () => (
   <Pad>
     <h2>What you want to say</h2>
     <ul>
@@ -25,4 +22,4 @@ const Points = slide(() => (
 ));
 
 // The order here is the order they are shown in.
-deck([Cover, Points]);
+deck([Intro, Content]);

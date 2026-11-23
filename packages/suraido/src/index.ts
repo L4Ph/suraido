@@ -12,5 +12,18 @@ export type {
   SlideComponent,
   SlideInfo,
 } from "./deck.tsx";
-export { Pad, Center, Cols, Full } from "./layout.tsx";
+export { Pad, Center, Cols, Full, Body } from "./layout.tsx";
+export {
+  Aside,
+  Code,
+  Cover,
+  Divider,
+  Figure,
+  Lead,
+  Matrix,
+  Points,
+  Side,
+  Stat,
+} from "./blocks.tsx";
+export type { Point } from "./blocks.tsx";
 export type { Pos, Paths } from "./nav.ts";

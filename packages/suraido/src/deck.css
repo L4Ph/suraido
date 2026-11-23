@@ -3,7 +3,7 @@
  * Layered styles always lose to unlayered ones, so anything here can be overridden
  * with a plain selector — no !important, no specificity games.
  */
-@layer suraido.base, suraido.theme, suraido.type, suraido.layout, suraido.deck;
+@layer suraido.base, suraido.theme, suraido.type, suraido.layout, suraido.blocks, suraido.deck;
 
 @layer suraido.theme {
   :root {
@@ -27,6 +27,19 @@
     --suraido-h2: 60px;
     --suraido-h3: 34px;
     --suraido-text: 32px;
+
+    /*
+     * The blocks are sized off --suraido-text, so a deck that sets one number moves all of
+     * them together and keeps the ratio it was written with.
+     */
+    --suraido-aside-size: calc(var(--suraido-text) * 0.72);
+    --suraido-caption-size: calc(var(--suraido-text) * 0.68);
+    --suraido-cover-h1: calc(var(--suraido-h1) * 0.87);
+    --suraido-lead-size: calc(var(--suraido-text) * 1.3);
+    --suraido-stat-size: calc(var(--suraido-text) * 2);
+    --suraido-code-size: calc(var(--suraido-text) * 0.8);
+    --suraido-figure-max: 680px;
+    --suraido-points-gap: 1.1em;
 
     --suraido-step-fade: 200ms;
     --suraido-slide-fade: 260ms;
@@ -156,6 +169,202 @@
     height: 100%;
     object-fit: cover;
     display: block;
+  }
+
+  /*
+   * Pad becomes a column only when a slide asks for a body, so a deck that never uses one
+   * keeps the block layout it was written against.
+   */
+  .suraido-pad:has(> .suraido-body) {
+    display: flex;
+    flex-direction: column;
+  }
+  .suraido-body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 0;
+  }
+}
+
+@layer suraido.blocks {
+  /* ---- the small print ---- */
+  .suraido-aside {
+    margin: 0.6em 0 0;
+    font-size: var(--suraido-aside-size);
+    line-height: 1.5;
+    color: var(--suraido-muted);
+  }
+
+  /* ---- a picture and what it is ---- */
+  .suraido-figure {
+    margin: 0;
+    width: 100%;
+  }
+  .suraido-figure-media {
+    display: grid;
+    place-items: center;
+  }
+  .suraido-figure-media > :is(img, video, svg) {
+    display: block;
+    max-width: 100%;
+  }
+  .suraido-figure.is-width .suraido-figure-media > :is(img, video) {
+    width: 100%;
+  }
+  .suraido-figure.is-contain .suraido-figure-media {
+    max-height: var(--suraido-figure-max);
+  }
+  .suraido-figure.is-contain .suraido-figure-media > :is(img, video) {
+    width: auto;
+    max-height: var(--suraido-figure-max);
+  }
+  .suraido-figure.is-paper .suraido-figure-media > :is(img, video) {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+  }
+  .suraido-figure.is-center {
+    margin-inline: auto;
+    text-align: center;
+  }
+  .suraido-figure figcaption {
+    margin-top: 16px;
+    font-size: var(--suraido-caption-size);
+    line-height: 1.4;
+    color: var(--suraido-muted);
+  }
+
+  /* ---- cover and divider ---- */
+  .suraido-cover h1 {
+    max-width: 18em;
+    font-size: var(--suraido-cover-h1);
+  }
+  .suraido-cover.is-center,
+  .suraido-divider.is-center {
+    align-items: center;
+    text-align: center;
+  }
+  .suraido-cover.is-center h1,
+  .suraido-divider.is-center h1 {
+    max-width: none;
+  }
+  .suraido-byline {
+    margin: 0.5em 0 0;
+    font-size: var(--suraido-text);
+    color: var(--suraido-muted);
+  }
+  .suraido-divider h1,
+  .suraido-divider h2 {
+    font-size: var(--suraido-cover-h1);
+    line-height: 1.25;
+  }
+
+  /* ---- term and explanation ---- */
+  .suraido-points {
+    margin: 0;
+    padding: 0;
+  }
+  .suraido-point + .suraido-point {
+    margin-top: var(--suraido-points-gap);
+  }
+  .suraido-points dt {
+    font-size: var(--suraido-text);
+    font-weight: 800;
+    line-height: 1.3;
+  }
+  .suraido-points dd {
+    margin: 0.15em 0 0;
+    font-size: var(--suraido-text);
+    line-height: 1.5;
+  }
+
+  /* ---- a column with a heading ---- */
+  .suraido-side > h3 {
+    margin: 0 0 24px;
+    color: var(--suraido-accent);
+  }
+
+  /* ---- one number ---- */
+  .suraido-stat b {
+    display: block;
+    font-size: var(--suraido-stat-size);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--suraido-accent);
+  }
+  .suraido-stat span {
+    display: block;
+    margin-top: 0.35em;
+    font-size: var(--suraido-aside-size);
+    color: var(--suraido-muted);
+  }
+
+  /* ---- the one sentence ---- */
+  .suraido-lead {
+    margin: 0 0 0.8em;
+    font-size: var(--suraido-lead-size);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  /* ---- rows and columns ---- */
+  .suraido-matrix {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: calc(var(--suraido-text) * 0.9);
+    line-height: 1.5;
+  }
+  .suraido-matrix thead th {
+    padding: 0 24px 16px 0;
+    font-size: var(--suraido-aside-size);
+    font-weight: 600;
+    text-align: left;
+    color: var(--suraido-muted);
+  }
+  .suraido-matrix tbody th {
+    width: 22%;
+    padding: 24px 24px 24px 0;
+    border-top: 2px solid var(--suraido-rule);
+    font-weight: 800;
+    text-align: left;
+    vertical-align: top;
+  }
+  .suraido-matrix td {
+    padding: 24px 24px 24px 0;
+    border-top: 2px solid var(--suraido-rule);
+    vertical-align: top;
+  }
+
+  /* ---- source ---- */
+  .suraido-code {
+    margin: 0;
+  }
+  .suraido-code figcaption {
+    margin-bottom: 8px;
+    font-family: var(--suraido-font-mono);
+    font-size: calc(var(--suraido-caption-size) * 0.85);
+    color: var(--suraido-muted);
+  }
+  .suraido-code pre {
+    margin: 0;
+    padding: 1em 1.2em;
+    overflow: hidden;
+    border-radius: 8px;
+    background: color-mix(in oklab, var(--suraido-fg) 5%, transparent);
+  }
+  .suraido-code code {
+    display: block;
+    padding: 0;
+    background: none;
+    font-size: var(--suraido-code-size);
+    line-height: 1.55;
+  }
+  .suraido-code.is-s code {
+    font-size: calc(var(--suraido-code-size) * 0.82);
   }
 }
 

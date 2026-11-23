@@ -74,6 +74,32 @@ const Counter = slide({ path: "count" }, ({ update }) => {
 - **Do not declare how many stops a slide has.** It is counted from the reveals it draws.
   `static steps` is there to override that, which is rarely what you want.
 
+## Shapes that already exist
+
+Arrangement: `<Pad>` `<Body>` `<Center>` `<Cols>` `<Full>`. `<Body>` is what goes under the
+`<h2>` — it takes the rest of the slide and centres itself in it. `<Cols align="center">` is how
+a short column lines up with a tall one.
+
+Blocks, one per shape a deck keeps writing:
+
+|                                  |                                                          |
+| -------------------------------- | -------------------------------------------------------- |
+| `<Aside>`                        | The small print: a source, a caveat, what the picture is |
+| `<Figure caption paper fit max>` | A picture or diagram with a caption under it             |
+| `<Cover title byline>`           | A title slide: one heading and the lines under it        |
+| `<Divider>`                      | The slide that says what the next part is called         |
+| `<Points items>`                 | Term over explanation, repeated                          |
+| `<Side heading>`                 | One column with a heading over it                        |
+| `<Stat value label>`             | One number, and what it counts                           |
+| `<Lead>`                         | The one sentence a summary slide is built around         |
+| `<Matrix head rows>`             | Rows and columns, first cell of a row is its name        |
+| `<Code label size>`              | A block of source                                        |
+
+**Reach for these before writing a class.** If you are about to write a muted `<p>` for a
+source, a `<figure>` with a `figcaption`, a `<li><b>` list, two columns with headings over
+them, a big number, or a `<pre>`, the block exists and the stylesheet in this project should
+not have to grow.
+
 ## When something is wrong
 
 Nothing is written to your console: the deck ships no diagnostics. Most of what used to be
@@ -157,6 +183,11 @@ Colors and sizes come from CSS variables. Reach for those before writing a selec
   --suraido-h1: 92px;
   --suraido-h2: 60px;
   --suraido-text: 32px;
+  --suraido-aside-size: calc(var(--suraido-text) * 0.72);
+  --suraido-caption-size: calc(var(--suraido-text) * 0.68);
+  --suraido-lead-size: calc(var(--suraido-text) * 1.3);
+  --suraido-stat-size: calc(var(--suraido-text) * 2);
+  --suraido-code-size: calc(var(--suraido-text) * 0.8);
   --suraido-slide-fade: 260ms; /* how long a slide takes to come in */
 }
 ```

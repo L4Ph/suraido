@@ -1,7 +1,8 @@
 /*
  * Every suraido.js style lives inside an @layer, so a plain selector here always wins.
  * For colors and sizes, override the --suraido-* variables instead — they reach everything.
+ *
+ * Arrangement (<Pad> <Body> <Center> <Cols> <Full>) and the blocks (<Cover> <Figure>
+ * <Points> <Code>, and the rest) already exist, so this file is for what is specific to
+ * this deck. Run `npx @suraido/cli docs blocks` for the list.
  */
-.lead {
-  color: var(--suraido-muted);
-}

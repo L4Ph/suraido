@@ -1,15 +1,12 @@
 /*
- * Arrangement is left to the built-in <Pad> <Center> <Cols> <Full>.
- * Only this deck's own decoration lives here.
+ * Everything that is arrangement or a shape lives in `suraido.js`: <Pad> <Body> <Center>
+ * <Cols> <Full> <Cover> <Divider> <Figure> <Points> <Side> <Stat> <Lead> <Matrix> <Code>.
+ * Only this deck's own decoration belongs here.
  */
 .eyebrow {
   font-size: 24px;
   letter-spacing: 0.18em;
   color: var(--suraido-accent);
-}
-.lead {
-  font-size: 34px;
-  color: var(--suraido-muted);
 }
 
 /* Section divider: flip the ground */

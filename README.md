@@ -55,20 +55,20 @@ does — the deck that comes out is one you can read.
 
 ## Packages
 
-|                                           |                                                                           |
-| ----------------------------------------- | ------------------------------------------------------------------------- |
-| [suraido.js](packages/suraido)            | The framework. JSX runtime, `slide()` / `Step` / `deck()`, layout, themes |
-| [create-suraido](packages/create-suraido) | `npm create suraido`                                                      |
-| [@suraido/cli](packages/cli)              | `suraido export` — a deck as a PDF, or as images                          |
+|                                           |                                                                                   |
+| ----------------------------------------- | --------------------------------------------------------------------------------- |
+| [suraido.js](packages/suraido)            | The framework. JSX runtime, `slide()` / `Step` / `deck()`, layout, blocks, themes |
+| [create-suraido](packages/create-suraido) | `npm create suraido`                                                              |
+| [@suraido/cli](packages/cli)              | `suraido export` — a deck as a PDF, or as images                                  |
 
 ## Examples
 
-|                                     |                                                                                        |
-| ----------------------------------- | -------------------------------------------------------------------------------------- |
-| [basic](examples/basic)             | The smallest deck: a cover, staged reveals, state on a class                           |
-| [layouts](examples/layouts)         | Cover, section divider, two columns, full bleed, quote, figures. **Made to be copied** |
-| [themes](examples/themes)           | The same deck under six themes                                                         |
-| [interactive](examples/interactive) | A live tally, an animation, a text field. The things a Markdown deck cannot do         |
+|                                     |                                                                                                |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------- |
+| [basic](examples/basic)             | The smallest deck: a cover, staged reveals, state on a class                                   |
+| [layouts](examples/layouts)         | Every built-in shape once: cover, divider, body, columns, figures, points, stats, matrix, code |
+| [themes](examples/themes)           | The same deck under six themes                                                                 |
+| [interactive](examples/interactive) | A live tally, an animation, a text field. The things a Markdown deck cannot do                 |
 
 ## Development
 
