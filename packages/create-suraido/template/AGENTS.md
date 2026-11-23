@@ -198,6 +198,14 @@ the `.step` fade covers that.
 To change the whole palette at once, swap the `import "suraido.js/themes/<name>.css"` line
 (`olivia`, `noel`, `nine009`, `botanical`, `dolch`, `laser`).
 
+**Say which font you are in by loading it.** `await font("ibm-plex-sans-jp")` before
+`deck([...])` loads any Fontsource font by its id and sets `--suraido-font`. A `--suraido-font`
+with no `@font-face` behind it is a deck that looks right on the machine it was written on and
+wrong on the one it is presented from: text takes its width from the font, the canvas is fixed
+at 1920x1080, and what no longer fits is clipped with nothing on screen to say so.
+`npx @suraido/cli docs fonts` has the rest, including self-hosting for a room whose network is
+a guess.
+
 **Styles that belong to one slide can live in that slide, in a `<style>` element.** Only one
 slide is mounted at a time, so the styles leave with it.
 

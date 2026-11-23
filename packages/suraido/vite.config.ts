@@ -22,5 +22,12 @@ export default defineConfig({
     clearMocks: false,
     include: ["src/**/*.test.ts"],
     environment: "happy-dom",
+    environmentOptions: {
+      // A font's <link> is not fetched for real, so the suite runs without a network, and a
+      // disabled load counts as a load so the code path under test is the ordinary one.
+      happyDOM: {
+        settings: { disableCSSFileLoading: true, handleDisabledFileLoadingAsSuccess: true },
+      },
+    },
   },
 });

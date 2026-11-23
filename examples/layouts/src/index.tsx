@@ -8,6 +8,7 @@ import {
   deck,
   Divider,
   Figure,
+  font,
   Full,
   Lead,
   Matrix,
@@ -21,6 +22,8 @@ import {
 import "suraido.js/deck.css";
 import "suraido.js/themes/nine009.css";
 import "./slides.css";
+
+await font("ibm-plex-sans-jp");
 
 /**
  * A deck is a list of slides, so they can be written straight into it. Naming them first —

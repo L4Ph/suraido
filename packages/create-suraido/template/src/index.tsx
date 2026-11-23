@@ -1,7 +1,10 @@
-import { Cover, deck, Pad, slide, Step } from "suraido.js";
+import { Cover, deck, font, Pad, slide, Step } from "suraido.js";
 import "suraido.js/deck.css";
 import "suraido.js/themes/olivia.css";
 import "./slides.css";
+
+// The font the deck is in, by its Fontsource id. Awaited so the cover is drawn in it.
+await font("ibm-plex-sans-jp");
 
 const Intro = slide({ path: "intro" }, () => (
   <Cover title="Title" byline="Subtitle" align="center" />

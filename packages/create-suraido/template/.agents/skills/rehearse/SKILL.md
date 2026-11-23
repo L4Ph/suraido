@@ -43,12 +43,22 @@ const s = document.querySelector(".stage");
   brokenImages: [...s.querySelectorAll("img")]
     .filter((i) => i.naturalWidth === 0)
     .map((i) => i.getAttribute("src")),
+  // A family named in --suraido-font that nothing loaded. The slide was measured in a font
+  // the room does not have, so every width on it is wrong.
+  missingFonts: [...document.fonts].map((f) => f.family),
+  fontLoaded: document.fonts.check(`32px ${getComputedStyle(s).fontFamily.split(",")[0]}`),
 });
 ```
 
 Watch for a slide whose content runs past the 1920x1080 canvas. Nothing on screen shows
 it — the stage is scaled down, so the overflow is simply cut off. Compare what you can read
 against the source.
+
+`fontLoaded: false` means `--suraido-font` names a family with no `@font-face` behind it, or
+one the network never delivered. Either way the numbers above were measured in a different
+font from the one the deck asked for, which makes them worth nothing. Fix that before
+measuring anything else: `await font("<fontsource-id>")` before `deck([...])`, or the
+Fontsource package that carries the family the deck names.
 
 Also weigh body text against its background: below 4.5:1 will not carry to the back of
 a room, however good it looks on a laptop.

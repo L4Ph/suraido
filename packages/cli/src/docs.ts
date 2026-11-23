@@ -116,6 +116,48 @@ the width, and \`export\` will tell you if the slide as a whole runs past the ca
 `,
   },
 
+  fonts: {
+    description: "Loading the font a deck is in, by its Fontsource id",
+    body: `# Fonts
+
+    import { deck, font } from "suraido.js";
+
+    await font("ibm-plex-sans-jp");
+    deck([...]);
+
+Any [Fontsource](https://fontsource.org) id works — \`noto-sans-jp\`, \`inter\`, \`roboto-flex\`.
+The id is the last part of fontsource.org/fonts/<id>.
+
+**Naming a font is not loading it.** A deck that sets \`--suraido-font\` with no \`@font-face\`
+behind it renders in whatever the machine happens to have. Text takes its width from the font,
+the canvas is a fixed 1920x1080, and what no longer fits is clipped — silently. The deck looks
+right where it was written and different on the machine it is presented from.
+
+\`font()\` asks the Fontsource API what the family is called and which release the files belong
+to, puts their stylesheet on the page for each weight, and sets the token. Two requests, both
+pinned to a version, no dependency.
+
+- \`await\` it before \`deck([...])\` and the first slide is drawn in the right font. Without the
+  await the deck opens in the fallback and moves over a moment later.
+- \`font("ibm-plex-mono", { token: "--suraido-font-mono" })\` for the code font.
+- \`{ weights: [400] }\` to load less. A variable font is one file for every weight, so it is
+  ignored there.
+- An id Fontsource does not have, or a network that is not there, is a warning in the console
+  and a deck that still opens — in the fallback font. The rehearsal skill checks for that
+  before you get on stage.
+
+## No network in the room
+
+The CDN is a convenience. For a talk, self-host:
+
+    npm i @fontsource/ibm-plex-sans-jp
+    import "@fontsource/ibm-plex-sans-jp/japanese.css";
+    import "@fontsource/ibm-plex-sans-jp/latin.css";
+
+Then keep \`--suraido-font\` in your \`slides.css\`. Same font, no request.
+`,
+  },
+
   export: {
     description: "Turning a built deck into a PDF or images",
     body: `# Export

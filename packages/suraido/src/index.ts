@@ -1,4 +1,6 @@
 export { flushSync, render } from "./dom.ts";
+export { font } from "./font.ts";
+export type { FontOptions } from "./font.ts";
 export type { VNode, Child } from "./dom.ts";
 export { Deck, deck, slide, Step } from "./deck.tsx";
 export type {

@@ -8,8 +8,8 @@ Write slides in JSX. No React, no dependencies.
 npm create suraido@latest my-deck
 ```
 
-Zero dependencies. A two-slide deck builds to 11 kB (4.5 kB gzipped) including the deck, and a
-deck using every block in the catalogue to 17 kB (6.7 kB gzipped).
+Zero dependencies. A two-slide deck builds to 12 kB (5.0 kB gzipped) including the deck, and a
+deck using every block in the catalogue to 18 kB (7.4 kB gzipped).
 
 ## What is in here
 
@@ -21,6 +21,7 @@ deck using every block in the catalogue to 17 kB (6.7 kB gzipped).
 | [src/deck.tsx](src/deck.tsx)             | 493   | `slide()` / `Step` / `Deck` / `deck()`                       |
 | [src/layout.tsx](src/layout.tsx)         | 84    | `Pad` / `Body` / `Center` / `Cols` / `Full`                  |
 | [src/blocks.tsx](src/blocks.tsx)         | 221   | `Cover` / `Figure` / `Points` / `Code`, and the rest         |
+| [src/font.ts](src/font.ts)               | 130   | `font()` — a font, by its Fontsource id                      |
 | [src/themes/](src/themes)                | —     | Six keycap colorways                                         |
 
 ## Build tools
@@ -157,6 +158,31 @@ at 4.5:1, headings and shapes at 3:1. A new theme has to clear the same bar, bec
 that looks lovely on a laptop can be unreadable from the back of a room.
 
 For your own theme, write the same tokens. Put them on `:root` and they beat suraido.js's layer.
+
+### Fonts
+
+Naming a font is not loading it. A deck whose `--suraido-font` has no `@font-face` behind it
+renders in whatever the machine happens to have — and since text takes its width from the font
+while the canvas stays 1920x1080, what no longer fits is clipped with nothing on screen to say
+so. It looks right where it was written and different where it is presented.
+
+`font()` loads any [Fontsource](https://fontsource.org) font by its id and sets the token:
+
+```ts
+import { deck, font, slide } from "suraido.js";
+
+await font("ibm-plex-sans-jp"); // or "noto-sans-jp", "inter", "roboto-flex"…
+deck([...]);
+```
+
+Two requests: the Fontsource API, which says what the family is called and which release the
+files belong to, and their CDN stylesheet for each weight. Both are pinned to a version. A
+variable font is one stylesheet for every weight. No dependency, and the deck is in the fallback
+font rather than broken if either is unreachable — the rehearsal skill checks for exactly that.
+
+`font("ibm-plex-mono", { token: "--suraido-font-mono" })` when it is the code font you mean.
+For a room whose network is a guess, self-host instead: `npm i @fontsource/ibm-plex-sans-jp`,
+import `japanese.css` and `latin.css`, and keep `--suraido-font` in your own `slides.css`.
 
 ## Where suraido.js stops and you start
 
