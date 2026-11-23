@@ -38,6 +38,11 @@
     "./deck.css": "./dist/deck.css",
     "./themes/*.css": "./dist/themes/*.css"
   },
+  "scripts": {
+    "build": "vp pack",
+    "test": "vp test",
+    "prepack": "npm run build"
+  },
   "devDependencies": {
     "happy-dom": "^20.0.0"
   }

@@ -29,6 +29,11 @@
   "publishConfig": {
     "access": "public"
   },
+  "scripts": {
+    "build": "vp pack",
+    "test": "vp test",
+    "prepack": "npm run build"
+  },
   "dependencies": {
     "@puppeteer/browsers": "^2.4.0",
     "pdf-lib": "^1.17.1",
