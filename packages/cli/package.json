@@ -30,9 +30,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "vp pack",
-    "test": "vp test",
-    "prepack": "npm run build"
+    "prepack": "vp pack"
   },
   "dependencies": {
     "@puppeteer/browsers": "^2.4.0",

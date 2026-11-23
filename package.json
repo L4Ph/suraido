@@ -11,7 +11,7 @@
   "type": "module",
   "scripts": {
     "dev": "npm run dev -w example-basic",
-    "build": "npm run build -w suraido.js",
+    "build": "vp -C packages/suraido pack",
     "test": "vp test",
     "prepare": "vp config"
   },
