@@ -55,3 +55,44 @@ test("an out-of-range step is rounded, and the URL is normalised", async () => {
   expect(shown).toEqual([true, true]);
   expect(hash).toBe("#points.2");
 });
+
+test("transition: false skips document.startViewTransition and swaps immediately", async () => {
+  location.hash = "#a";
+  vi.resetModules();
+
+  const { slide, deck } = await import("./deck.tsx");
+  const { jsx } = await import("./jsx-runtime.ts");
+
+  const startViewTransition = vi.fn((cb: () => void) => {
+    cb();
+    return {
+      ready: Promise.resolve(),
+      finished: Promise.resolve(),
+      updateCallbackDone: Promise.resolve(),
+      skipTransition() {},
+    };
+  });
+  Object.defineProperty(document, "startViewTransition", {
+    value: startViewTransition,
+    configurable: true,
+    writable: true,
+  });
+
+  const root = document.createElement("div");
+  root.id = "root";
+  document.body.appendChild(root);
+
+  try {
+    const A = slide({ path: "a" }, () => jsx("p", { children: "A" }));
+    const B = slide({ path: "b" }, () => jsx("p", { children: "B" }));
+    const ctx = deck([A, B], { transition: false });
+    await new Promise((r) => setTimeout(r, 0));
+
+    ctx.go("b");
+    expect(startViewTransition).not.toHaveBeenCalled();
+    expect(root.textContent).toContain("B");
+  } finally {
+    root.remove();
+    Reflect.deleteProperty(document, "startViewTransition");
+  }
+});
