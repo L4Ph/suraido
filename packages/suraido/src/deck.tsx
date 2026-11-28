@@ -273,7 +273,13 @@ function SlideAt({ slide: S, step }: { slide: SlideComponent; step: number }) {
   return <S />;
 }
 
-type DeckProps = { slides: SlideComponent[]; width?: number; height?: number };
+type DeckProps = {
+  slides: SlideComponent[];
+  width?: number;
+  height?: number;
+  /** Skip document.startViewTransition() and swap slides immediately. */
+  transition?: boolean;
+};
 
 export class Deck extends Component<DeckProps, { i: number; over: boolean }> {
   paths: Paths = this.props.slides.map((s) => s.path);
@@ -353,7 +359,7 @@ export class Deck extends Component<DeckProps, { i: number; over: boolean }> {
       swap();
     };
 
-    if (!document.startViewTransition) return once();
+    if (this.props.transition === false || !document.startViewTransition) return once();
     const shift = document.startViewTransition(once);
     // Nothing waits on these, and "Uncaught (in promise)" is not a diagnosis.
     shift.ready.catch(() => {});
